@@ -1,5 +1,6 @@
 import * as jwt from 'jsonwebtoken';
 import express = require('express');
+import http = require('http');
 import { ApolloServer } from 'apollo-server-express';
 import { makeExecutableSchema } from 'graphql-tools';
 import ExecutableSchema from './src/schema';
@@ -52,6 +53,7 @@ if (cluster.isMaster) {
     },
   });
 
+  const PORT = config.server.port;
   const app = express();
 
   const session = require('express-session');
@@ -64,9 +66,12 @@ if (cluster.isMaster) {
   }));
   server.applyMiddleware({app});
 
-  app.listen({port: config.server.port}, () => {
-    console.log(`${process.pid} Server ready at http://localhost:${config.server.port}${server.graphqlPath}`);
-    console.log(`${process.pid} Subscriptions ready at ws://localhost:${config.server.port}${server.subscriptionsPath}`);
+  const httpServer = http.createServer(app);
+  server.installSubscriptionHandlers(httpServer);
+
+  httpServer.listen(PORT, () => {
+    console.log(`${process.pid} Server ready at http://localhost:${PORT}${server.graphqlPath}`);
+    console.log(`${process.pid} Subscriptions ready at ws://localhost:${PORT}${server.subscriptionsPath}`);
   });
 
 }
