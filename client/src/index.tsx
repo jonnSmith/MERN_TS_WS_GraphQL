@@ -1,19 +1,23 @@
 import * as React from "react";
-import {render} from "react-dom";
+import { render } from "react-dom";
 import { ApolloProvider } from 'react-apollo';
 import { ApolloClient } from 'apollo-client';
-import { OperationDefinitionNode } from 'graphql';
 import { getMainDefinition } from 'apollo-utilities';
 import { ApolloLink, split } from 'apollo-link';
 import { HttpLink } from 'apollo-link-http';
 import { WebSocketLink } from 'apollo-link-ws';
-import { onError } from 'apollo-link-error';
+import { ErrorResponse, onError } from 'apollo-link-error';
 import { InMemoryCache } from 'apollo-cache-inmemory';
 
 import App from "./components/App";
-import { signOut } from './components/SignOut';
+import {signOut} from './components/SignOut';
 
-import config from './../../configs/server/config';
+import config from './../../configs/config.app';
+
+interface Definition {
+  kind: string;
+  operation?: string;
+}
 
 const httpLink = new HttpLink({
   uri: `http://localhost:${config.server.port}/graphql`,
@@ -27,8 +31,8 @@ const wsLink = new WebSocketLink({
 });
 
 const terminatingLink = split(
-  ({ query }) => {
-    const { kind, operation }: OperationDefinitionNode = getMainDefinition(query);
+  ({query}) => {
+    const {kind, operation}: Definition = getMainDefinition(query);
     return (
       kind === 'OperationDefinition' && operation === 'subscription'
     );
@@ -38,22 +42,22 @@ const terminatingLink = split(
 );
 
 const authLink = new ApolloLink((operation, forward) => {
-  operation.setContext(({ headers = {} }) => {
+  operation.setContext(({headers = {}}) => {
     const token = localStorage.getItem('token');
 
     if (token) {
-      headers = { ...headers, 'x-token': token };
+      headers = {...headers, 'x-token': token};
     }
 
-    return { headers };
+    return {headers};
   });
 
   return forward(operation);
 });
 
-const errorLink = onError(({ graphQLErrors, networkError }) => {
+const errorLink = onError(({graphQLErrors, networkError}: ErrorResponse) => {
   if (graphQLErrors) {
-    graphQLErrors.forEach(({ message, locations, path }) => {
+    graphQLErrors.forEach(({message, locations, path}) => {
       console.log('GraphQL error', message);
 
       if (message === 'UNAUTHENTICATED') {
@@ -62,9 +66,11 @@ const errorLink = onError(({ graphQLErrors, networkError }) => {
     });
   }
 
-  if (networkError ) {
+  if (networkError) {
     console.log('Network error', networkError);
-    if (networkError.statusCode === 401) {
+    if (networkError &&
+      'statusCode' in networkError &&
+      networkError.statusCode === 401) {
       signOut(client);
     }
   }
@@ -83,7 +89,7 @@ const rootEl = document.getElementById("root");
 
 render(
   <ApolloProvider client={client}>
-    <App />
+    <App/>
   </ApolloProvider>,
   rootEl,
 );

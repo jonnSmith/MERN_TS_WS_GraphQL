@@ -5,7 +5,7 @@ import { ApolloServer } from 'apollo-server-express';
 import { makeExecutableSchema } from 'graphql-tools';
 import ExecutableSchema from './src/schema';
 import User from './src/common/user/user.model';
-import config from './../configs/server/config';
+import config from './../configs/config.app';
 
 const schema = makeExecutableSchema(ExecutableSchema);
 

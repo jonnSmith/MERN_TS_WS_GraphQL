@@ -1,15 +1,12 @@
 module.exports = {
   preset: "ts-jest",
-  testPathIgnorePatterns: [
-    "/node_modules/",
-    "/client/"
-  ],
   coverageReporters: [
     "lcov",
     "html"
   ],
+  rootDir: "../../server",
   testEnvironment: "node",
   setupFilesAfterEnv: [
-    "./jest.setup.js"
+    "../configs/server/jest.setup.js"
   ]
 };

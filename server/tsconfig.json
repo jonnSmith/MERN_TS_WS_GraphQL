@@ -3,13 +3,12 @@
     "allowSyntheticDefaultImports": true,
     "target": "es5",
     "module": "commonjs",
-    "lib": ["es2015"],
+    "lib": ["es5","es6","dom"],
     "sourceMap": true,
-    "outDir": "./build/dist",
+    "outDir": "../build",
     "strict": true,
     "noImplicitAny": false,
-    "moduleResolution": "node",
-    "esModuleInterop": true
+    "moduleResolution": "node"
   },
   "include": [
     "./**/*.ts"

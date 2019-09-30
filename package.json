@@ -5,22 +5,24 @@
   "description": "",
   "author": "jonnSmith",
   "scripts": {
-    "server-start": "ts-node server/index.ts",
+    "server-dev": "ts-node server/server.ts",
     "server-test": "node_modules/.bin/jest --config=configs/server/jest.config.js",
-    "client-start": "webpack-dev-server --config=configs/client/webpack/dev.js",
-    "client-test": "node_modules/.bin/jest --config=configs/client/jest.json"
+    "server-build": "tsc -p server/tsconfig.json",
+    "server-prod": "node build/server/server.js",
+    "client-dev": "webpack-dev-server --config=configs/client/webpack/dev.js",
+    "client-test": "node_modules/.bin/jest --config=configs/client/jest.json",
+    "client-build": "webpack -p --config=configs/client/webpack/prod.js",
+    "client-prod": "node build/server/client.js",
+    "clean": "rimraf build/*",
+    "clean-server": "rimraf build/server/*",
+    "clean-client": "rimraf build/client/*"
   },
   "scripts-all": {
-    "server-start": "node server/build/index.js",
     "server-start:debug": "node --inspect=5858 -r ts-node/register server/index.ts",
-    "server-compile": "rm -rf server/build/* && tsc",
     "server-normalize": "npm run format && npm run lint",
     "server-format": "prettier --write --loglevel=warn 'server/**/*.ts'",
     "server-lint": "tslint server/**/*.ts",
-    "build": "yarn run clean-dist && webpack -p --config=configs/webpack/prod.js",
-    "clean-dist": "rimraf dist/*",
-    "lint": "tslint './server/**/*.ts*' --format stylish --project . --force",
-    "start-prod": "yarn run build && node express.js"
+    "lint": "tslint './server/**/*.ts*' --format stylish --project . --force"
   },
   "dependencies": {
     "@types/bcryptjs": "^2.4.1",
