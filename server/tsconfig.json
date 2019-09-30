@@ -1,0 +1,21 @@
+{
+  "compilerOptions": {
+    "allowSyntheticDefaultImports": true,
+    "target": "es5",
+    "module": "commonjs",
+    "lib": ["es2015"],
+    "sourceMap": true,
+    "outDir": "./build/dist",
+    "strict": true,
+    "noImplicitAny": false,
+    "moduleResolution": "node",
+    "esModuleInterop": true
+  },
+  "include": [
+    "./**/*.ts"
+  ],
+  "exclude": [
+    "./src/**/*.spec.ts",
+    "./**/*.json"
+  ]
+}
