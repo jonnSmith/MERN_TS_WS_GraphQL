@@ -1,21 +1,27 @@
 import * as React from "react";
-import { hot } from "react-hot-loader";
+import { Router, Route } from 'react-router-dom';
+import SignInPage from './Authtorization/SignIn';
+import ChatRoom from './ChatRoom';
+import withSession from './Helpers/Session/withSession';
+import { ROUTES } from '../constants/routes';
+import history from '../constants/history';
 
-const reactLogo = require("./../assets/img/react_logo.svg");
-import "./../assets/scss/App.scss";
+const App = ({ session, refetch }) => (
+  <Router history={history}>
+    <div>
+      <hr />
+      <Route
+        exact
+        path={ROUTES.CHAT_ROOM}
+        component={() => <ChatRoom/>}
+      />
+      <Route
+        exact
+        path={ROUTES.SIGN_IN}
+        component={() => <SignInPage refetch={refetch} />}
+      />
+    </div>
+  </Router>
+);
 
-class App extends React.Component<{}, undefined> {
-    public render() {
-        return (
-            <div className="app">
-                <h1>Hello World!</h1>
-                <p>Foo to the barz</p>
-                <img src={reactLogo} height="480"/>
-            </div>
-        );
-    }
-}
-
-declare let module: object;
-
-export default hot(module)(App);
+export default withSession(App);

@@ -44,8 +44,8 @@ if (cluster.isMaster) {
       return error;
     },
     async context({req}) {
-      const token = req && req.headers && req.headers.authorization;
-      if (token) {
+      const token = req && req.headers && req.headers[config.token.header];
+      if (token && typeof token === 'string') {
         const data: any = jwt.verify(token, config.token.secret);
         const user = data.id ? await User.findById(data.id) : null;
         return {user};

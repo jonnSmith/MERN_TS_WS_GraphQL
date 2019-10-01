@@ -3,11 +3,12 @@ import { merge } from 'lodash';
 
 import { userResolvers, userTypeDefs } from './common/user/user.schema';
 import { workspaceResolvers, workspaceTypeDefs } from './common/workspace/workspace.schema';
+import { messageResolvers, messageTypeDefs } from './common/message/message.schema';
 import { rootTypeDefs } from './common/root';
 
 const ExecutableSchema: IExecutableSchemaDefinition = {
-  typeDefs: [rootTypeDefs, userTypeDefs, workspaceTypeDefs],
-  resolvers: merge(userResolvers, workspaceResolvers),
+  typeDefs: [rootTypeDefs, userTypeDefs, workspaceTypeDefs, messageTypeDefs],
+  resolvers: merge(userResolvers, workspaceResolvers, messageResolvers),
 };
 
 export default ExecutableSchema;

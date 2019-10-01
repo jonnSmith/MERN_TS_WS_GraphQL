@@ -42,8 +42,8 @@ export const messageResolvers = {
       return messages.map(message => message.toObject());
     },
     async message(_, { id }) {
-      const user: any = await User.findById(id);
-      return user.toObject();
+      const message: any = await Message.findById(id);
+      return message.toObject();
     },
   },
   Mutation: {

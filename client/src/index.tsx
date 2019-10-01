@@ -10,7 +10,7 @@ import { ErrorResponse, onError } from 'apollo-link-error';
 import { InMemoryCache } from 'apollo-cache-inmemory';
 
 import App from "./components/App";
-import {signOut} from './components/SignOut';
+import { signOut } from './components/Authtorization/SignOut';
 
 import config from './../../configs/config.app';
 
@@ -43,10 +43,10 @@ const terminatingLink = split(
 
 const authLink = new ApolloLink((operation, forward) => {
   operation.setContext(({headers = {}}) => {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem(config.token.storage);
 
     if (token) {
-      headers = {...headers, 'x-token': token};
+      headers = {...headers, [config.token.header]: token};
     }
 
     return {headers};

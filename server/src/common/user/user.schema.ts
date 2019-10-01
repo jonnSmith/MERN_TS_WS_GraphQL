@@ -22,6 +22,7 @@ export const userTypeDefs = `
   extend type Query {
     users(filter: UserFilterInput): [User]
     user(id: String!): User
+    currentUser: User
   }
 
   input UserInput {
@@ -50,6 +51,11 @@ export const userResolvers = {
     async user(_, { id }) {
       const user: any = await User.findById(id);
       return user.toObject();
+    },
+    async currentUser(_, {}, { user }) {
+      if (!user || !user.id) { return {}; }
+      const currentUser: any = await User.findById(user.id);
+      return currentUser.toObject();
     },
   },
   Mutation: {

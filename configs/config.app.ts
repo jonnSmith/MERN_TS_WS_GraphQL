@@ -13,6 +13,8 @@ export default {
     uri: 'mongodb://localhost/neurochat',
   },
   token: {
+    header: 'x-token',
+    storage: 'token',
     secret: 'neurochat!secret',
   },
 };
