@@ -1,4 +1,5 @@
 import * as React from "react";
+import { Card, CardTitle, TextField, CardActions, Button } from 'react-md';
 import { withRouter }  from 'react-router-dom';
 import { Mutation } from 'react-apollo';
 import { ROUTES } from '../../constants/routes';
@@ -16,12 +17,14 @@ interface SignInFormState {
   password: string;
 }
 
-const className = "sign-in";
+import "./../../assets/scss/SignIn.scss";
 
 const SignInPage = ({ history, refetch }) => (
-  <div className={className}>
-    <h1>SignIn</h1>
-    <SignInForm history={history} refetch={refetch} />
+  <div className="md-block-centered sign-in">
+    <Card>
+      <CardTitle title="SignIn" />
+      <SignInForm history={history} refetch={refetch} />
+    </Card>
   </div>
 );
 
@@ -36,9 +39,8 @@ class SignInForm extends React.Component<SignInProps, SignInFormState> {
     this.setState({...INITIAL_STATE});
   }
 
-  onChange = event => {
-    const { name, value } = event.target;
-    switch(name) {
+  onChange = (value, event) => {
+    switch(event.target.id) {
       case 'email': {
         this.setState({ email: value });
         break;
@@ -66,24 +68,35 @@ class SignInForm extends React.Component<SignInProps, SignInFormState> {
     return (
       <Mutation mutation={SIGN_IN} variables={{ email, password }}>
         {(signIn, { data, loading, error }) => (
-          <form onSubmit={event => this.onSubmit(event, signIn)}>
-            <input
+          <form className="md-grid text-fields__application" onSubmit={event => this.onSubmit(event, signIn)}>
+            <TextField
+              id="email"
               name="email"
               value={email}
               onChange={this.onChange}
               type="text"
-              placeholder="Email or Username"
+              label="Email or Username"
+              className="md-cell md-cell--12"
             />
-            <input
+            <TextField
+              id="password"
               name="password"
               value={password}
               onChange={this.onChange}
               type="password"
-              placeholder="Password"
+              label="Password"
+              className="md-cell md-cell--12"
             />
-            <button disabled={isInvalid || loading} type="submit">
-              Sign In
-            </button>
+            <CardActions className="md-cell md-cell--12">
+              <Button
+                raised
+                primary
+                className="md-cell--right"
+                disabled={isInvalid || loading}
+                type="submit">
+                Sign In
+              </Button>
+            </CardActions>
             {error}
             {/*{error && <ErrorMessage error={error} />}*/}
           </form>

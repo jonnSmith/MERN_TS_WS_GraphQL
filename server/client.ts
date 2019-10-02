@@ -13,7 +13,7 @@ app.get('/*', function(req, res) {
       res.status(500).send(err)
     }
   })
-})
+});
 
 app.listen(portNumber, () => {
   console.log(`Cleint web server started: http://localhost:${portNumber}`);

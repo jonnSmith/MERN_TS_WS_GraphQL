@@ -6,10 +6,11 @@ import withSession from './Helpers/Session/withSession';
 import { ROUTES } from '../constants/routes';
 import history from '../constants/history';
 
+import "./../assets/scss/App.scss";
+
 const App = ({ session, refetch }) => (
   <Router history={history}>
-    <div>
-      <hr />
+    <div className="md-grid app">
       <Route
         exact
         path={ROUTES.CHAT_ROOM}

@@ -57,10 +57,12 @@
     "react-apollo": "^2.2.4",
     "react-dom": "^16.9.0",
     "react-hot-loader": "^4.12.13",
+    "react-md": "^1.12.3",
     "react-router-dom": "^4.3.1",
     "react-scripts": "^3.1.2",
     "subscriptions-transport-ws": "^0.9.15",
-    "typescript": "^3.6.3"
+    "typescript": "^3.6.3",
+    "webfontloader": "^1.6.28"
   },
   "devDependencies": {
     "@babel/cli": "^7.6.0",
@@ -68,6 +70,7 @@
     "@babel/preset-env": "^7.6.0",
     "@babel/preset-react": "^7.0.0",
     "@types/jest": "^24.0.18",
+    "@types/webfontloader": "^1.6.29",
     "awesome-typescript-loader": "^5.2.1",
     "babel-loader": "^8.0.6",
     "css-loader": "^3.2.0",

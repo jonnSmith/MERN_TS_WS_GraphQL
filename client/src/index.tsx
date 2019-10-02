@@ -1,4 +1,5 @@
 import * as React from "react";
+import * as WebFontLoader from 'webfontloader';
 import { render } from "react-dom";
 import { ApolloProvider } from 'react-apollo';
 import { ApolloClient } from 'apollo-client';
@@ -13,6 +14,15 @@ import App from "./components/App";
 import { signOut } from './components/Authtorization/SignOut';
 
 import config from './../../configs/config.app';
+
+import "./assets/scss/index.scss";
+
+WebFontLoader.load({
+  google: {
+    families: ['Roboto:300,400,500,700', 'Material Icons'],
+  },
+});
+
 
 interface Definition {
   kind: string;
