@@ -1,9 +1,8 @@
 import * as React from "react";
-import { Cell, Card, CardTitle, TextField, CardActions, Button } from 'react-md';
-import withAuthorization from './Helpers/Session/withAuthorization';
-import SignOutButton from './Authtorization/SignOut';
+import { Cell, Card, CardTitle, CardActions } from 'react-md';
+import withAuthorization from '../Helpers/Session/withAuthorization';
 
-import "./../assets/scss/ChatRoom.scss";
+import "../../assets/scss/ChatRoom.scss";
 const className = "chat-room";
 
 const ChatRoom = ({ session }) => (
@@ -11,7 +10,7 @@ const ChatRoom = ({ session }) => (
     <Card>
       {session && session.currentUser && <CardTitle title={session.currentUser.firstName + ' (' + session.currentUser.email + ')'} />}
       <CardActions>
-        <SignOutButton/>
+
       </CardActions>
     </Card>
   </Cell>

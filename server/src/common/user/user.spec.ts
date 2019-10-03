@@ -45,15 +45,28 @@ describe('Test user queries, mutations and subscriptions', () => {
       tester.test(true, mutation, userFixture);
 
     });
-    test("Should be a valid login mutation", () => {
+    test("Should be a valid sign in mutation", () => {
       const mutation = `
-         mutation LoginUser($email: String!, $password: String!) {
-           loginUser(email: $email, password: $password)
+         mutation SignInUser($email: String!, $password: String!) {
+           signInUser(email: $email, password: $password)
          }
       `;
       tester.test(true, mutation, {
         email: userFixture.user.email,
         password: userFixture.user.password
+      });
+    });
+    test("Should be a sign up mutation", () => {
+      const mutation = `
+         mutation SignUpUser($email: String!, $password: String!, $firstName: String!, $lastName: String) {
+           signUpUser(email: $email, password: $password, firstName: $firstName, lastName: $lastName)
+         }
+      `;
+      tester.test(true, mutation, {
+        email: userFixture.user.email,
+        password: userFixture.user.password,
+        firstName: userFixture.user.firstName,
+        lastName: userFixture.user.lastName,
       });
     });
   });

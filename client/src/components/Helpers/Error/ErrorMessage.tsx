@@ -1,16 +1,18 @@
 import * as React from 'react';
-import {hot} from "react-hot-loader";
-import "./../../../assets/scss/ErrorMessage.scss";
+import { GraphQLError } from 'graphql';
+import { FontIcon, List, ListItem } from 'react-md';
+import "../../../assets/scss/ErrorMessage.scss";
 
-interface ErrorProps {
-  error: {
-    message: string;
-    type?: string;
-  }
+type ErrorProps = {
+  error: GraphQLError
 }
 
-const ErrorMessage: React.FC<ErrorProps> = ({ error }) => <div className={error.type}><small>{ error.message }</small></div>;
 
-declare let module: object;
-export default hot(module)(ErrorMessage);
-export { ErrorProps };
+const errorIcon = <FontIcon key="error_outline">error_outline</FontIcon>;
+
+const ErrorMessage: React.FC<ErrorProps> = ({error}) => <ListItem leftIcon={errorIcon} primaryText={error.extensions.code} secondaryText= {error.message} />;
+
+const ErrorMessages = ({errors}) => <List>{errors.filter(e => e).map( (error, i) => <ErrorMessage error={error} key={i} /> )}</List>;
+
+export default ErrorMessage;
+export { ErrorMessages };

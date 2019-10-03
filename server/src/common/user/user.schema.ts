@@ -37,7 +37,8 @@ export const userTypeDefs = `
     addUser(input: UserInput!): User
     editUser(id: String!, input: UserInput!): User
     deleteUser(id: String!): User
-    loginUser(email: String!, password: String!): String!
+    signInUser(email: String!, password: String!): String!
+    signUpUser(email: String!, password: String!, firstName: String!, lastName: String): String!
   }
 
 `;
@@ -53,7 +54,7 @@ export const userResolvers = {
       return user.toObject();
     },
     async currentUser(_, {}, { user }) {
-      if (!user || !user.id) { return {}; }
+      if (!user || !user.id) { return null; }
       const currentUser: any = await User.findById(user.id);
       return currentUser.toObject();
     },
@@ -71,7 +72,11 @@ export const userResolvers = {
       const user: any = await User.findByIdAndRemove(id);
       return user ? user.toObject() : null;
     },
-    async loginUser(_, { email, password }) {
+    async signUpUser(_, { email, password, firstName, lastName}) {
+      const user: any = await User.create({email, password, firstName, lastName});
+      return jwt.sign({ id: user.id }, config.token.secret);
+    },
+    async signInUser(_, { email, password,  }) {
       const user: any = await User.findOne({ email });
       const match: boolean = await user.comparePassword(password);
       if (match) {

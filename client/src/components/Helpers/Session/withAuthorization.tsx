@@ -10,7 +10,6 @@ const withAuthorization = conditionFn => Component => props => (
       if (networkStatus < 7) {
         return null;
       }
-
       return conditionFn(data) ? (
         <Component {...props} session={data} refetch={refetch} />
       ) : (

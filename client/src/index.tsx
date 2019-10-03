@@ -1,6 +1,7 @@
 import * as React from "react";
 import * as WebFontLoader from 'webfontloader';
 import { render } from "react-dom";
+import { BrowserRouter as Router } from 'react-router-dom';
 import { ApolloProvider } from 'react-apollo';
 import { ApolloClient } from 'apollo-client';
 import { getMainDefinition } from 'apollo-utilities';
@@ -54,14 +55,11 @@ const terminatingLink = split(
 const authLink = new ApolloLink((operation, forward) => {
   operation.setContext(({headers = {}}) => {
     const token = localStorage.getItem(config.token.storage);
-
     if (token) {
       headers = {...headers, [config.token.header]: token};
     }
-
     return {headers};
   });
-
   return forward(operation);
 });
 
@@ -69,13 +67,11 @@ const errorLink = onError(({graphQLErrors, networkError}: ErrorResponse) => {
   if (graphQLErrors) {
     graphQLErrors.forEach(({message, locations, path}) => {
       console.log('GraphQL error', message);
-
       if (message === 'UNAUTHENTICATED') {
         signOut(client);
       }
     });
   }
-
   if (networkError) {
     console.log('Network error', networkError);
     if (networkError &&
@@ -87,9 +83,7 @@ const errorLink = onError(({graphQLErrors, networkError}: ErrorResponse) => {
 });
 
 const link = ApolloLink.from([authLink, errorLink, terminatingLink]);
-
 const cache = new InMemoryCache();
-
 const client = new ApolloClient({
   link,
   cache,
@@ -99,7 +93,7 @@ const rootEl = document.getElementById("root");
 
 render(
   <ApolloProvider client={client}>
-    <App/>
+    <Router><App/></Router>
   </ApolloProvider>,
   rootEl,
 );

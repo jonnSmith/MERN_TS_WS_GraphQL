@@ -1,15 +1,16 @@
 import * as React from "react";
 import { Card, CardTitle, TextField, CardActions, Button } from 'react-md';
-import { withRouter }  from 'react-router-dom';
+import { withRouter, Redirect }  from 'react-router-dom';
 import { Mutation } from 'react-apollo';
 import { ROUTES } from '../../constants/routes';
-import ErrorMessage from '../Helpers/Error/ErrorMessage';
-import {SIGN_IN} from '../../queries/user';
+import { SIGN_IN } from '../../queries/user';
+import { ErrorMessages } from '../Helpers/Error/ErrorMessage';
 import config from './../../../../configs/config.app';
 
 interface SignInProps {
   history: any,
-  refetch: any
+  refetch: any,
+  session: any
 }
 
 interface SignInFormState {
@@ -19,14 +20,14 @@ interface SignInFormState {
 
 import "./../../assets/scss/SignIn.scss";
 
-const SignInPage = ({ history, refetch }) => (
-  <div className="md-block-centered sign-in">
+const SignInPage = ({ history, refetch, session }) => {
+  return (<div className="md-block-centered sign-in">
     <Card>
       <CardTitle title="SignIn" />
-      <SignInForm history={history} refetch={refetch} />
+      <SignInForm history={history} refetch={refetch} session={session}/>
     </Card>
-  </div>
-);
+  </div>)
+};
 
 
 const INITIAL_STATE = {
@@ -36,10 +37,14 @@ const INITIAL_STATE = {
 
 class SignInForm extends React.Component<SignInProps, SignInFormState> {
   componentWillMount() {
+    if (this.props.session && this.props.session.currentUser) {
+      this.props.history.push(ROUTES.CHAT_ROOM);
+    }
     this.setState({...INITIAL_STATE});
   }
 
   onChange = (value, event) => {
+    if (!event) { return; }
     switch(event.target.id) {
       case 'email': {
         this.setState({ email: value });
@@ -55,12 +60,18 @@ class SignInForm extends React.Component<SignInProps, SignInFormState> {
   onSubmit = (event, signIn) => {
     signIn().then(async ({ data }) => {
       this.setState({ ...INITIAL_STATE });
-      localStorage.setItem(config.token.storage, data.loginUser);
+      localStorage.setItem(config.token.storage, data.token);
       await this.props.refetch();
       this.props.history.push(ROUTES.CHAT_ROOM);
     });
     event.preventDefault();
   };
+
+  componentWillUnmount() {
+    this.setState = (state,callback) => {
+      return;
+    }
+  }
 
   public render() {
     const { email, password } = this.state;
@@ -87,6 +98,9 @@ class SignInForm extends React.Component<SignInProps, SignInFormState> {
               label="Password"
               className="md-cell md-cell--12"
             />
+            <div  className="md-cell md-cell--12">
+              {error && error.graphQLErrors && error.graphQLErrors.length && <ErrorMessages errors={error.graphQLErrors}/>}
+            </div>
             <CardActions className="md-cell md-cell--12">
               <Button
                 raised
@@ -97,8 +111,6 @@ class SignInForm extends React.Component<SignInProps, SignInFormState> {
                 Sign In
               </Button>
             </CardActions>
-            {error}
-            {/*{error && <ErrorMessage error={error} />}*/}
           </form>
         )}
       </Mutation>

@@ -3,6 +3,10 @@
  * so that it reduces friction.
  */
 export default {
+  app: {
+    name: "NeuroChat 0.0.1",
+    sidebar: "Navigation"
+  },
   server: {
     port: 3000,
   },
