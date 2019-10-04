@@ -1,19 +1,20 @@
 import * as React from "react";
 import { Cell, Card, CardTitle, CardActions } from 'react-md';
 import withAuthorization from '../Helpers/Session/withAuthorization';
+import MessageCreate from '../Messages/MessageCreate'
 
 import "../../assets/scss/ChatRoom.scss";
-const className = "chat-room";
+const className = "chat-room md-grid";
 
 const ChatRoom = ({ session }) => (
-  <Cell size={12} offset={0} className={className}>
-    <Card>
+  <div className={className}>
+    <Card className="md-cell md-cell--12">
       {session && session.currentUser && <CardTitle title={session.currentUser.firstName + ' (' + session.currentUser.email + ')'} />}
-      <CardActions>
-
-      </CardActions>
     </Card>
-  </Cell>
+    <Card className="md-cell md-cell--12">
+      <MessageCreate session={session}/>
+    </Card>
+  </div>
 );
 
 export default withAuthorization(
