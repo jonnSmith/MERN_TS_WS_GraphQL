@@ -8,7 +8,7 @@ const messageSchema = new mongoose.Schema(
   {
     userId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'User', // this must match the name we assigned to the workspace model
+      ref: 'User',
     },
     text: {
       type: String,
