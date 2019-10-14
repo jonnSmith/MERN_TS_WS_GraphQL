@@ -1,17 +1,15 @@
 import Sequelize from 'sequelize';
 import { combineResolvers } from 'graphql-resolvers';
+import { ForbiddenError } from 'apollo-server';
 
 import pubsub, { EVENTS } from '../../helpers/subscription';
 import { isAuthenticated, isMessageOwner } from '../../helpers/authorization';
 
-const toCursorHash = string => Buffer.from(string).toString('base64');
-
-const fromCursorHash = string =>
-  Buffer.from(string, 'base64').toString('ascii');
-
 import User from '../user/user.model';
 import Workspace from '../workspace/workspace.model';
 import Message from './message.model';
+
+const DEFAULT_FILTER = { skip: 0, limit: 100, order: 'asc'};
 
 export const messageTypeDefs = `
 
@@ -24,64 +22,59 @@ export const messageTypeDefs = `
     workspace: Workspace
     createdAt: String!
   }
-
+  
   input MessageFilterInput {
     skip: Int
     limit: Int
-  }
-  
-  type Subscription {
-    messageAdded(repoFullName: String!): Message
+    order: String
   }
 
   extend type Query {
-    messages(skip: Int, limit: Int): MessageConnection!
+    stream(filter: MessageFilterInput): MessageConnection!
     message(id: ID!): Message!
   }
 
   extend type Mutation {
-    createMessage(text: String!): Message!
-    deleteMessage(id: ID!): Boolean!
+    createMessage(text: String!, filter: MessageFilterInput): Message
+    deleteMessage(id: ID!, filter: MessageFilterInput): Message
   }
   
   type MessageConnection {
-    edges: [Message!]!
-    pageInfo: PageInfo!
+    messages: [Message]
   }
   
-  type PageInfo {
-    hasNextPage: Boolean!
-    endCursor: String!
+  extend type Subscription {
+    messageUpdated: MessageUpdated
+    messageCreated: MessageCreated
+    messageDeleted: MessageDeleted
   }
   
-   extend type Subscription {
-    messageCreated: MessageCreated!
+  type MessageUpdated {
+    messages: [Message]
   }
   
   type MessageCreated {
-    message: Message!
+    message: Message
+  }
+  
+  type MessageDeleted {
+    message: Message
   }
 
 `;
 
 export const messageResolvers = {
   Query: {
-    messages: async (parent, { skip, limit = 100 }, { _ }) => {
-      const messages: any[] = await Message.find({}, null, {
-        order: [['createdAt', 'DESC']],
-        limit: limit,
-        skip
+    stream: async (parent, { filter = DEFAULT_FILTER }, { _ }) => {
+      let messages: any[] = await Message.find({}, null, {
+        skip: filter.skip,
+        limit: filter.limit,
+        sort:{
+          createdAt: filter.order
+        }
       });
-      const hasNextPage = messages.length > limit;
-      const edges = hasNextPage ? messages.slice(0, -1) : messages;
-
-      return {
-        edges,
-        pageInfo: {
-          hasNextPage,
-          endCursor: messages.length,
-        },
-      };
+      messages = messages.map(m => m.toObject());
+      return { messages };
     },
     async message(_, { id }) {
       const message: any = await Message.findById(id);
@@ -91,14 +84,29 @@ export const messageResolvers = {
 
   Mutation: {
     createMessage: combineResolvers(
-      isAuthenticated,
-      async (parent, { text }, { me }) => {
-        const message: any = await Message.create({
+        isAuthenticated,
+      async (parent, { text, filter = DEFAULT_FILTER }, { user }) => {
+        let message: any = await Message.create({
           text: text,
-          userId: me.id
+          userId: user.id,
+          workspaceId: user.workspaceId
         });
-        pubsub.publish(EVENTS.MESSAGE.CREATED, {
-          messageCreated: { message },
+        if(!message) {
+          throw new ForbiddenError('Message forbidden to create.');
+        }
+        pubsub.publish(EVENTS.MESSAGE.CREATED, { messageCreated: { message }, });
+        const messages: any[] = await Message.find({}, null, {
+          skip: filter.skip,
+          limit: filter.limit,
+          sort:{
+            createdAt: filter.order
+          }
+        });
+        if(!messages) {
+          throw new ForbiddenError('Message forbidden to query.');
+        }
+        pubsub.publish(EVENTS.MESSAGE.UPDATED, {
+          messageUpdated: { messages },
         });
         return message.toObject();
       },
@@ -106,9 +114,26 @@ export const messageResolvers = {
     deleteMessage: combineResolvers(
       isAuthenticated,
       isMessageOwner,
-      async (parent, { id }, { _ }) => {
+      async (parent, { id, filter = DEFAULT_FILTER }, { _ }) => {
         const message: any = await Message.findByIdAndRemove(id);
-        return message ? message.toObject() : null;
+        if(!message) {
+          throw new ForbiddenError('Message forbidden to delete.');
+        }
+        pubsub.publish(EVENTS.MESSAGE.DELETED, { messageDeleted: { message }, });
+        const messages: any[] = await Message.find({}, null, {
+          skip: filter.skip,
+          limit: filter.limit,
+          sort:{
+            createdAt: filter.order
+          }
+        });
+        if(!messages) {
+          throw new ForbiddenError('Message forbidden to query.');
+        }
+        pubsub.publish(EVENTS.MESSAGE.UPDATED, {
+          messageUpdated: { messages },
+        });
+        return message.toObject();
       },
     ),
   },
@@ -131,6 +156,12 @@ export const messageResolvers = {
   Subscription: {
     messageCreated: {
       subscribe: () => pubsub.asyncIterator(EVENTS.MESSAGE.CREATED),
+    },
+    messageDeleted: {
+      subscribe: () => pubsub.asyncIterator(EVENTS.MESSAGE.DELETED),
+    },
+    messageUpdated: {
+      subscribe: () => pubsub.asyncIterator(EVENTS.MESSAGE.UPDATED),
     },
   },
 };

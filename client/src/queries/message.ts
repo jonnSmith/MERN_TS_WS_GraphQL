@@ -1,8 +1,8 @@
 import gql from 'graphql-tag';
 
 export const CREATE_MESSAGE = gql`
-  mutation CreateMessage($text: String!) {
-    message: createMessage(text: $text) {
+  mutation CreateMessage($text: String!, $filter: MessageFilterInput) {
+    message: createMessage(text: $text, filter: $filter) {
       id
       text
       createdAt
@@ -23,55 +23,67 @@ export const MESSAGE_CREATED = gql`
         createdAt
         user {
           id
-          username
+          email
         }
-      }
-    }
-  }
-`;
-
-export const GET_PAGINATED_MESSAGES_WITH_USERS = gql`
-  query($cursor: String, $limit: Int!) {
-    messages(cursor: $cursor, limit: $limit)
-      @connection(key: "MessagesConnection") {
-      edges {
-        id
-        text
-        createdAt
-        user {
-          id
-          username
-        }
-      }
-      pageInfo {
-        hasNextPage
-        endCursor
-      }
-    }
-  }
-`;
-
-export const GET_ALL_MESSAGES_WITH_USERS = gql`
-  query {
-    messages(order: "DESC") @connection(key: "MessagesConnection") {
-      edges {
-        id
-        text
-        createdAt
-        user {
-          id
-          username
-        }
-      }
-      pageInfo {
-        hasNextPage
       }
     }
   }
 `;
 
 export const DELETE_MESSAGE = gql`
-  mutation($id: ID!) {
-    deleteMessage(id: $id)
+  mutation($id: ID!, $filter: MessageFilterInput) {
+    deleteMessage(id: $id, filter: $filter) {
+      id
+    }
+  }
+`;
+
+export const MESSAGE_DELETED = gql`
+  subscription {
+    messageDeleted {
+      message {
+        id
+      }
+    }
+  }
+`;
+
+export const GET_PAGINATED_MESSAGES = gql`
+  query($filter: MessageFilterInput) {
+    stream(filter: $filter) {
+      messages {
+        id
+        text
+        createdAt
+        user {
+          id
+          email
+        }
+      }
+    }
+  }
+`;
+
+export const MESSAGE_UPDATED = gql`
+  subscription {
+    messageUpdated {
+      messages {
+        id
+        text
+        createdAt
+        user {
+          id
+          email
+        }
+      }
+    }
+  }
+`;
+
+export const GET_MESSAGES_COUNT = gql`
+  query {
+    messagesCount {
+      count
+    }
   }
 `;

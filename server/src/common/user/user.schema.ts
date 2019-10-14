@@ -1,6 +1,10 @@
 import * as jwt from 'jsonwebtoken';
 import Workspace from '../workspace/workspace.model';
+import Sequelize from 'sequelize';
+import { ForbiddenError } from 'apollo-server';
+import { combineResolvers } from 'graphql-resolvers';
 import User from './user.model';
+import { isAuthenticated, isMessageOwner } from '../../helpers/authorization';
 import config from '../../../../configs/config.app';
 
 export const userTypeDefs = `
@@ -82,7 +86,7 @@ export const userResolvers = {
       if (match) {
         return jwt.sign({ id: user.id }, config.token.secret);
       }
-      throw new Error('Not Authorised.');
+      throw new ForbiddenError('Not Authorised.');
     },
   },
   User: {

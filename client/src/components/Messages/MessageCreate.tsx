@@ -10,6 +10,7 @@ interface CreateMessageState {
 
 interface CreateMessageProps {
   session: any,
+  filter: any
 }
 
 const INITIAL_STATE = {
@@ -35,7 +36,6 @@ class MessageCreate extends React.Component<CreateMessageProps, CreateMessageSta
   onSubmit = (event, createMessage) => {
     createMessage().then(async ({ data }) => {
       this.setState({...INITIAL_STATE});
-      console.debug('data', data);
     });
     event.preventDefault();
   };
@@ -48,9 +48,10 @@ class MessageCreate extends React.Component<CreateMessageProps, CreateMessageSta
 
   public render() {
     const { text } = this.state;
+    const { filter } = this.props;
     const isInvalid = text === '' ;
     return (
-      <Mutation mutation={CREATE_MESSAGE} variables={{ text }}>
+      <Mutation mutation={CREATE_MESSAGE} variables={{ text, filter }}>
         {(createMessage, { data, loading, error }) => (
           <form className="md-grid text-fields__application" onSubmit={event => this.onSubmit(event, createMessage)}>
             <TextField

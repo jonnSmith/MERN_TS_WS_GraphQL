@@ -17,7 +17,8 @@ const messageFixture = {
 const filterFixture = {
   filter: {
     limit: 10,
-    skip: 0
+    skip: 0,
+    order: "asc"
   }
 };
 
@@ -51,14 +52,16 @@ describe('Test message queries, mutations and subscriptions', () => {
   describe("Message Queries",  () => {
     test("Should be a valid messages query", () => {
       const query = `
-        query getMessages($filter: MessageFilterInput) {
-          messages(filter: $filter) {
-            id
-            text
-            createdAt
-            user {
+        query getMessages($skip: Int, $limit: Int, $order: String) {
+          stream($skip: Int, $limit: Int, $order: String) {
+            messages: {
               id
-              email
+              text
+              createdAt
+              user {
+                id
+                email
+              }
             }
           }
         }
