@@ -80,10 +80,10 @@ export const MESSAGE_UPDATED = gql`
   }
 `;
 
-export const GET_MESSAGES_COUNT = gql`
+export const MESSAGES_COUNT = gql`
   query {
-    messagesCount {
-      count
+    count {
+      total
     }
   }
 `;

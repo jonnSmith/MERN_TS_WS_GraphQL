@@ -1,4 +1,3 @@
-import Sequelize from 'sequelize';
 import { combineResolvers } from 'graphql-resolvers';
 import { ForbiddenError } from 'apollo-server';
 
@@ -31,6 +30,7 @@ export const messageTypeDefs = `
 
   extend type Query {
     stream(filter: MessageFilterInput): MessageConnection!
+    count: MessagesCount
     message(id: ID!): Message!
   }
 
@@ -41,6 +41,10 @@ export const messageTypeDefs = `
   
   type MessageConnection {
     messages: [Message]
+  }
+  
+  type MessagesCount {
+    total: Int
   }
   
   extend type Subscription {
@@ -76,10 +80,20 @@ export const messageResolvers = {
       messages = messages.map(m => m.toObject());
       return { messages };
     },
-    async message(_, { id }) {
-      const message: any = await Message.findById(id);
-      return message.toObject();
-    },
+    message: combineResolvers(
+      isAuthenticated,
+      async (_, { id }) => {
+        const message: any = await Message.findById(id);
+        return message.toObject();
+      },
+    ),
+    count: combineResolvers(
+      isAuthenticated,
+      async (_, {  }) => {
+        const total: number = await Message.countDocuments({});
+        return { total };
+      },
+    ),
   },
 
   Mutation: {

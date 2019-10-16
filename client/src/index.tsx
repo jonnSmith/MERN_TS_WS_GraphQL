@@ -11,6 +11,10 @@ import { WebSocketLink } from 'apollo-link-ws';
 import { ErrorResponse, onError } from 'apollo-link-error';
 import { InMemoryCache } from 'apollo-cache-inmemory';
 
+import { Provider } from 'react-redux';
+import { Store } from 'redux';
+import configureStore, { IAppState } from './store/Store';
+
 import App from "./components/App";
 import { signOut } from './components/Authtorization/SignOut';
 
@@ -28,6 +32,10 @@ WebFontLoader.load({
 interface Definition {
   kind: string;
   operation?: string;
+}
+
+interface IProps {
+  store: Store<IAppState>;
 }
 
 const httpLink = new HttpLink({
@@ -89,11 +97,21 @@ const client = new ApolloClient({
   cache,
 });
 
+
+const Root: React.SFC<IProps> = props => {
+  return (
+    <ApolloProvider client={client}>
+      <Provider store={props.store}>
+        <Router><App /></Router>
+      </Provider>
+    </ApolloProvider>
+  );
+};
+
+const store = configureStore();
 const rootEl = document.getElementById("root");
 
 render(
-  <ApolloProvider client={client}>
-    <Router><App/></Router>
-  </ApolloProvider>,
+  <Root store={store} />,
   rootEl,
 );
