@@ -25,6 +25,7 @@
     "lint": "tslint './server/**/*.ts*' --format stylish --project . --force"
   },
   "dependencies": {
+    "@apollo/react-hooks": "^3.1.4",
     "@types/bcryptjs": "^2.4.1",
     "@types/express": "^4.17.1",
     "@types/jsonwebtoken": "^7.2.8",

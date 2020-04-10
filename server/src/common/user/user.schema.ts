@@ -1,6 +1,6 @@
 import * as jwt from 'jsonwebtoken';
 import Workspace from '../workspace/workspace.model';
-import Sequelize from 'sequelize';
+import { Sequelize } from 'sequelize';
 import { ForbiddenError } from 'apollo-server';
 import { combineResolvers } from 'graphql-resolvers';
 import User from './user.model';
