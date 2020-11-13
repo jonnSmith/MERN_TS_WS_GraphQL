@@ -1,5 +1,6 @@
 import { useQuery } from "@apollo/react-hooks";
 import * as React from "react";
+import { NavigationInterface } from "./components/navigation/drawer";
 import { GET_ME } from "./gql/queries/user";
 
 const App = () => {
@@ -8,7 +9,7 @@ const App = () => {
     if (loading) { return <p>Still loading..</p>; }
     if (error) { return <p>There is an error!</p>; }
 
-    return <p>Loaded {JSON.stringify(data)}</p>;
+    return <NavigationInterface />;
 };
 
 export { App };

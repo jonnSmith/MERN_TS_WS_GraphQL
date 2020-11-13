@@ -6,6 +6,7 @@ import {ErrorResponse, onError} from "apollo-link-error";
 import {HttpLink} from "apollo-link-http";
 import {WebSocketLink} from "apollo-link-ws";
 import {getMainDefinition} from "apollo-utilities";
+import {History} from "history";
 import config from "../../../../configs/config.app";
 import {signOut} from "../../misc/helpers/sign-out";
 import {IApolloClientOptions, IDefinition} from "./types";
@@ -18,7 +19,14 @@ class ApolloConnection {
         return ApolloConnection.Client;
     }
 
+    public static get history() {
+        // tslint:disable-next-line:no-unused-expression
+        if (!ApolloConnection.History) { new ApolloConnection(); }
+        return ApolloConnection.History;
+    }
+
     private static Client: ApolloClient<any>;
+    private static History: History;
 
     private static CreateApolloCache = (): ApolloCache<any> => {
        return new InMemoryCache();
@@ -76,14 +84,14 @@ class ApolloConnection {
         return onError(({graphQLErrors, networkError}: ErrorResponse) => {
             if (graphQLErrors) {
                 graphQLErrors.forEach(({message, locations, path}) => {
-                    console.log("GraphQL error", message);
+                    // console.log("GraphQL error", message);
                     if (message === "UNAUTHENTICATED") {
                         signOut(ApolloConnection.client);
                     }
                 });
             }
             if (networkError) {
-                console.log("Network error", networkError);
+                // console.log("Network error", networkError);
                 if (
                     networkError &&
                     "statusCode" in networkError &&
@@ -99,6 +107,7 @@ class ApolloConnection {
         const cache = ApolloConnection.CreateApolloCache();
         const link = ApolloConnection.CreateApolloLink();
         ApolloConnection.Client = ApolloConnection.Client || ApolloConnection.CreateClient({cache, link});
+        ApolloConnection.History = ApolloConnection.History || require("history").createBrowserHistory();
     }
 
 }

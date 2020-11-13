@@ -1,11 +1,11 @@
 import config from "../../../../../configs/config.app";
+import { ApolloConnection } from "../../../gql/client";
 import { ROUTES } from "../../enums/routes";
-import { createHistory } from "../history";
 
 const signOut = (client) => {
   localStorage.removeItem(config.token.storage);
   client.resetStore();
-  createHistory.push(ROUTES.SignIn);
+  ApolloConnection.history.push(ROUTES.SignIn);
 };
 
 export { signOut };

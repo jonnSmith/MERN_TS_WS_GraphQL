@@ -1,8 +1,9 @@
 const enum ROUTES {
   ChatRoom = "/chat",
   SignUp = "/register",
-  SignIn = "/",
+  SignIn = "/login",
   Account = "/account",
+  HomePage = "/"
 }
 
 export { ROUTES };
