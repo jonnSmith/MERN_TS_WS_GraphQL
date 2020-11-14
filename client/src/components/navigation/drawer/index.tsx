@@ -3,29 +3,34 @@ import NavigationDrawer from "react-md/lib/NavigationDrawers";
 import { Route, Router, Switch } from "react-router-dom";
 import config from "../../../../../configs/config.app";
 import { NavigationData } from "../../../misc/constants/navigation";
-import { ROUTES } from "../../../misc/enums/routes";
 import { NavigationLink } from "../link";
+
+class NavigationElements {
+    private constructor() {
+
+    }
+}
 
 const NavigationItems = () => {
     const Navigations: Array<React.ReactElement<any>> = [];
     const Routers: Array<React.ReactElement<any>> = [];
     NavigationData.forEach((props) => {
         Navigations.push(
-            (<NavigationLink {...props} key={props.to} />)
+            <NavigationLink {...props} key={props.to} />
         );
+        const RouteComponent = React.lazy(() => import(`../../../pages/${props.filename}`));
         Routers.push(
             (<Route
                 exact={props.exact || false}
                 path={props.to}
                 key={props.filename}
-                component={ React.lazy(() => import(`../../../pages/${props.filename}`)) }
+                render={ () => <RouteComponent /> }
             />));
        });
     return { Navigations, Routers };
 };
 
 const NavigationInterface = () => {
-    // @ts-ignore
     const { Navigations, Routers } = NavigationItems();
     return <NavigationDrawer
         drawerTitle={config.app.sidebar}

@@ -1,6 +1,6 @@
 import * as React from "react";
 
-const Account = () => {
+const Account: React.FC = () => {
     return <p>Account</p>;
 };
 

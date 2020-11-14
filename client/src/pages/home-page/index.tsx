@@ -1,7 +1,6 @@
 import * as React from "react";
-import Account from "../account";
 
-const HomePage = () => {
+const HomePage: React.FC = () => {
     return <p>Home</p>;
 };
 

@@ -1,7 +1,6 @@
 import * as React from "react";
-import Account from "../account";
 
-const ChatRoom = () => {
+const ChatRoom: React.FC = () => {
     return <p>Chat Room</p>;
 };
 
