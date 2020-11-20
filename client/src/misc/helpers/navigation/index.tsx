@@ -1,6 +1,8 @@
 import * as React from "react";
+import {ReactElement} from "react";
 import {Route} from "react-router-dom";
 import { NavigationData } from "../../constants/navigation";
+import {ACTIONS} from "../../constants/store";
 import { ROUTES } from "../../enums/routes";
 
 class Navigation {
@@ -29,13 +31,17 @@ class Navigation {
             Navigation.NavigationLinks.length ?
             Navigation.NavigationLinks : [...NavigationData].map( (props) => {
                 const NavigationLink = React.lazy(() => import("../../../components/navigation/link") );
-                return (<NavigationLink {...props} key={props.id} />);
+                const NavigationAction = React.lazy(() => import("../../../components/navigation/action") );
+                let link: ReactElement = null;
+                if (ROUTES[props.id]) { link = (<NavigationLink {...props} key={props.id} />); }
+                if (ACTIONS[props.id]) { link = (<NavigationAction {...props} key={props.id} />); }
+                return link;
             }
         );
 
         Navigation.NavigationRoutes =
             Navigation.NavigationRoutes.length ?
-            Navigation.NavigationRoutes : [...NavigationData].map( (props) => {
+            Navigation.NavigationRoutes : [...NavigationData].filter((n) => ROUTES[n.id]).map( (props) => {
                 const RouteComponent = React.lazy(() => import(`../../../pages/${props.id}/`));
                 return (<Route
                     exact={props.exact || false}

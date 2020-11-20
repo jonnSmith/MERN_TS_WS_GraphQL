@@ -1,16 +1,15 @@
 import * as React from "react";
 import { FontIcon, ListItem } from "react-md";
-import { Link as RouterLink } from "react-router-dom";
-import { ROUTES } from "../../../misc/enums/routes";
+import { useDispatch } from "react-redux";
+import { ACTIONS } from "../../../misc/constants/store";
 
 const NavigationAction = (props) => {
-    const { label, exact, icon, id, payload } = props;
-    const action = ROUTES[id];
+    const { label, icon, id, payload } = props;
+    const type = ACTIONS[id];
+    const dispatch = useDispatch();
     return (
         <ListItem
-            component={RouterLink}
-            exact={`${exact}`}
-            onClick={() => {  }}
+            onClick={() => { dispatch({type, payload}); }}
             primaryText={label}
             leftIcon={icon ? (<FontIcon>{icon}</FontIcon>) : null}
         />

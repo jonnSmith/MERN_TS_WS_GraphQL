@@ -7,7 +7,7 @@ import { Navigation } from "../../../misc/helpers/navigation";
 import { StateReturnTypes } from "../../../store/reducers/types";
 
 const NavigationInterface = () => {
-    const user = useSelector((state: StateReturnTypes) => state.UserReducer);
+    const {user} = useSelector((state: StateReturnTypes) => state.UserReducer);
     return <NavigationDrawer
         drawerTitle={config.app.sidebar}
         toolbarTitle={config.app.name}

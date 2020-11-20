@@ -13,10 +13,13 @@ function* userStatusChanged() {
 function* updateUser(action) {
     const path = ApolloConnection.history?.location?.pathname;
     const auth = NavigationPathsSecurity[path];
-    const userToken = action?.payload?.token || "";
-    localStorage.setItem(config.token.storage, userToken);
-    if (userToken && !auth) { ApolloConnection.history.push(ROUTES.Account); }
-    if (!userToken && auth) { ApolloConnection.history.push(ROUTES.SignIn); }
+    const {user} = action?.payload;
+    localStorage.setItem(config.token.storage, user?.token || "");
+    if (action.type === ACTIONS.USER_LOGOUT) {
+        ApolloConnection.client.clearStore();
+    }
+    if (user?.token && !auth) { ApolloConnection.history.replace(ROUTES.Account); }
+    if (!user?.token && auth) { ApolloConnection.history.replace(ROUTES.SignIn); }
     yield put(userUpdated(action.payload));
 }
 

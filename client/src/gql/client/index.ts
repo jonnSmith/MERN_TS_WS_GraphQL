@@ -11,6 +11,7 @@ import config from "../../../../configs/config.app";
 import {ACTIONS} from "../../misc/constants/store";
 import { store } from "../../store";
 import {IApolloClientOptions, IDefinition} from "./types";
+import {UserInitState} from "../../store/reducers/constants";
 
 class ApolloConnection {
 
@@ -88,7 +89,7 @@ class ApolloConnection {
                     console.log("GraphQL error", message);
                     switch (extensions?.code) {
                         case "UNAUTHENTICATED": {
-                            store.dispatch({type: ACTIONS.USER_LOGOUT, payload: null});
+                            store.dispatch({type: ACTIONS.USER_LOGOUT, payload: UserInitState});
                             break;
                         }
                         case "BAD_USER_INPUT": {
@@ -103,15 +104,8 @@ class ApolloConnection {
                 });
             }
             if (networkError) {
-                // console.log("Network error", networkError);
-                if (
-                    networkError &&
-                    "statusCode" in networkError &&
-                    networkError.statusCode === 401
-                ) {
-                    // signOut(ApolloConnection.client);
-                    // console.debug('AUTH ERROR');
-                }
+                if (!graphQLErrors.length) { console.error(networkError.message); }
+                return null;
             }
         });
     }

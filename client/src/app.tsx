@@ -2,6 +2,7 @@ import { useQuery } from "@apollo/react-hooks";
 import * as React from "react";
 import { useDispatch } from "react-redux";
 import { NavigationInterface } from "./components/navigation/drawer";
+import { ApolloConnection } from "./gql/client";
 import { GET_ME } from "./gql/queries/user";
 import {ACTIONS} from "./misc/constants/store";
 
@@ -11,9 +12,15 @@ const App = () => {
 
     React.useEffect( () => {
         if (data && typeof data?.user !== "undefined") {
-            dispatch({type: data.user ? ACTIONS.USER_LOGIN : ACTIONS.USER_LOGOUT, payload: data.user});
+            dispatch({type: data.user ? ACTIONS.USER_LOGIN : ACTIONS.USER_LOGOUT, payload: data});
         }
     }, [data]);
+
+    React.useEffect(() => {
+        if (ApolloConnection.history.action === "PUSH") {
+            refetch().catch((e) => { console.debug(e.message); });
+        }
+    }, [ApolloConnection.history.location.pathname]);
 
     if (loading) { return <p>Still loading...</p>; }
 

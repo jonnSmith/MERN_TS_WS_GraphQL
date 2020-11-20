@@ -18,18 +18,16 @@ const LoginForm = (props: ILoginProps) => {
 
     React.useLayoutEffect(() => {
         let timeout;
-        if (passwordRef?.current && emailRef?.current) {
-            timeout = setTimeout(() => {
-                // @ts-ignore
-                passwordRef?.current?.focus();
-                // @ts-ignore
-                emailRef?.current.focus();
-            }, 0);
-        }
+        timeout = setTimeout(() => {
+            // @ts-ignore
+            passwordRef?.current?.state?.floating = true;
+            // @ts-ignore
+            emailRef?.current?.state?.floating = true;
+        }, 0);
         return () => {
             clearTimeout(timeout);
         };
-    }, [passwordRef?.current, emailRef?.current]);
+    }, []);
 
     return (<form
         className="md-grid text-fields__application"

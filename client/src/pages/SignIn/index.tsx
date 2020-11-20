@@ -18,7 +18,7 @@ const SignIn: React.FC = () => {
 
     React.useLayoutEffect(() => {
         if (data?.user) {
-            dispatch({type: ACTIONS.USER_LOGIN, payload: data.user});
+            dispatch({type: ACTIONS.USER_LOGIN, payload: data});
         }
     }, [data?.user]);
 

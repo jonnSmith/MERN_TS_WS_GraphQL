@@ -1,8 +1,9 @@
-import {IUserModel} from "../../../gql/queries/user/model";
 import { ACTIONS } from "../../../misc/constants/store";
-import { ICommonAction } from "../../../misc/interfaces/store";
+import { ICommonAction } from "../../actions/types";
+import { UserInitState } from "../constants";
+import { IUserReducer } from "../types";
 
-const UserReducer = (state: IUserModel | null = null, action: ICommonAction): IUserModel | null => {
+const UserReducer = (state: IUserReducer = UserInitState, action: ICommonAction): IUserReducer => {
     switch (action.type) {
         case ACTIONS.USER_UPDATED:
             return {...state, ...action.payload};
