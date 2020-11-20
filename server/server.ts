@@ -6,6 +6,7 @@ import { makeExecutableSchema } from 'graphql-tools';
 import ExecutableSchema from './src/schema';
 import User from './src/common/user/user.model';
 import config from './../configs/config.app';
+import {AuthenticationError} from "apollo-server";
 
 const schema = makeExecutableSchema(ExecutableSchema);
 
@@ -46,10 +47,12 @@ if (cluster.isMaster) {
     },
     async context({req}) {
       const token = req && req.headers && req.headers[config.token.header];
-      if (token && typeof token === 'string') {
-        const data: any = jwt.verify(token, config.token.secret);
-        const user = data.id ? await User.findById(data.id) : null;
-        return {user};
+      if (!token) { return null; }
+      try {
+        const data: any = jwt.verify(token as string, config.token.secret);
+        return data.id ? await User.findById(data.id) : null;
+      } catch(e) {
+        throw new AuthenticationError(e);
       }
     },
   });

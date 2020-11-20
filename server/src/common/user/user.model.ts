@@ -65,7 +65,7 @@ userSchema.method('comparePassword', function comparePassword(
     throw new Error('User has not been configured with a password.');
   }
   if (!candidate) {
-    return false;
+    throw new Error('Password is wrong');
   }
   return bcrypt.compare(candidate, this.password);
 });

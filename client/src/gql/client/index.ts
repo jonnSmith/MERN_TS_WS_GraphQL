@@ -8,7 +8,8 @@ import {WebSocketLink} from "apollo-link-ws";
 import {getMainDefinition} from "apollo-utilities";
 import {History} from "history";
 import config from "../../../../configs/config.app";
-import {signOut} from "../../misc/helpers/sign-out";
+import {ACTIONS} from "../../misc/constants/store";
+import { store } from "../../store";
 import {IApolloClientOptions, IDefinition} from "./types";
 
 class ApolloConnection {
@@ -83,10 +84,21 @@ class ApolloConnection {
     private static CreateErrorLink() {
         return onError(({graphQLErrors, networkError}: ErrorResponse) => {
             if (graphQLErrors) {
-                graphQLErrors.forEach(({message, locations, path}) => {
-                    // console.log("GraphQL error", message);
-                    if (message === "UNAUTHENTICATED") {
-                        signOut(ApolloConnection.client);
+                graphQLErrors.forEach(({message, extensions, locations, path}) => {
+                    console.log("GraphQL error", message);
+                    switch (extensions?.code) {
+                        case "UNAUTHENTICATED": {
+                            store.dispatch({type: ACTIONS.USER_LOGOUT, payload: null});
+                            break;
+                        }
+                        case "BAD_USER_INPUT": {
+                            console.debug(message);
+                            break;
+                        }
+                        case "INTERNAL_SERVER_ERROR": {
+                            console.error(message);
+                            break;
+                        }
                     }
                 });
             }
@@ -97,7 +109,8 @@ class ApolloConnection {
                     "statusCode" in networkError &&
                     networkError.statusCode === 401
                 ) {
-                    signOut(ApolloConnection.client);
+                    // signOut(ApolloConnection.client);
+                    // console.debug('AUTH ERROR');
                 }
             }
         });

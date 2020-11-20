@@ -1,28 +1,20 @@
 import * as React from "react";
 import { FontIcon, ListItem } from "react-md";
-import { Link as RouterLink, Route } from "react-router-dom";
+import { Link as RouterLink } from "react-router-dom";
+import { ROUTES } from "../../../misc/enums/routes";
 
 const NavigationLink = (props) => {
-  const { label, to, exact, icon, auth, action, filename } = props;
-  let leftIcon;
-  if (icon) {
-    leftIcon = <FontIcon>{icon}</FontIcon>;
-  }
+  const { label, exact, icon, id } = props;
+  const path = ROUTES[id];
   return (
-    <Route path={to} exact={exact}>
-    {({match}) => {
-      return (
-        <ListItem
-          component={RouterLink}
-          active={!!match}
-          to={to}
-          primaryText={label}
-          leftIcon={leftIcon}
-        />
-      );
-
-    }}
-  </Route>);
+    <ListItem
+      component={RouterLink}
+      exact={`${exact}`}
+      to={path}
+      primaryText={label}
+      leftIcon={icon ? (<FontIcon>{icon}</FontIcon>) : null}
+    />
+  );
 };
 
-export { NavigationLink };
+export { NavigationLink as default };

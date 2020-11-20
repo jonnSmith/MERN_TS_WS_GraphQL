@@ -1,4 +1,4 @@
-const enum ROUTES {
+enum ROUTES {
   ChatRoom = "/chat",
   SignUp = "/register",
   SignIn = "/login",
@@ -6,4 +6,6 @@ const enum ROUTES {
   HomePage = "/"
 }
 
-export { ROUTES };
+type RouteString = keyof typeof ROUTES;
+
+export { ROUTES, RouteString };

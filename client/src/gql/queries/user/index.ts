@@ -1,8 +1,20 @@
 import gql from "graphql-tag";
 
+const userFields  = `{
+  id
+  email
+  firstName
+  lastName
+  token
+  workspace {
+    id
+    name
+  }
+}`;
+
 const SIGN_IN = gql`
   mutation($email: String!, $password: String!) {
-    token: signInUser(email: $email, password: $password)
+    user: signInUser(email: $email, password: $password) ${userFields}
   }
 `;
 
@@ -13,27 +25,18 @@ const SIGN_UP = gql`
     $firstName: String!
     $lastName: String
   ) {
-    token: signUpUser(
+    user: signUpUser(
       email: $email
       password: $password
       firstName: $firstName
       lastName: $lastName
-    )
+    ) ${userFields}
   }
 `;
 
 const GET_ME = gql`
   {
-    currentUser {
-      id
-      email
-      firstName
-      lastName
-      workspace {
-        id
-        name
-      }
-    }
+    user: currentUser ${userFields}
   }
 `;
 

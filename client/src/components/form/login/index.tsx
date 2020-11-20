@@ -1,44 +1,64 @@
 import * as React from "react";
 import {Button, CardActions, TextField} from "react-md";
-import {ErrorMessages} from "../../../legacy/components/elements/error-message";
+import { ILoginProps } from "./types";
 
-const LoginForm: React.FC = (props) => {
+const LoginForm = (props: ILoginProps) => {
 
-    const { error } = props;
+    const { onSubmit } = props;
+    const [email, setEmail] = React.useState("");
+    const [password, setPass] = React.useState("");
+
+    const sendSignInForm = (event) => {
+        event.preventDefault();
+        onSubmit({email, password});
+    };
+
+    const passwordRef = React.useRef();
+    const emailRef = React.useRef();
+
+    React.useLayoutEffect(() => {
+        let timeout;
+        if (passwordRef?.current && emailRef?.current) {
+            timeout = setTimeout(() => {
+                // @ts-ignore
+                passwordRef?.current?.focus();
+                // @ts-ignore
+                emailRef?.current.focus();
+            }, 0);
+        }
+        return () => {
+            clearTimeout(timeout);
+        };
+    }, [passwordRef?.current, emailRef?.current]);
 
     return (<form
         className="md-grid text-fields__application"
-        onSubmit={(event) => { console.debug("submit"); }}
+        onSubmit={(event) => sendSignInForm(event)}
     >
         <TextField
             id="email"
             name="email"
-            value={undefined}
-            onChange={ () => console.debug("change") }
-            type="text"
+            onChange={(value) => setEmail(value as string)}
+            type="email"
             label="Email or Username"
             className="md-cell md-cell--12"
+            ref={emailRef}
         />
         <TextField
             id="password"
             name="password"
-            value={undefined}
-            onChange={ () => console.debug("change") }
+            onChange={(value) => setPass(value as string)}
             type="password"
             label="Password"
             className="md-cell md-cell--12"
+            ref={passwordRef}
         />
-        <div className="md-cell md-cell--12">
-            {error && error.graphQLErrors && error.graphQLErrors.length && (
-                <ErrorMessages errors={error.graphQLErrors}/>
-            )}
-        </div>
         <CardActions className="md-cell md-cell--12">
             <Button
                 raised
                 primary
                 className="md-cell--right"
-                disabled={false}
+                disabled={!(email && password)}
                 type="submit"
             >
                 Sign In
@@ -47,4 +67,4 @@ const LoginForm: React.FC = (props) => {
     </form>);
 };
 
-export { LoginForm };
+export {LoginForm};

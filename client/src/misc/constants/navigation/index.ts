@@ -1,53 +1,57 @@
-import {ROUTES} from "../../enums/routes";
+import {ROUTES, RouteString} from "../../enums/routes";
 
-const NavigationData = [
+interface INavigationData {
+    action?: any;
+    auth: boolean;
+    exact: boolean;
+    icon: string;
+    id: RouteString;
+    label: string;
+}
+
+const NavigationData: INavigationData[] = [
     {   action: null,
         auth: false,
         exact: true,
-        filename: "sign-in",
         icon: "person",
         id: "SignIn",
         label: "Sign In",
-        to: ROUTES.SignIn,
     },
     {
         action: null,
         auth: false,
         exact: true,
-        filename: "sign-up",
         icon: "person_add",
         id: "SignUp",
         label: "Sign Up",
-        to: ROUTES.SignUp,
     },
     {
         action: null,
         auth: true,
         exact: true,
-        filename: "chat-room",
         icon: "chat",
         id: "ChatRoom",
         label: "Chat Room",
-        to: ROUTES.ChatRoom,
     },
     {
         action: null,
         auth: true,
         exact: true,
-        filename: "account",
         icon: "account_box",
+        id: "Account",
         label: "User Info",
-        to: ROUTES.Account,
     },
     {
         action: null,
         auth: false,
         exact: true,
-        filename: "home-page",
         icon: "home",
+        id: "HomePage",
         label: "Home Page",
-        to: ROUTES.HomePage,
     },
 ];
 
-export { NavigationData };
+const NavigationPathsSecurity = {};
+NavigationData.forEach( (r) => { NavigationPathsSecurity[ROUTES[r.id]] = r.auth; });
+
+export { NavigationData, NavigationPathsSecurity, INavigationData };
