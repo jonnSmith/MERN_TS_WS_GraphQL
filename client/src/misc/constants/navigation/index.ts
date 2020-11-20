@@ -4,6 +4,7 @@ import {ROUTES} from "../../enums/routes";
 
 const NavigationData: INavigationData[] = [
     {
+        active: false,
         auth: false,
         exact: true,
         icon: "person",
@@ -12,6 +13,7 @@ const NavigationData: INavigationData[] = [
         payload: null
     },
     {
+        active: false,
         auth: false,
         exact: true,
         icon: "person_add",
@@ -20,14 +22,7 @@ const NavigationData: INavigationData[] = [
         payload: null
     },
     {
-        auth: true,
-        exact: true,
-        icon: "chat",
-        id: "ChatRoom",
-        label: "Chat Room",
-        payload: null
-    },
-    {
+        active: false,
         auth: true,
         exact: true,
         icon: "account_box",
@@ -36,6 +31,16 @@ const NavigationData: INavigationData[] = [
         payload: null
     },
     {
+        active: false,
+        auth: true,
+        exact: true,
+        icon: "chat",
+        id: "ChatRoom",
+        label: "Chat Room",
+        payload: null
+    },
+    {
+        active: false,
         auth: false,
         exact: true,
         icon: "home",

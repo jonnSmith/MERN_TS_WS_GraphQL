@@ -4,6 +4,7 @@ import {Route} from "react-router-dom";
 import { NavigationData } from "../../constants/navigation";
 import {ACTIONS} from "../../constants/store";
 import { ROUTES } from "../../enums/routes";
+import {ApolloConnection} from "../../../gql/client";
 
 class Navigation {
 
@@ -30,6 +31,7 @@ class Navigation {
         Navigation.NavigationLinks =
             Navigation.NavigationLinks.length ?
             Navigation.NavigationLinks : [...NavigationData].map( (props) => {
+
                 const NavigationLink = React.lazy(() => import("../../../components/navigation/link") );
                 const NavigationAction = React.lazy(() => import("../../../components/navigation/action") );
                 let link: ReactElement = null;
