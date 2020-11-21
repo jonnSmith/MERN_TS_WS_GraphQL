@@ -6,12 +6,12 @@ import {ErrorResponse, onError} from "apollo-link-error";
 import {HttpLink} from "apollo-link-http";
 import {WebSocketLink} from "apollo-link-ws";
 import {getMainDefinition} from "apollo-utilities";
+import {IApolloClientOptions, IDefinition} from "core/apollo/interfaces";
+import { config } from "core/config";
+import {CoreStore} from "core/store";
+import {ACTIONS} from "core/store/constants";
+import {UserInitState} from "data/user/constants";
 import {History} from "history";
-import config from "../../../../configs/config.app";
-import {ACTIONS} from "../../misc/constants/store";
-import { CoreStore } from "../../store";
-import {UserInitState} from "../../store/reducers/constants";
-import {IApolloClientOptions, IDefinition} from "./types";
 
 class ApolloConnection {
 
@@ -31,7 +31,7 @@ class ApolloConnection {
     private static History: History;
 
     private static CreateApolloCache = (): ApolloCache<any> => {
-       return new InMemoryCache();
+        return new InMemoryCache();
     }
 
     private static CreateApolloLink = (): ApolloLink => {

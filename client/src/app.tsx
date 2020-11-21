@@ -4,6 +4,7 @@ import { useDispatch } from "react-redux";
 import { NavigationInterface } from "./components/navigation/drawer";
 import { ApolloConnection } from "./gql/client";
 import { GET_ME } from "./gql/queries/user";
+import { NavigationPathsSecurity } from "./misc/constants/navigation";
 import {ACTIONS} from "./misc/constants/store";
 
 const App = () => {
@@ -17,7 +18,10 @@ const App = () => {
     }, [data]);
 
     React.useEffect(() => {
-        if (ApolloConnection.history.action === "PUSH") {
+        if (
+            ApolloConnection.history.action === "PUSH" &&
+            NavigationPathsSecurity[ApolloConnection.history.location.pathname]
+        ) {
             refetch().catch((e) => { console.debug(e.message); });
         }
     }, [ApolloConnection.history.location.pathname]);

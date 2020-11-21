@@ -1,7 +1,7 @@
 import { applyMiddleware, compose, createStore, Store } from "redux";
 import createSagaMiddleware, { SagaMiddleware } from "redux-saga";
-import { rootReducers } from "./reducers";
-import { rootSaga } from "./sagas";
+import { rootReducers } from "core/store/reducers";
+import { rootSaga } from "core/store/sagas";
 
 class CoreStore {
 

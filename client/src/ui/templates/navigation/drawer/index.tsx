@@ -1,0 +1,25 @@
+import {config} from "core/config";
+import {CoreNavigation} from "core/navigation";
+import {StateReturnTypes} from "core/store/types";
+import * as React from "react";
+import NavigationDrawer from "react-md/lib/NavigationDrawers";
+import {useSelector} from "react-redux";
+import {Switch} from "react-router-dom";
+
+const NavigationInterface = () => {
+    const {user} = useSelector((state: StateReturnTypes) => state.UserReducer);
+    return <NavigationDrawer
+        drawerTitle={config.app.sidebar}
+        toolbarTitle={config.app.name}
+        mobileDrawerType={NavigationDrawer.DrawerTypes.TEMPORARY_MINI}
+        tabletDrawerType={NavigationDrawer.DrawerTypes.PERSISTENT_MINI}
+        desktopDrawerType={NavigationDrawer.DrawerTypes.PERSISTENT_MINI}
+        navItems={CoreNavigation.links(!!(user?.token))}
+    >
+        <Switch>
+            {CoreNavigation.routes(!!(user?.token))}
+        </Switch>
+    </NavigationDrawer>;
+};
+
+export { NavigationInterface };
