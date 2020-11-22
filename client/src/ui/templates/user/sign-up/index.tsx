@@ -1,6 +1,6 @@
 import {SetFloatingTextInputRefs} from "@appchat/ui/templates/functions";
 import {SignUpFormInitialObject} from "@appchat/ui/templates/user/constants";
-import {ISignUpProps} from "@appchat/ui/templates/user/types";
+import {ISignUpForm, ISignUpProps} from "@appchat/ui/templates/user/types";
 import * as React from "react";
 import {Button, CardActions, TextField} from "react-md";
 
@@ -17,14 +17,14 @@ const UserSignUp = (props: ISignUpProps) => {
         SetFloatingTextInputRefs([emailRef, passwordRef]);
     }, [emailRef, passwordRef]);
 
-    const sendSignUpForm = (event) => {
+    const sendSignUpForm = (event: React.FormEvent) => {
         event.preventDefault();
         onSubmit(SignUpForm);
     };
 
     return (<form
         className="md-grid md-grid--no-spacing text-fields__application"
-        onSubmit={(event) => { sendSignUpForm(event); }}
+        onSubmit={(event: React.FormEvent) => { sendSignUpForm(event); }}
     >
         <TextField
             id="email"
@@ -65,7 +65,7 @@ const UserSignUp = (props: ISignUpProps) => {
                 raised
                 secondary
                 className="md-cell--right"
-                disabled={Object.keys(SignUpForm).some((key) => !SignUpForm[key])}
+                disabled={Object.keys(SignUpForm).some((key: keyof ISignUpForm) => !SignUpForm[key])}
                 type="submit"
             >
                 Sign Up

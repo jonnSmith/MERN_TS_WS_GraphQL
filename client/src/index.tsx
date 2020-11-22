@@ -1,7 +1,6 @@
 import {ApolloProvider} from "@apollo/react-hooks";
 import {ApolloConnection} from "@appchat/core/apollo";
 import {CoreStore} from "@appchat/core/store";
-import {LoaderFallback} from "@appchat/ui/elements/loader";
 import * as React from "react";
 import {render} from "react-dom";
 import {Provider} from "react-redux";
@@ -10,7 +9,8 @@ import * as WebFontLoader from "webfontloader";
 
 import { App } from "./app";
 
-require("../../node_modules/react-md/dist/react-md.blue-deep_purple.min.css");
+require("../../node_modules/react-md/dist/react-md.blue-green.min.css");
+require("../../node_modules/react-loader-spinner/dist/loader/css/react-spinner-loader.css");
 
 WebFontLoader.load({
     google: {

@@ -9,7 +9,7 @@ const UserSignIn = (props: ISignInProps) => {
     const [email, setEmail] = React.useState("");
     const [password, setPass] = React.useState("");
 
-    const sendSignInForm = (event) => {
+    const sendSignInForm = (event: React.FormEvent) => {
         event.preventDefault();
         onSubmit({email, password});
     };
