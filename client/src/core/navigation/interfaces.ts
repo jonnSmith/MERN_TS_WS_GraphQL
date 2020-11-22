@@ -1,5 +1,5 @@
-import {RouteString} from "core/navigation/types";
-import {ActionsString} from "core/store/types";
+import {RouteString} from "@appchat/core/navigation/types";
+import {ActionsString} from "@appchat/core/store/types";
 
 interface INavigationData {
     auth: boolean;

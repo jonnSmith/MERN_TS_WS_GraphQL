@@ -1,5 +1,5 @@
-import {ApolloCache} from "apollo-cache";
-import {ApolloLink} from "apollo-link";
+import {ApolloCache} from "@apollo/client/cache";
+import {ApolloLink} from "@apollo/client/link/core";
 
 interface IDefinition {
     kind: string;
@@ -8,7 +8,7 @@ interface IDefinition {
 
 interface IApolloClientOptions {
     cache: ApolloCache<any>;
-    link: ApolloLink;
+    link?: ApolloLink;
 }
 
 export { IDefinition, IApolloClientOptions };

@@ -1,21 +1,20 @@
 {
   "compilerOptions": {
-    "outDir": "../build",
-    "sourceMap": true,
-    "noImplicitAny": false,
-    "baseUrl": "./src",
-    "module": "commonjs",
-    "target": "es5",
     "jsx": "react",
-    "lib": [
-      "es5",
-      "es6",
-      "dom"
-    ]
+    "module": "commonjs",
+    "noImplicitAny": true,
+    "preserveConstEnums": false,
+    "removeComments": true,
+    "strict": false,
+    "sourceMap": true,
+    "target": "es5",
+    "baseUrl": "./",
+    "paths": {
+      "@appchat/*": ["src/*/index", "src/*"]
+    }
   },
-  "include": [
-    "./src/**/*"
-  ],
+  "include": ["./**/*.ts", "./**/*.tsx"],
+  "exclude": ["./src/legacy", "./../node_modules"],
   "awesomeTypescriptLoaderOptions": {
     "reportFiles": [
       "./src/**/*"

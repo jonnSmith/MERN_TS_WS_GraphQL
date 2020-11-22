@@ -1,5 +1,5 @@
-import {ApolloConnection} from "core/apollo";
-import {ROUTES} from "core/navigation/enums";
+import {ApolloConnection} from "@appchat/core/apollo";
+import {ROUTES} from "@appchat/core/navigation/enums";
 import * as React from "react";
 import {FontIcon, ListItem} from "react-md";
 import {Link as RouterLink} from "react-router-dom";
@@ -19,4 +19,4 @@ const NavigationLink = (props) => {
   );
 };
 
-export { NavigationLink as default };
+export { NavigationLink };

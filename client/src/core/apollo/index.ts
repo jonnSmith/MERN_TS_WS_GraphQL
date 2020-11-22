@@ -1,16 +1,15 @@
-import {ApolloCache} from "apollo-cache";
-import {InMemoryCache} from "apollo-cache-inmemory";
-import {ApolloClient, ApolloClientOptions} from "apollo-client";
-import {ApolloLink, split} from "apollo-link";
-import {ErrorResponse, onError} from "apollo-link-error";
-import {HttpLink} from "apollo-link-http";
-import {WebSocketLink} from "apollo-link-ws";
-import {getMainDefinition} from "apollo-utilities";
-import {IApolloClientOptions, IDefinition} from "core/apollo/interfaces";
-import { config } from "core/config";
-import {CoreStore} from "core/store";
-import {ACTIONS} from "core/store/constants";
-import {UserInitState} from "data/user/constants";
+import {ApolloClient, ApolloClientOptions} from "@apollo/client";
+import {ApolloCache, InMemoryCache} from "@apollo/client/cache";
+import {ApolloLink, split} from "@apollo/client/link/core";
+import {ErrorResponse, onError} from "@apollo/client/link/error";
+import {HttpLink} from "@apollo/client/link/http";
+import {WebSocketLink} from "@apollo/client/link/ws";
+import {getMainDefinition} from "@apollo/client/utilities";
+import {IApolloClientOptions, IDefinition} from "@appchat/core/apollo/interfaces";
+import {config} from "@appchat/core/config";
+import {CoreStore} from "@appchat/core/store";
+import {ACTIONS} from "@appchat/core/store/constants";
+import {UserInitState} from "@appchat/data/user/constants";
 import {History} from "history";
 
 class ApolloConnection {
@@ -105,7 +104,6 @@ class ApolloConnection {
             }
             if (networkError) {
                 if (!graphQLErrors.length) { console.error(networkError.message); }
-                return null;
             }
         });
     }

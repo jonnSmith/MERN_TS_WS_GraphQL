@@ -1,7 +1,7 @@
+import { rootReducers } from "@appchat/core/store/reducers";
+import { rootSaga } from "@appchat/core/store/sagas";
 import { applyMiddleware, compose, createStore, Store } from "redux";
 import createSagaMiddleware, { SagaMiddleware } from "redux-saga";
-import { rootReducers } from "core/store/reducers";
-import { rootSaga } from "core/store/sagas";
 
 class CoreStore {
 

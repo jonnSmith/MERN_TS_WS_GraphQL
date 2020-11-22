@@ -1,9 +1,9 @@
-import {ApolloConnection} from "core/apollo";
-import {config} from "core/config";
-import {NavigationPathsSecurity } from "core/navigation/constants";
-import {ROUTES} from "core/navigation/enums";
-import {ACTIONS} from "core/store/constants";
-import {userUpdated} from "data/user/actions";
+import {ApolloConnection} from "@appchat/core/apollo";
+import {config} from "@appchat/core/config";
+import {NavigationPathsSecurity } from "@appchat/core/navigation/constants";
+import {ROUTES} from "@appchat/core/navigation/enums";
+import {ACTIONS} from "@appchat/core/store/constants";
+import {userUpdated} from "@appchat/data/user/actions";
 import {put, takeLatest} from "redux-saga/effects";
 
 function* userStatusChanged() {

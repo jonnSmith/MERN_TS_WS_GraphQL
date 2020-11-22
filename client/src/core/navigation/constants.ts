@@ -1,6 +1,7 @@
-import {ROUTES} from "core/navigation/enums";
-import {INavigationData} from "core/navigation/interfaces";
-import {UserInitState} from "data/user/constants";
+import {ROUTES} from "@appchat/core/navigation/enums";
+import {INavigationData} from "@appchat/core/navigation/interfaces";
+import {INavigationPathsSecurity} from "@appchat/core/navigation/types";
+import {UserInitState} from "@appchat/data/user/constants";
 
 const NavigationData: INavigationData[] = [
     {
@@ -58,7 +59,9 @@ const NavigationData: INavigationData[] = [
     },
 ];
 
-const NavigationPathsSecurity = {};
-NavigationData.forEach( (r) => { NavigationPathsSecurity[ROUTES[r.id]] = r.auth; });
+const NavigationPathsSecurity: INavigationPathsSecurity = {} as INavigationPathsSecurity;
+NavigationData
+    .filter((r) => typeof ROUTES[r.id] !== "undefined"  )
+    .forEach( (r) => { NavigationPathsSecurity[ROUTES[r.id]] = r.auth; });
 
 export { NavigationData, NavigationPathsSecurity, INavigationData };

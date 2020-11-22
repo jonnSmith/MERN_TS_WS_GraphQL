@@ -1,4 +1,6 @@
-const UserInitState = { user: null };
+import {IUserModel} from "@appchat/data/user/interfaces";
+
+const UserInitState: {user: IUserModel} = { user: null };
 
 const UserFields  = `{
   id

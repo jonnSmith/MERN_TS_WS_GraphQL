@@ -1,4 +1,4 @@
-import {UserFields} from "data/user/constants";
+import {UserFields} from "@appchat/data/user/constants";
 import gql from "graphql-tag";
 
 const SIGN_IN = gql`

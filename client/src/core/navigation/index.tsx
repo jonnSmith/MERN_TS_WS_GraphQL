@@ -1,26 +1,25 @@
-import {NavigationData} from "core/navigation/constants";
-import {ROUTES} from "core/navigation/enums";
-import {ACTIONS} from "core/store/constants";
+import {NavigationData} from "@appchat/core/navigation/constants";
+import {ROUTES} from "@appchat/core/navigation/enums";
+import {ACTIONS} from "@appchat/core/store/constants";
 import * as React from "react";
 import {ReactElement} from "react";
+import { NavigationAction } from "@appchat/ui/elements/navigation/action";
+import { NavigationLink } from "@appchat/ui/elements/navigation/link";
+import * as Pages from "@appchat/ui/pages";
 import {Route} from "react-router-dom";
 
 class CoreNavigation {
 
-    public static links(auth) {
+    public static links(auth: boolean) {
         // tslint:disable-next-line:no-unused-expression
         if (!CoreNavigation.NavigationLinks.length) { new CoreNavigation(); }
-        return CoreNavigation.NavigationLinks.filter(
-            (link) => link.props.auth && auth || !link.props.auth && !auth ? link : null
-        );
+        return CoreNavigation.NavigationLinks.filter( (l) => l.props.auth && auth || !l.props.auth && !auth);
     }
 
-    public static routes(auth) {
+    public static routes(auth: boolean) {
         // tslint:disable-next-line:no-unused-expression
         if (!CoreNavigation.NavigationRoutes.length) { new CoreNavigation(); }
-        return CoreNavigation.NavigationRoutes.filter(
-            (route) => route.props.auth && auth || !route.props.auth && !auth ? route : null
-        );
+        return CoreNavigation.NavigationRoutes.filter( (r) => r.props.auth && auth || !r.props.auth && !auth);
     }
 
     private static NavigationLinks: Array<React.ReactElement<any>> = [];
@@ -30,19 +29,16 @@ class CoreNavigation {
         CoreNavigation.NavigationLinks =
             CoreNavigation.NavigationLinks.length ?
                 CoreNavigation.NavigationLinks : [...NavigationData].map( (props) => {
-                    const NavigationLink = React.lazy(() => import("ui/elements/navigation/link") );
-                    const NavigationAction = React.lazy(() => import("ui/elements/navigation/action") );
-                    let link: ReactElement = null;
-                    if (ROUTES[props.id]) { link = (<NavigationLink {...props} key={props.id} />); }
-                    if (ACTIONS[props.id]) { link = (<NavigationAction {...props} key={props.id} />); }
-                    return link;
-                }
-                );
+                    const NavigationItem = props.payload ?
+                        NavigationAction :
+                        NavigationLink ;
+                    return (<NavigationItem {...props} key={props.id}  />);
+                });
 
         CoreNavigation.NavigationRoutes =
             CoreNavigation.NavigationRoutes.length ?
-                CoreNavigation.NavigationRoutes : [...NavigationData].filter((n) => ROUTES[n.id]).map( (props) => {
-                    const RouteComponent = React.lazy(() => import(`ui/pages/${props.id}/`));
+                CoreNavigation.NavigationRoutes : [...NavigationData].filter((n) => !n.payload).map( (props) => {
+                    const RouteComponent = Pages[props.id];
                     return (<Route
                         exact={props.exact || false}
                         path={ROUTES[props.id]}
@@ -50,8 +46,7 @@ class CoreNavigation {
                         auth={props.auth}
                         render={ () => <RouteComponent /> }
                     />);
-                }
-                );
+                });
     }
 }
 

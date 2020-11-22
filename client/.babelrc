@@ -4,7 +4,16 @@
     "@babel/preset-react"
   ],
   "plugins": [
-    "react-hot-loader/babel"
+    [
+      "babel-plugin-module-resolver",
+      {
+        "cwd": "babelrc",
+        "extensions": [".ts", ".tsx", ".scss", ".svg"],
+        "alias": {
+          "@appchat": "./src"
+        }
+      }
+    ]
   ],
   "env": {
     "production": {

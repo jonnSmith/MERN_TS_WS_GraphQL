@@ -1,4 +1,4 @@
-import {IWorkspaceModel} from "data/workspace/interfaces";
+import {IWorkspaceModel} from "@appchat/data/workspace/interfaces";
 
 interface IUserModel {
     id: string;

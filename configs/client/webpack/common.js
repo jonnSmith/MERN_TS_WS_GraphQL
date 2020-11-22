@@ -1,23 +1,28 @@
 // shared config (dev and prod)
 const { resolve } = require('path');
-const { CheckerPlugin } = require('awesome-typescript-loader');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 module.exports = {
   resolve: {
     extensions: ['.ts', '.tsx', '.js', '.jsx'],
   },
-  context: resolve(__dirname, '../../../client/src'),
+  context: resolve(__dirname, './../../../client/src'),
   module: {
     rules: [
       {
         test: /\.js$/,
         use: ['babel-loader', 'source-map-loader'],
-        exclude: /node_modules/,
+        exclude: /node_modules/
       },
       {
         test: /\.tsx?$/,
-        use: ['babel-loader', 'awesome-typescript-loader?{configFileName: "client/tsconfig.json"}'],
+        use: ['babel-loader', 'awesome-typescript-loader?{configFileName: "./client/tsconfig.json"}'],
+
+      },
+      {
+        test: /\.ts?$/,
+        use: ['babel-loader', 'awesome-typescript-loader?{configFileName: "./client/tsconfig.json"}'],
+        exclude: "/node_modules"
       },
       {
         test: /\.css$/,
@@ -41,7 +46,6 @@ module.exports = {
     ],
   },
   plugins: [
-    new CheckerPlugin(),
     new HtmlWebpackPlugin({template: 'index.html.ejs',}),
   ],
   externals: {

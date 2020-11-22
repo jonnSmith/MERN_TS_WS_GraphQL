@@ -1,8 +1,9 @@
+import {SetFloatingTextInputRefs} from "@appchat/ui/templates/functions";
+import {ISignInProps} from "@appchat/ui/templates/user/types";
 import * as React from "react";
 import {Button, CardActions, TextField} from "react-md";
-import {ILoginProps} from "ui/templates/user/types";
 
-const UserSignIn = (props: ILoginProps) => {
+const UserSignIn = (props: ISignInProps) => {
 
     const { onSubmit } = props;
     const [email, setEmail] = React.useState("");
@@ -17,20 +18,11 @@ const UserSignIn = (props: ILoginProps) => {
     const emailRef = React.useRef();
 
     React.useLayoutEffect(() => {
-        let timeout;
-        timeout = setTimeout(() => {
-            // @ts-ignore
-            passwordRef?.current?.state?.floating = true;
-            // @ts-ignore
-            emailRef?.current?.state?.floating = true;
-        }, 0);
-        return () => {
-            clearTimeout(timeout);
-        };
+        SetFloatingTextInputRefs([passwordRef, emailRef]);
     }, []);
 
     return (<form
-        className="md-grid text-fields__application"
+        className="md-grid text-fields__application md-grid--no-spacing"
         onSubmit={(event) => sendSignInForm(event)}
     >
         <TextField

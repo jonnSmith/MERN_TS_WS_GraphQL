@@ -1,5 +1,5 @@
-import {ACTIONS} from "core/store/constants";
-import * as UserReducers from "data/user/reducers";
+import {ACTIONS} from "@appchat/core/store/constants";
+import * as UserReducers from "@appchat/data/user/reducers";
 
 type ActionsString = keyof typeof ACTIONS;
 

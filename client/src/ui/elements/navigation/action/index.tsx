@@ -1,4 +1,4 @@
-import {ACTIONS} from "core/store/constants";
+import {ACTIONS} from "@appchat/core/store/constants";
 import * as React from "react";
 import {FontIcon, ListItem} from "react-md";
 import {useDispatch} from "react-redux";
@@ -16,4 +16,4 @@ const NavigationAction = (props) => {
     );
 };
 
-export { NavigationAction as default };
+export { NavigationAction };

@@ -1,5 +1,9 @@
-import {ROUTES} from "core/navigation/enums";
+import {ROUTES} from "@appchat/core/navigation/enums";
 
 type RouteString = keyof typeof ROUTES;
 
-export { RouteString };
+type INavigationPathsSecurity = {
+    [key in keyof typeof ROUTES]: boolean;
+};
+
+export { RouteString, INavigationPathsSecurity };

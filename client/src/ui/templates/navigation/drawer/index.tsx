@@ -1,7 +1,8 @@
-import {config} from "core/config";
-import {CoreNavigation} from "core/navigation";
-import {StateReturnTypes} from "core/store/types";
+import {config} from "@appchat/core/config";
+import {CoreNavigation} from "@appchat/core/navigation";
+import {StateReturnTypes} from "@appchat/core/store/types";
 import * as React from "react";
+import { render } from "react-dom";
 import NavigationDrawer from "react-md/lib/NavigationDrawers";
 import {useSelector} from "react-redux";
 import {Switch} from "react-router-dom";
@@ -14,10 +15,10 @@ const NavigationInterface = () => {
         mobileDrawerType={NavigationDrawer.DrawerTypes.TEMPORARY_MINI}
         tabletDrawerType={NavigationDrawer.DrawerTypes.PERSISTENT_MINI}
         desktopDrawerType={NavigationDrawer.DrawerTypes.PERSISTENT_MINI}
-        navItems={CoreNavigation.links(!!(user?.token))}
+        navItems={ CoreNavigation.links(typeof user?.token !== "undefined") }
     >
         <Switch>
-            {CoreNavigation.routes(!!(user?.token))}
+            {CoreNavigation.routes(typeof user?.token !== "undefined")}
         </Switch>
     </NavigationDrawer>;
 };
