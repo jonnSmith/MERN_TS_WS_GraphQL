@@ -1,7 +1,7 @@
 import * as jwt from 'jsonwebtoken';
 import Workspace from '../workspace/workspace.model';
 import { Sequelize } from 'sequelize';
-import { ForbiddenError } from 'apollo-server';
+import {AuthenticationError, UserInputError} from "apollo-server";
 import { combineResolvers } from 'graphql-resolvers';
 import User from './user.model';
 import { isAuthenticated, isMessageOwner } from '../../helpers/authorization';
@@ -17,6 +17,7 @@ export const userTypeDefs = `
     password: String!
     firstName: String!
     lastName: String
+    token: String
   }
 
   input UserFilterInput {
@@ -41,8 +42,8 @@ export const userTypeDefs = `
     addUser(input: UserInput!): User
     editUser(id: String!, input: UserInput!): User
     deleteUser(id: String!): User
-    signInUser(email: String!, password: String!): String!
-    signUpUser(email: String!, password: String!, firstName: String!, lastName: String): String!
+    signInUser(email: String!, password: String!): User
+    signUpUser(email: String!, password: String!, firstName: String!, lastName: String): User
   }
 
 `;
@@ -57,10 +58,19 @@ export const userResolvers = {
       const user: any = await User.findById(id);
       return user.toObject();
     },
-    async currentUser(_, {}, { user }) {
-      if (!user || !user.id) { return null; }
-      const currentUser: any = await User.findById(user.id);
-      return currentUser.toObject();
+    async currentUser(_, {}, user) {
+      const { id } = user;
+      if (!id) { return null; }
+      try {
+        const userDocument = await User.findById(id);
+        if (!userDocument) { return null; }
+        const userObject = userDocument.toObject();
+        userObject.token = jwt.sign({id: userObject.id}, config.token.secret);
+        return userObject;
+      }
+      catch (e) {
+        throw new AuthenticationError(e);
+      }
     },
   },
   Mutation: {
@@ -76,18 +86,31 @@ export const userResolvers = {
       const user: any = await User.findByIdAndRemove(id);
       return user ? user.toObject() : null;
     },
-    async signUpUser(_, { email, password, firstName, lastName}) {
-      const user: any = await User.create({email, password, firstName, lastName});
-      return jwt.sign({ id: user.id }, config.token.secret);
-    },
-    async signInUser(_, { email, password,  }) {
-      const user: any = await User.findOne({ email });
-      const match: boolean = await user.comparePassword(password);
-      if (match) {
-        return jwt.sign({ id: user.id }, config.token.secret);
+    async signUpUser(_, data) {
+      const { email, password, firstName, lastName} = data;
+      let userObject;
+      try {
+        const user: any = await User.create({email, password, firstName, lastName});
+        userObject = user.toObject();
+        userObject.token = jwt.sign({id: user.id}, config.token.secret);
+      } catch (e) {
+        throw new UserInputError(e);
       }
-      throw new ForbiddenError('Not Authorised.');
+      return userObject;
     },
+    async signInUser(_, data) {
+      const { email, password} = data;
+      let userObject;
+      try {
+        const user: any = await User.findOne({email});
+        const match: boolean = await user.comparePassword(password);
+        userObject = match ? user.toObject() : null;
+        userObject.token = jwt.sign({id: user.id}, config.token.secret);
+      } catch (e) {
+        throw new UserInputError(e);
+      }
+      return userObject;
+    }
   },
   User: {
     async workspace(user: { workspaceId: string }) {

@@ -8,8 +8,11 @@
   "jsRules": {},
   "rules": {
     "object-literal-sort-keys": false,
+    "only-arrow-functions": false,
+    "no-var-requires": false,
     "ordered-imports": false,
-    "no-console": false
+    "no-console": false,
+    "one-variable-per-declaration": false
   },
   "rulesDirectory": []
 }
