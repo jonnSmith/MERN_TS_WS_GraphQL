@@ -1,5 +1,5 @@
 import {MessageFormInitialObject} from "@appchat/ui/templates/message/constants";
-import {IMessageSendProps} from "@appchat/ui/templates/message/interfaces";
+import {IMessageSendForm, IMessageSendProps} from "@appchat/ui/templates/message/interfaces";
 import * as React from "react";
 import {Button, CardActions, TextField} from "react-md";
 
@@ -20,7 +20,7 @@ const MessageSend = (props: IMessageSendProps) => {
         <TextField
             id="text"
             name="text"
-            onChange={ (value) => { updateMessageForm({...MessageForm, ...{ message: value as string}}); } }
+            onChange={ (value) => { updateMessageForm({...MessageForm, ...{ text: value as string}}); } }
             rows={2}
             maxLength={200}
             label="Message text"
@@ -31,7 +31,7 @@ const MessageSend = (props: IMessageSendProps) => {
                 raised
                 primary
                 className="md-cell--right"
-                disabled={false}
+                disabled={Object.keys(MessageForm).some((key: keyof IMessageSendForm) => !MessageForm[key])}
                 type="submit">
                 Send
             </Button>

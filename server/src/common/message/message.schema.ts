@@ -100,8 +100,8 @@ export const messageResolvers = {
     createMessage: combineResolvers(
         isAuthenticated,
       async (parent, { text, filter = DEFAULT_FILTER }, { user }) => {
-        let message: any = await Message.create({
-          text: text,
+        const message: any = await Message.create({
+          text,
           userId: user.id,
           workspaceId: user.workspaceId
         });

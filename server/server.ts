@@ -50,7 +50,8 @@ if (cluster.isMaster) {
       if (!token) { return null; }
       try {
         const data: any = jwt.verify(token as string, config.token.secret);
-        return data.id ? await User.findById(data.id) : null;
+        const user = User.findById(data.id);
+        return user ? {user} : null;
       } catch(e) {
         throw new AuthenticationError(e);
       }

@@ -3,7 +3,7 @@ interface IMessageSendProps {
 }
 
 interface IMessageSendForm {
-    message: string;
+    text: string;
 }
 
 export { IMessageSendForm, IMessageSendProps };
