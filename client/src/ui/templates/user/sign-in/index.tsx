@@ -1,5 +1,6 @@
 import {SetFloatingTextInputRefs} from "@appchat/ui/templates/functions";
-import {ISignInProps} from "@appchat/ui/templates/user/interfaces";
+import {SignInFormInitialObject} from "@appchat/ui/templates/user/constants";
+import {ISignInForm, ISignInProps, ISignUpForm} from "@appchat/ui/templates/user/interfaces";
 import * as React from "react";
 import {Button, CardActions, TextField} from "react-md";
 
@@ -9,9 +10,11 @@ const UserSignIn = (props: ISignInProps) => {
     const [email, setEmail] = React.useState("");
     const [password, setPass] = React.useState("");
 
+    const[SignInForm, updateSignInForm] = React.useState(SignInFormInitialObject);
+
     const sendSignInForm = (event: React.FormEvent) => {
         event.preventDefault();
-        onSubmit({email, password});
+        onSubmit(SignInForm);
     };
 
     const passwordRef = React.useRef();
@@ -28,7 +31,7 @@ const UserSignIn = (props: ISignInProps) => {
         <TextField
             id="email"
             name="email"
-            onChange={(value) => setEmail(value as string)}
+            onChange={ (value) => { updateSignInForm({...SignInForm, ...{ email: value as string}}); } }
             type="email"
             label="Email or Username"
             className="md-cell md-cell--12"
@@ -37,7 +40,7 @@ const UserSignIn = (props: ISignInProps) => {
         <TextField
             id="password"
             name="password"
-            onChange={(value) => setPass(value as string)}
+            onChange={ (value) => { updateSignInForm({...SignInForm, ...{ password: value as string}}); } }
             type="password"
             label="Password"
             className="md-cell md-cell--12"
@@ -48,7 +51,7 @@ const UserSignIn = (props: ISignInProps) => {
                 raised
                 primary
                 className="md-cell--right"
-                disabled={!(email && password)}
+                disabled={Object.keys(SignInForm).some((key: keyof ISignInForm) => !SignInForm[key])}
                 type="submit"
             >
                 Sign In
