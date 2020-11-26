@@ -9,8 +9,10 @@ import * as WebFontLoader from "webfontloader";
 
 import { App } from "./app";
 
-require("../../node_modules/react-md/dist/react-md.blue-green.min.css");
-require("../../node_modules/react-loader-spinner/dist/loader/css/react-spinner-loader.css");
+import "./../../node_modules/react-loader-spinner/dist/loader/css/CradleLoader.css";
+import "./../../node_modules/react-loader-spinner/dist/loader/css/Plane.css";
+import "./../../node_modules/react-loader-spinner/dist/loader/css/Triangle.css";
+import "./../../node_modules/react-md/dist/react-md.blue-green.min.css";
 
 WebFontLoader.load({
     google: {

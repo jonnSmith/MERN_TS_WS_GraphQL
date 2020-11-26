@@ -12,22 +12,23 @@ class CoreStore {
     }
 
     private static SagaMiddleware: SagaMiddleware;
-    private static ComposeEnhancer;
+    private static ComposeEnhancer: any;
     private static InitStore: Store;
-    private static sagaIsRunnning: boolean = false;
+    private static sagaIsRunning: boolean = false;
 
     private constructor() {
         CoreStore.SagaMiddleware = CoreStore.SagaMiddleware || createSagaMiddleware();
-        CoreStore.ComposeEnhancer = CoreStore.ComposeEnhancer || ((process.env.NODE_ENV !== "production" &&
-            window["__REDUX_DEVTOOLS_EXTENSION_COMPOSE__"]) ||
+        CoreStore.ComposeEnhancer = CoreStore.ComposeEnhancer ||
+            // @ts-ignore
+            ((process.env.NODE_ENV !== "production" && window["__REDUX_DEVTOOLS_EXTENSION_COMPOSE__"]) ||
             compose);
         CoreStore.InitStore = CoreStore.InitStore || createStore(
             rootReducers,
             {},
             CoreStore.ComposeEnhancer(applyMiddleware(CoreStore.SagaMiddleware))
         );
-        if (!CoreStore.sagaIsRunnning) {
-            CoreStore.sagaIsRunnning = CoreStore.SagaMiddleware.run(rootSaga).isRunning();
+        if (!CoreStore.sagaIsRunning) {
+            CoreStore.sagaIsRunning = CoreStore.SagaMiddleware.run(rootSaga).isRunning();
         }
     }
 }

@@ -1,6 +1,6 @@
 import {SetFloatingTextInputRefs} from "@appchat/ui/templates/functions";
 import {SignUpFormInitialObject} from "@appchat/ui/templates/user/constants";
-import {ISignUpForm, ISignUpProps} from "@appchat/ui/templates/user/types";
+import {ISignUpForm, ISignUpProps} from "@appchat/ui/templates/user/interfaces";
 import * as React from "react";
 import {Button, CardActions, TextField} from "react-md";
 

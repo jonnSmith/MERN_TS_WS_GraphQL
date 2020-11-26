@@ -1,5 +1,5 @@
 import {SetFloatingTextInputRefs} from "@appchat/ui/templates/functions";
-import {ISignInProps} from "@appchat/ui/templates/user/types";
+import {ISignInProps} from "@appchat/ui/templates/user/interfaces";
 import * as React from "react";
 import {Button, CardActions, TextField} from "react-md";
 

@@ -2,7 +2,6 @@ import {config} from "@appchat/core/config";
 import {CoreNavigation} from "@appchat/core/navigation";
 import {StateReturnTypes} from "@appchat/core/store/types";
 import * as React from "react";
-import { render } from "react-dom";
 import NavigationDrawer from "react-md/lib/NavigationDrawers";
 import {useSelector} from "react-redux";
 import {Switch} from "react-router-dom";

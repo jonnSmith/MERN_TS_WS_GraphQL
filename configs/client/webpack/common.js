@@ -1,6 +1,7 @@
 // shared config (dev and prod)
 const { resolve } = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const FaviconsWebpackPlugin = require('favicons-webpack-plugin')
 
 module.exports = {
   resolve: {
@@ -25,15 +26,10 @@ module.exports = {
         exclude: "/node_modules"
       },
       {
-        test: /\.css$/,
-        use: ['style-loader', { loader: 'css-loader', options: { importLoaders: 1 } }],
-      },
-      {
-        test: /\.(scss|sass)$/,
+        test: /\.css$/i,
         use: [
-          'style-loader',
-          { loader: 'css-loader', options: { importLoaders: 1 } },
-          'sass-loader',
+          { loader: 'style-loader', options: { injectType: 'linkTag', insert: 'body' } },
+          { loader: 'file-loader' },
         ],
       },
       {
@@ -47,6 +43,11 @@ module.exports = {
   },
   plugins: [
     new HtmlWebpackPlugin({template: 'index.html.ejs',}),
+    new FaviconsWebpackPlugin({
+      logo: 'assets/img/logo.svg',
+      publicPath: '/',
+      outputPath: '/',
+    })
   ],
   externals: {
     'react': 'React',

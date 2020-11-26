@@ -1,11 +1,9 @@
 import {INavigationData, NavigationData} from "@appchat/core/navigation/constants";
 import {ROUTES} from "@appchat/core/navigation/enums";
-import {ACTIONS} from "@appchat/core/store/constants";
 import { NavigationAction } from "@appchat/ui/elements/navigation/action";
 import { NavigationLink } from "@appchat/ui/elements/navigation/link";
 import * as Pages from "@appchat/ui/pages";
 import * as React from "react";
-import {ReactElement} from "react";
 import {Route} from "react-router-dom";
 
 class CoreNavigation {
@@ -40,10 +38,10 @@ class CoreNavigation {
                 CoreNavigation.NavigationRoutes : [...NavigationData]
                     .filter((n) => !n.payload)
                     .map( (props: INavigationData) => {
-                        const RouteComponent = Pages[props.id];
+                        const RouteComponent = Pages[props.id as keyof typeof ROUTES];
                         return (<Route
                             exact={props.exact || false}
-                            path={ROUTES[props.id]}
+                            path={ROUTES[props.id as keyof typeof ROUTES]}
                             key={props.id}
                             auth={props.auth}
                             render={ () => <RouteComponent /> }
