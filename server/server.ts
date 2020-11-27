@@ -50,11 +50,23 @@ if (cluster.isMaster) {
       if (!token) { return null; }
       try {
         const data: any = jwt.verify(token as string, config.token.secret);
-        const user = User.findById(data.id);
-        return user ? {user} : null;
+        return data?.id ? data : null;
       } catch(e) {
         throw new AuthenticationError(e);
       }
+    },
+    subscriptions: {
+      onConnect: (connectionParams) => {
+        // @ts-ignore
+        if (!connectionParams?.token) { return null; }
+        try {
+          // @ts-ignore
+          const data: any = jwt.verify(connectionParams?.token as string, config.token.secret);
+          return data?.id ? data : null;
+        } catch(e) {
+          throw new AuthenticationError(e);
+        }
+      },
     },
   });
 

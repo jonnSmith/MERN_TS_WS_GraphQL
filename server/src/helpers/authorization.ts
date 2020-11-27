@@ -2,8 +2,9 @@ import { ForbiddenError } from 'apollo-server';
 import { combineResolvers, skip } from 'graphql-resolvers';
 import Message from '../common/message/message.model';
 
-export const isAuthenticated = (parent, args, { user }) =>
-  user ? skip : new ForbiddenError('Not authenticated as user.');
+export const isAuthenticated = (parent, args, data) => {
+  return data.id ? skip : new ForbiddenError('Not authenticated as user.');
+}
 
 export const isMessageOwner = async (
   parent,

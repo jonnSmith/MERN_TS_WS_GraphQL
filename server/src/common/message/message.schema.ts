@@ -80,30 +80,23 @@ export const messageResolvers = {
       messages = messages.map(m => m.toObject());
       return { messages };
     },
-    message: combineResolvers(
-      isAuthenticated,
-      async (_, { id }) => {
+    message: async (_, { id }) => {
         const message: any = await Message.findById(id);
         return message.toObject();
-      },
-    ),
-    count: combineResolvers(
-      isAuthenticated,
-      async (_, {  }) => {
+        },
+    count: async (_, {  }) => {
         const total: number = await Message.countDocuments({});
         return { total };
       },
-    ),
   },
 
   Mutation: {
     createMessage: combineResolvers(
         isAuthenticated,
-      async (parent, { text, filter = DEFAULT_FILTER }, { user }) => {
+      async (parent, { text, filter = DEFAULT_FILTER }, { id }) => {
         const message: any = await Message.create({
           text,
-          userId: user.id,
-          workspaceId: user.workspaceId
+          userId: id,
         });
         if(!message) {
           throw new ForbiddenError('Message forbidden to create.');

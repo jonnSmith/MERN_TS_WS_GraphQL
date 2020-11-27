@@ -67,6 +67,10 @@ class ApolloConnection {
         const wsLink = new WebSocketLink({
             options: {
                 reconnect: true,
+                // tslint:disable-next-line:object-literal-sort-keys
+                connectionParams: () => ({
+                    token: localStorage.getItem(config.token.storage),
+                }),
             },
             uri: `ws://localhost:${config.server.port}/graphql`,
         });
