@@ -4,7 +4,7 @@ import http = require('http');
 import { ApolloServer } from 'apollo-server-express';
 import { makeExecutableSchema } from 'graphql-tools';
 import ExecutableSchema from './src/schema';
-import User from './src/common/user/user.model';
+// import User from './src/common/user/user.model';
 import config from './../configs/config.app';
 import {AuthenticationError} from "apollo-server";
 
@@ -42,7 +42,7 @@ if (cluster.isMaster) {
   const server = new ApolloServer({
     schema,
     formatError(error) {
-      console.log(error);
+      console.error(error);
       return error;
     },
     async context({req}) {
@@ -62,7 +62,7 @@ if (cluster.isMaster) {
         try {
           // @ts-ignore
           const data: any = jwt.verify(connectionParams?.token as string, config.token.secret);
-          return data?.id ? data : null;
+          return data?.id ? { data } : null;
         } catch(e) {
           throw new AuthenticationError(e);
         }
