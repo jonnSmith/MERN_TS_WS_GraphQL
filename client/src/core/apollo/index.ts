@@ -9,6 +9,7 @@ import {IApolloClientOptions, IDefinition} from "@appchat/core/apollo/interfaces
 import {config} from "@appchat/core/config";
 import {CoreStore} from "@appchat/core/store";
 import {ACTIONS} from "@appchat/core/store/constants";
+import {ClientStorage} from "@appchat/core/store/storage";
 import {UserInitState} from "@appchat/data/user/constants";
 import {History} from "history";
 
@@ -49,7 +50,7 @@ class ApolloConnection {
     private static CreateAuthLink() {
         return new ApolloLink((operation, forward) => {
             operation.setContext(({headers = {}}) => {
-                const token = localStorage.getItem(config.token.storage);
+                const token = ClientStorage.read(config.token.storage);
                 if (token) {
                     headers = {...headers, [config.token.header]: token};
                 }
@@ -69,7 +70,7 @@ class ApolloConnection {
                 reconnect: true,
                 // tslint:disable-next-line:object-literal-sort-keys
                 connectionParams: () => ({
-                    token: localStorage.getItem(config.token.storage),
+                    token: ClientStorage.read(config.token.storage),
                 }),
             },
             uri: `ws://localhost:${config.server.port}/graphql`,
@@ -86,28 +87,30 @@ class ApolloConnection {
     }
 
     private static CreateErrorLink() {
-        return onError(({graphQLErrors, networkError}: ErrorResponse) => {
+        return onError(({graphQLErrors, networkError, response}: ErrorResponse) => {
             if (graphQLErrors) {
                 graphQLErrors.forEach(({message, extensions, locations, path}) => {
-                    console.log("GraphQL error", message);
                     switch (extensions?.code) {
                         case "UNAUTHENTICATED": {
                             CoreStore.ReduxSaga.dispatch({type: ACTIONS.USER_LOGOUT, payload: UserInitState});
+                            if (response && response.errors) { response.errors = null; }
                             break;
                         }
                         case "BAD_USER_INPUT": {
-                            console.debug(message);
+                            console.debug("graphQLError", message);
+                            response.errors = null;
                             break;
                         }
                         case "INTERNAL_SERVER_ERROR": {
-                            console.error(message);
+                            console.error("graphQLError", message);
+                            response.errors = null;
                             break;
                         }
                     }
                 });
             }
             if (networkError) {
-                if (!graphQLErrors.length) { console.error(networkError.message); }
+                if (!graphQLErrors.length) { console.error("networkError", networkError.message); }
             }
         });
     }

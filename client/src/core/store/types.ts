@@ -6,4 +6,9 @@ type ActionsString = keyof typeof ACTIONS;
 type StateReducers = typeof UserReducers;
 type StateReturnTypes = Record<keyof StateReducers, ReturnType<typeof UserReducers[keyof StateReducers]>>;
 
-export { ActionsString, StateReducers, StateReturnTypes };
+type SupportedStorageEngines = "localStorage" | "sessionStorage";
+type StorageEngines = {
+    [key in SupportedStorageEngines]: Storage;
+};
+
+export { ActionsString, StateReducers, StateReturnTypes, StorageEngines, SupportedStorageEngines };

@@ -8,18 +8,20 @@ import {Switch} from "react-router-dom";
 
 const NavigationInterface = () => {
     const {user} = useSelector((state: StateReturnTypes) => state.UserReducer);
-    return <NavigationDrawer
-        drawerTitle={config.app.sidebar}
-        toolbarTitle={config.app.name}
-        mobileDrawerType={NavigationDrawer.DrawerTypes.TEMPORARY_MINI}
-        tabletDrawerType={NavigationDrawer.DrawerTypes.PERSISTENT_MINI}
-        desktopDrawerType={NavigationDrawer.DrawerTypes.PERSISTENT_MINI}
-        navItems={ CoreNavigation.links(typeof user?.token !== "undefined") }
-    >
-        <Switch>
-            {CoreNavigation.routes(typeof user?.token !== "undefined")}
-        </Switch>
-    </NavigationDrawer>;
+    return <React.Suspense fallback={<p>error</p>}>
+        <NavigationDrawer
+            drawerTitle={config.app.sidebar}
+            toolbarTitle={config.app.name}
+            mobileDrawerType={NavigationDrawer.DrawerTypes.TEMPORARY_MINI}
+            tabletDrawerType={NavigationDrawer.DrawerTypes.PERSISTENT_MINI}
+            desktopDrawerType={NavigationDrawer.DrawerTypes.PERSISTENT_MINI}
+            navItems={ CoreNavigation.links(typeof user?.token !== "undefined") }
+        >
+            <Switch>
+                {CoreNavigation.routes(typeof user?.token !== "undefined")}
+            </Switch>
+        </NavigationDrawer>
+    </React.Suspense>;
 };
 
 export { NavigationInterface };

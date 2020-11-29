@@ -7,7 +7,7 @@ import * as React from "react";
 import {useDispatch} from "react-redux";
 
 const App = () => {
-    const { data, loading } = useQuery(GET_ME, {notifyOnNetworkStatusChange: true});
+    const { data, loading, error } = useQuery(GET_ME, {notifyOnNetworkStatusChange: true});
     const dispatch = useDispatch();
 
     React.useEffect( () => {
@@ -15,7 +15,7 @@ const App = () => {
             dispatch({type: data.user ? ACTIONS.USER_LOGIN : ACTIONS.USER_LOGOUT, payload: data});
         }
     }, [data]);
-
+    if (error) { return <><p>Critical error: {JSON.stringify(error)} </p><a href="/login">Reload</a> </>; }
     return loading ? <LoaderSpinner /> : <NavigationInterface />;
 };
 

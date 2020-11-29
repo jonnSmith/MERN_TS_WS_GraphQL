@@ -7,6 +7,7 @@ import ExecutableSchema from './src/schema';
 // import User from './src/common/user/user.model';
 import config from './../configs/config.app';
 import {AuthenticationError} from "apollo-server";
+import User from "./src/common/user/user.model";
 
 const schema = makeExecutableSchema(ExecutableSchema);
 
@@ -50,7 +51,9 @@ if (cluster.isMaster) {
       if (!token) { return null; }
       try {
         const data: any = jwt.verify(token as string, config.token.secret);
-        return data?.id ? data : null;
+        const userDocument: any = await User.findById(data?.id);
+        const userData = userDocument.toObject()
+        return userData?.id ? userData : null;
       } catch(e) {
         throw new AuthenticationError(e);
       }

@@ -11,7 +11,7 @@ export default {
     port: 3000,
   },
   client: {
-    port: 8080
+    port: 8080,
   },
   mongodb: {
     uri: 'mongodb://localhost/neurochat',
@@ -20,5 +20,6 @@ export default {
     header: 'x-token',
     storage: 'token',
     secret: 'neurochat!secret',
+    engine: 'sessionStorage',
   },
 };

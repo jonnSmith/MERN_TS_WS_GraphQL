@@ -1,6 +1,6 @@
 import * as jwt from 'jsonwebtoken';
 import Workspace from '../workspace/workspace.model';
-import {AuthenticationError, UserInputError} from "apollo-server";
+import {UserInputError} from "apollo-server";
 import User from './user.model';
 import config from '../../../../configs/config.app';
 
@@ -56,18 +56,7 @@ export const userResolvers = {
       return user.toObject();
     },
     async currentUser(_, {}, user) {
-      const { id } = user;
-      if (!id) { return null; }
-      try {
-        const userDocument = await User.findById(id);
-        if (!userDocument) { return null; }
-        const userObject = userDocument.toObject();
-        userObject.token = jwt.sign({id: userObject.id}, config.token.secret);
-        return userObject;
-      }
-      catch (e) {
-        throw new AuthenticationError(e);
-      }
+      return user;
     },
   },
   Mutation: {
