@@ -1,4 +1,6 @@
-import { ForbiddenError } from 'apollo-server';
+// tslint:disable-next-line:no-submodule-imports
+import { ForbiddenError } from '@apollo/server/errors';
+import {CoreBus} from "../../core/bus";
 
 import User from '../user/user.model';
 import Workspace from '../workspace/workspace.model';
@@ -25,39 +27,60 @@ export const messageTypeDefs = `
     createMessage(text: String!): Message
     deleteMessage(id: ID!): Message
   }
-
+  
+  type updateAction {
+    id: ID
+    action: String
+  }
+  
+  extend type Subscription {
+    chatUpdated: updateAction
+  }
 `;
+
+const PubSub = CoreBus.pubsub;
 
 export const messageResolvers = {
   Query: {
-    messages: async (_, {}, {}) => {
+    messages: async (_, {}, user) => {
       let messages: any[] = await Message.find({}, null, {});
       messages = messages.map(m => m.toObject());
       return { messages };
     },
-    message: async (_, { id }) => {
+    message: async (_, { id }, user) => {
       const message: any = await Message.findById(id);
       return message.toObject();
     },
   },
   Mutation: {
-    createMessage: async (_, { text }, { id }) => {
+    createMessage: async (_, { text }, user) => {
+      try {
         const message: any = await Message.create({
           text,
-          userId: id,
+          userId: user?.id,
         });
-        if(!message) {
-          throw new ForbiddenError('Message forbidden to create.');
-        }
+        await PubSub.publish('CHAT_UPDATED', {chatUpdated: { id: message?.id, action: 'create'}});
         return message.toObject();
-      },
-    deleteMessage: async (_, { id }, { }) => {
+      }
+      catch(e) {
+        console.debug(e);
+        throw new ForbiddenError('Message forbidden to create.');
+      }
+    },
+    deleteMessage: async (_, { id }, user) => {
+      try {
         const message: any = await Message.findByIdAndRemove(id);
-        if(!message) {
-          throw new ForbiddenError('Message forbidden to delete.');
-        }
+        await PubSub.publish('CHAT_UPDATED', {chatUpdated: { id: message?.id, action: 'delete'}});
         return message.toObject();
-      },
+      } catch(e) {
+        throw new ForbiddenError('Message forbidden to delete.');
+      }
+    },
+  },
+  Subscription: {
+    chatUpdated: {
+      subscribe: () => PubSub.asyncIterator('CHAT_UPDATED'),
+    }
   },
   Message: {
     async user(message: { userId: string }) {

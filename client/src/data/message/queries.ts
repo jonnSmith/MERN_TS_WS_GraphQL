@@ -22,7 +22,16 @@ const DELETE_MESSAGE = gql`
   }
 `;
 
+const CHAT_UPDATED = gql`
+  subscription {
+    chatUpdated {
+      action
+      id
+    }
+  }`;
+
 export {
     CREATE_MESSAGE,
-    DELETE_MESSAGE
+    DELETE_MESSAGE,
+    CHAT_UPDATED
 };

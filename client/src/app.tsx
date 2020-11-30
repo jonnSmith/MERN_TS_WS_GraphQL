@@ -15,7 +15,7 @@ const App = () => {
             dispatch({type: data.user ? ACTIONS.USER_LOGIN : ACTIONS.USER_LOGOUT, payload: data});
         }
     }, [data]);
-    if (error) { return <><p>Critical error: {JSON.stringify(error)} </p><a href="/login">Reload</a> </>; }
+    if (error) { return <><p>Critical error: {JSON.stringify(error)} </p><a href="/">Reload</a> </>; }
     return loading ? <LoaderSpinner /> : <NavigationInterface />;
 };
 

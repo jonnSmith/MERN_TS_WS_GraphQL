@@ -1,6 +1,7 @@
 import * as jwt from 'jsonwebtoken';
 import Workspace from '../workspace/workspace.model';
-import {UserInputError} from "apollo-server";
+// tslint:disable-next-line:no-submodule-imports
+import {UserInputError} from '@apollo/server/errors';
 import User from './user.model';
 import config from '../../../../configs/config.app';
 
@@ -10,9 +11,9 @@ export const userTypeDefs = `
     id: ID!
     workspaceId: String
     workspace: Workspace
-    email: String!
-    password: String!
-    firstName: String!
+    email: String
+    password: String
+    firstName: String
     lastName: String
     token: String
   }
@@ -24,7 +25,7 @@ export const userTypeDefs = `
   extend type Query {
     users(filter: UserFilterInput): [User]
     user(id: String!): User
-    currentUser: User
+    currentUser: User 
   }
 
   input UserInput {
@@ -56,7 +57,7 @@ export const userResolvers = {
       return user.toObject();
     },
     async currentUser(_, {}, user) {
-      return user;
+      return user && user.id ? { ...user, ...{ token: jwt.sign({ id: user.id }, config.token.secret) } } : null;
     },
   },
   Mutation: {

@@ -1,16 +1,16 @@
-const { PubSub } = require('apollo-server');
+import { RedisPubSub } from 'graphql-redis-subscriptions';
 
 class CoreBus {
     private static Bus;
 
-    public get pubsub() {
+    public static get pubsub() {
         // tslint:disable-next-line:no-unused-expression
         if(!CoreBus.Bus) { new CoreBus(); }
         return CoreBus.Bus;
     }
 
     constructor() {
-        CoreBus.Bus = CoreBus.Bus || new PubSub();
+        CoreBus.Bus = CoreBus.Bus || new RedisPubSub({});
     }
 }
 

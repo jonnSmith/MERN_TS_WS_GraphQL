@@ -12,6 +12,7 @@ import {ACTIONS} from "@appchat/core/store/constants";
 import {ClientStorage} from "@appchat/core/store/storage";
 import {UserInitState} from "@appchat/data/user/constants";
 import {History} from "history";
+import { SubscriptionClient } from "subscriptions-transport-ws";
 
 class ApolloConnection {
 
@@ -65,16 +66,15 @@ class ApolloConnection {
             uri: `http://localhost:${config.server.port}/graphql`,
         });
 
-        const wsLink = new WebSocketLink({
-            options: {
-                reconnect: true,
-                // tslint:disable-next-line:object-literal-sort-keys
-                connectionParams: () => ({
-                    token: ClientStorage.read(config.token.storage),
-                }),
-            },
-            uri: `ws://localhost:${config.server.port}/graphql`,
+        const client = new SubscriptionClient(`ws://localhost:${config.server.port}/graphql`, {
+            connectionParams: () => ({
+                token: ClientStorage.read(config.token.storage),
+            }),
+            reconnect: true,
         });
+
+
+        const wsLink = new WebSocketLink(client);
 
         return split(
             ({query}) => {
@@ -93,17 +93,17 @@ class ApolloConnection {
                     switch (extensions?.code) {
                         case "UNAUTHENTICATED": {
                             CoreStore.ReduxSaga.dispatch({type: ACTIONS.USER_LOGOUT, payload: UserInitState});
-                            if (response && response.errors) { response.errors = null; }
+                            // if (response && response.errors) { response.errors = null; }
                             break;
                         }
-                        case "BAD_USER_INPUT": {
+                        case "BAD_USER_INPUT" || "FORBIDDEN": {
                             console.debug("graphQLError", message);
-                            response.errors = null;
+                            // response.errors = null;
                             break;
                         }
                         case "INTERNAL_SERVER_ERROR": {
                             console.error("graphQLError", message);
-                            response.errors = null;
+                            // response.errors = null;
                             break;
                         }
                     }

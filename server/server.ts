@@ -1,13 +1,13 @@
 import * as jwt from 'jsonwebtoken';
 import express = require('express');
-import http = require('http');
+import {createServer} from "http";
 import { ApolloServer } from 'apollo-server-express';
 import { makeExecutableSchema } from 'graphql-tools';
 import ExecutableSchema from './src/schema';
-// import User from './src/common/user/user.model';
 import config from './../configs/config.app';
-import {AuthenticationError} from "apollo-server";
 import User from "./src/common/user/user.model";
+import { SubscriptionServer } from 'subscriptions-transport-ws';
+import {execute, subscribe} from "graphql";
 
 const schema = makeExecutableSchema(ExecutableSchema);
 
@@ -40,36 +40,22 @@ if (cluster.isMaster) {
    * Create the server which we will send our
    * GraphQL queries to.
    */
-  const server = new ApolloServer({
+  const apollo = new ApolloServer({
     schema,
     formatError(error) {
       console.error(error);
       return error;
     },
     async context({req}) {
-      const token = req && req.headers && req.headers[config.token.header];
-      if (!token) { return null; }
       try {
+        const token = req && req.headers && req.headers[config.token.header];
         const data: any = jwt.verify(token as string, config.token.secret);
         const userDocument: any = await User.findById(data?.id);
-        const userData = userDocument.toObject()
-        return userData?.id ? userData : null;
+        return userDocument.toObject();
       } catch(e) {
-        throw new AuthenticationError(e);
+        // throw new AuthenticationError(e);
+        return null;
       }
-    },
-    subscriptions: {
-      onConnect: (connectionParams) => {
-        // @ts-ignore
-        if (!connectionParams?.token) { return null; }
-        try {
-          // @ts-ignore
-          const data: any = jwt.verify(connectionParams?.token as string, config.token.secret);
-          return data?.id ? { data } : null;
-        } catch(e) {
-          throw new AuthenticationError(e);
-        }
-      },
     },
   });
 
@@ -84,14 +70,34 @@ if (cluster.isMaster) {
     saveUninitialized: true,
     secret: config.token.secret
   }));
-  server.applyMiddleware({app});
+  apollo.applyMiddleware({app});
+  const server = createServer(app);
 
-  const httpServer = http.createServer(app);
-  server.installSubscriptionHandlers(httpServer);
-
-  httpServer.listen(PORT, () => {
-    console.log(`${process.pid} Server ready at http://localhost:${PORT}${server.graphqlPath}`);
-    console.log(`${process.pid} Subscriptions ready at ws://localhost:${PORT}${server.subscriptionsPath}`);
+  server.listen(PORT, () => {
+    // tslint:disable-next-line:no-unused-expression
+    const ws = new SubscriptionServer({
+      schema,
+      execute,
+      subscribe,
+      onConnect: (connectionParams) => {
+        // @ts-ignore
+        if (!connectionParams?.token) {
+          return null;
+        }
+        try {
+          // @ts-ignore
+          const data: any = jwt.verify(connectionParams?.token as string, config.token.secret);
+          return data?.id ? {data} : null;
+        } catch (e) {
+          console.debug(e);
+          return null;
+        }
+      },
+    }, {
+      server,
+      path: '/graphql',
+    });
+    ws.server.addListener('connection', (client => {console.debug(client)}))
+    // console.debug('HTTP:WS CLUSTER STARTED', ws);
   });
-
 }
