@@ -5,7 +5,7 @@ import {Button, CardActions, TextField} from "react-md";
 
 const MessageSend = (props: IMessageSendProps) => {
 
-    const {onSubmit} = props;
+    const {onSubmit, loading} = props;
 
     const[MessageForm, updateMessageForm] = React.useState(MessageFormInitialObject);
 
@@ -25,6 +25,7 @@ const MessageSend = (props: IMessageSendProps) => {
             maxLength={200}
             label="Message text"
             className="md-cell md-cell--12"
+            disabled={loading}
         />
         <CardActions className="md-cell md-cell--12">
             <Button

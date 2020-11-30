@@ -8,10 +8,25 @@ export default {
     sidebar: "Navigation"
   },
   server: {
-    port: 5151,
+    port: 5252,
+    ws: 5151,
+    host: 'localhost',
+    path: 'graphql'
   },
   client: {
     port: 8484,
+    host: 'localhost',
+    apollo: {
+      options: {
+        ErrorPolicy: "none",
+        FetchPolicy: "network-only",
+      }
+    },
+    formats: {
+      message: {
+        date: "YYYY/MM/DD, H:mm"
+      }
+    }
   },
   mongodb: {
     uri: 'mongodb://localhost/neurochat',

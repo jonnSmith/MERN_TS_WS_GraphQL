@@ -7,7 +7,6 @@ const CREATE_MESSAGE = gql`
       text
       createdAt
       user {
-        id
         email
       }
     }
@@ -23,15 +22,36 @@ const DELETE_MESSAGE = gql`
 `;
 
 const CHAT_UPDATED = gql`
-  subscription {
+  subscription chatUpdated {
     chatUpdated {
       action
-      id
+      message {
+        id
+        text
+        createdAt
+        user {
+          email
+        }
+      }
     }
   }`;
+
+const PRELOAD_MESSAGE = gql`
+  {
+    message: preloadMessage {
+        id
+        text
+        createdAt
+        user {
+          email
+        }
+    }
+  }
+`;
 
 export {
     CREATE_MESSAGE,
     DELETE_MESSAGE,
-    CHAT_UPDATED
+    CHAT_UPDATED,
+    PRELOAD_MESSAGE
 };

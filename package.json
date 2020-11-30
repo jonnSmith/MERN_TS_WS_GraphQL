@@ -25,7 +25,6 @@
     "lint": "tslint './server/**/*.ts*' --format stylish --project . --force"
   },
   "dependencies": {
-    "@apollo/client": "^3.3.1",
     "@apollo/react-common": "3.1.4",
     "@apollo/react-components": "3.1.5",
     "@apollo/react-hooks": "^4.0.0",
@@ -46,7 +45,9 @@
     "axios": "^0.19.0",
     "bcryptjs": "^2.4.3",
     "connect-mongo": "^3.0.0",
+    "cors": "^2.8.5",
     "express": "^4.17.1",
+    "express-graphql": "^0.12.0",
     "express-session": "^1.16.2",
     "favicons-webpack-plugin": "^4.2.0",
     "graphql": "^15.4.0",
@@ -75,6 +76,7 @@
     "redux-starter-kit": "^0.7.0",
     "redux-thunk": "^2.3.0",
     "sequelize": "^5.19.3",
+    "subscriptions-transport-ws": "^0.9.18",
     "typescript": "^3.6.3",
     "webfontloader": "^1.6.28",
     "ws": "^7.4.0"

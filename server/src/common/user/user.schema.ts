@@ -4,6 +4,9 @@ import Workspace from '../workspace/workspace.model';
 import {UserInputError} from '@apollo/server/errors';
 import User from './user.model';
 import config from '../../../../configs/config.app';
+import {CoreBus} from "../../core/bus";
+
+// TODO: Remove password field from User data type
 
 export const userTypeDefs = `
 
@@ -46,6 +49,8 @@ export const userTypeDefs = `
 
 `;
 
+const PubSub = CoreBus.pubsub;
+
 export const userResolvers = {
   Query: {
     async users(_, { filter = {} }) {
@@ -56,7 +61,8 @@ export const userResolvers = {
       const user: any = await User.findById(id);
       return user.toObject();
     },
-    async currentUser(_, {}, user) {
+    async currentUser(_, {}, context) {
+      const { user } = await context;
       return user && user.id ? { ...user, ...{ token: jwt.sign({ id: user.id }, config.token.secret) } } : null;
     },
   },

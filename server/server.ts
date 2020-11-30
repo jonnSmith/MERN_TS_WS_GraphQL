@@ -1,17 +1,17 @@
-import * as jwt from 'jsonwebtoken';
 import express = require('express');
+import cors = require('cors');
 import {createServer} from "http";
-import {ApolloServer} from 'apollo-server-express';
 import {makeExecutableSchema} from 'graphql-tools';
-import scheme from './src/schema';
+import ExecutableSchema from './src/schema';
 import config from './../configs/config.app';
-import User from "./src/common/user/user.model";
 import {execute, subscribe} from "graphql";
-import {Server} from 'ws';
-// tslint:disable-next-line:no-submodule-imports
-import { useServer } from 'graphql-ws/lib/use/ws';
+import {SubscriptionServer} from 'subscriptions-transport-ws';
+import {graphqlHTTP} from "express-graphql";
 
-const schema = makeExecutableSchema(scheme);
+import {ContextMiddleware, OnConnectMiddleware} from "./src/core/midddlewares/token";
+import {CoreBus} from "./src/core/bus";
+
+const schema = makeExecutableSchema(ExecutableSchema);
 const mongoose = require('mongoose');
 mongoose.connect(
   config.mongodb.uri,
@@ -23,6 +23,8 @@ mongoose.connect(
   }
 );
 
+// TODO: Check clusters and add a common bus (Redis) if needed
+
 // const cluster = require('cluster');
 // const numCPUs = require('os').cpus().length;
 // if (cluster.isMaster) {
@@ -33,62 +35,72 @@ mongoose.connect(
 //     console.log(`worker ${worker.process.pid} died`);
 //   });
 // } else {
-  /**
-   * Create the server which we will send our
-   * GraphQL queries to.
-   */
-  const apollo = new ApolloServer({
-    schema,
-    formatError(error) {
-      console.error(error);
-      return error;
-    },
-    async context({req}) {
-      try {
-        const token = req && req.headers && req.headers[config.token.header];
-        const data: any = jwt.verify(token as string, config.token.secret);
-        const userDocument: any = await User.findById(data?.id);
-        return userDocument.toObject();
-      } catch(e) {
-        // throw new AuthenticationError(e);
-        return null;
-      }
-    },
-  });
 
-  const port = config.server.port;
-  const app = express();
+const PubSub = CoreBus.pubsub;
 
-  const session = require('express-session');
-  const MongoStore = require('connect-mongo')(session);
-  app.use(session({
-    store: new MongoStore({mongooseConnection: mongoose.connection}),
-    resave: true,
-    saveUninitialized: true,
-    secret: config.token.secret
-  }));
-  apollo.applyMiddleware({app});
-  const server = createServer(app);
+const app = express();
+const session = require('express-session');
+const MongoStore = require('connect-mongo')(session);
+app.use(session({
+  store: new MongoStore({mongooseConnection: mongoose.connection}),
+  resave: true,
+  saveUninitialized: true,
+  secret: config.token.secret
+}), cors());
 
-  const wsServer = new Server({
-    server,
-    path: '/graphql',
-    host: 'localhost',
-    port,
-  });
 
-  useServer(
-      {
-        schema,
-        execute,
-        subscribe,
-      },
-      wsServer,
-  );
+const ws = createServer((req, res) => {
+  res.writeHead(400);
+  res.end();
+})
 
-  server.listen(port, 'localhost', () => {
-    console.debug(`HTTP:WS CLUSTER STARTED :${port}`, wsServer.address(), server.address());
-  });
+ws.listen(config.server.ws, () => console.debug('websocket listening on port ', config.server.ws))
+
+const subscriptionServer = SubscriptionServer.create({
+  schema,
+  execute,
+  subscribe,
+  onConnect: OnConnectMiddleware,
+}, {server: ws, path: `/${config.server.path}`});
+
+app.use(`/${config.server.path}`, graphqlHTTP(async (request, response, graphQLParams) => (
+    {
+      schema,
+      graphiql: true,
+      context: ContextMiddleware(request),
+    }
+  )
+  )
+);
+
+app.listen(config.server.port, () => console.log('http server listening on ', config.server.port))
+
+// TODO: Apply updates for graphql-ws if any or cleanup commented code
+
+// apollo.applyMiddleware({app});
+// const server = createServer(app);
+//
+//
+// server.listen(port, () => {
+//   console.debug(`HTTP:WS CLUSTER STARTED :${port}`, server);
+// });
+
+// const wsServer = new Server({
+//   server,
+//   path: '/graphql',
+//   host: 'localhost',
+//   port,
+//   perMessageDeflate: false,
+// });
+//
+// useServer(
+//     {
+//       schema,
+//       execute,
+//       subscribe,
+//     },
+//     wsServer,
+// );
 
 
 // }

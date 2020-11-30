@@ -21,6 +21,7 @@ export const messageTypeDefs = `
   extend type Query {
     messages: [Message]
     message(id: ID!): Message!
+    preloadMessage: Message
   }
 
   extend type Mutation {
@@ -29,7 +30,7 @@ export const messageTypeDefs = `
   }
   
   type updateAction {
-    id: String
+    message: Message
     action: String
   }
   
@@ -42,24 +43,29 @@ const PubSub = CoreBus.pubsub;
 
 export const messageResolvers = {
   Query: {
-    messages: async (_, {}, user) => {
+    messages: async (_, {}, context) => {
       let messages: any[] = await Message.find({}, null, {});
       messages = messages.map(m => m.toObject());
       return { messages };
     },
-    message: async (_, { id }, user) => {
+    message: async (_, { id }, context) => {
       const message: any = await Message.findById(id);
+      return message.toObject();
+    },
+    preloadMessage: async (_, {}, context) => {
+      const message: any= await Message.findOne({}).sort({createdAt: -1});
       return message.toObject();
     },
   },
   Mutation: {
-    createMessage: async (_, { text }, user) => {
+    createMessage: async (_, { text }, context) => {
       try {
+        const { user } = await context;
         const message: any = await Message.create({
           text,
           userId: user?.id,
         });
-        await PubSub.publish('CHAT_UPDATED', {chatUpdated: { id: message?.id, action: 'create'}});
+        await PubSub.publish('CHAT_UPDATED', {chatUpdated: { ...{message, ...{user}}, action: 'create'}});
         return message.toObject();
       }
       catch(e) {
@@ -67,10 +73,10 @@ export const messageResolvers = {
         throw new ForbiddenError('Message forbidden to create.');
       }
     },
-    deleteMessage: async (_, { id }, user) => {
+    deleteMessage: async (_, { id }, context) => {
       try {
         const message: any = await Message.findByIdAndRemove(id);
-        await PubSub.publish('CHAT_UPDATED', {chatUpdated: { id: message?.id, action: 'delete'}});
+        await PubSub.publish('CHAT_UPDATED', {chatUpdated: { message, action: 'delete'}});
         return message.toObject();
       } catch(e) {
         throw new ForbiddenError('Message forbidden to delete.');
