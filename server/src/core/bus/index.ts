@@ -1,4 +1,4 @@
-import { RedisPubSub } from 'graphql-redis-subscriptions';
+import { PubSub } from  'graphql-subscriptions';
 
 class CoreBus {
     private static Bus;
@@ -10,7 +10,7 @@ class CoreBus {
     }
 
     constructor() {
-        CoreBus.Bus = CoreBus.Bus || new RedisPubSub({});
+        CoreBus.Bus = CoreBus.Bus || new PubSub({});
     }
 }
 

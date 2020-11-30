@@ -1,18 +1,16 @@
-import {ApolloClient, ApolloClientOptions} from "@apollo/client";
+import {ApolloClient, ApolloClientOptions, createHttpLink, from, split} from "@apollo/client";
 import {ApolloCache, InMemoryCache} from "@apollo/client/cache";
-import {ApolloLink, split} from "@apollo/client/link/core";
+import {setContext} from "@apollo/client/link/context";
+import {ApolloLink} from "@apollo/client/link/core";
 import {ErrorResponse, onError} from "@apollo/client/link/error";
-import {HttpLink} from "@apollo/client/link/http";
 import {WebSocketLink} from "@apollo/client/link/ws";
 import {getMainDefinition} from "@apollo/client/utilities";
-import {IApolloClientOptions, IDefinition} from "@appchat/core/apollo/interfaces";
 import {config} from "@appchat/core/config";
 import {CoreStore} from "@appchat/core/store";
 import {ACTIONS} from "@appchat/core/store/constants";
 import {ClientStorage} from "@appchat/core/store/storage";
 import {UserInitState} from "@appchat/data/user/constants";
 import {History} from "history";
-import { SubscriptionClient } from "subscriptions-transport-ws";
 
 class ApolloConnection {
 
@@ -31,55 +29,67 @@ class ApolloConnection {
     private static Client: ApolloClient<any>;
     private static History: History;
 
+    private static URI: string = `http://localhost:${config.server.port}/graphql`;
+
     private static CreateApolloCache = (): ApolloCache<any> => {
         return new InMemoryCache();
     }
 
     private static CreateApolloLink = (): ApolloLink => {
-        return ApolloLink.from([
+        return from([
             ApolloConnection.CreateAuthLink(),
             ApolloConnection.CreateErrorLink(),
             ApolloConnection.CreateTerminatingLink()]);
     }
 
-    private static CreateClient(
-        ClientOptions: ApolloClientOptions<IApolloClientOptions>):
-        ApolloClient<ApolloClientOptions<IApolloClientOptions>> {
-        return new ApolloClient(ClientOptions);
+    private static CreateClient(options: ApolloClientOptions<any>) {
+        return new ApolloClient(options);
     }
 
     private static CreateAuthLink() {
-        return new ApolloLink((operation, forward) => {
-            operation.setContext(({headers = {}}) => {
-                const token = ClientStorage.read(config.token.storage);
-                if (token) {
-                    headers = {...headers, [config.token.header]: token};
-                }
+        return setContext(async (_, {headers}) => {
+            const token = await ClientStorage.read(config.token.storage);
+            if (!token) {
                 return {headers};
-            });
-            return forward(operation);
+            }
+            return {
+                headers: {
+                    ...headers,
+                    [config.token.header]: token,
+                },
+            };
         });
     }
 
     private static CreateTerminatingLink() {
-        const httpLink = new HttpLink({
-            uri: `http://localhost:${config.server.port}/graphql`,
+        const httpLink = createHttpLink({
+            uri: ApolloConnection.URI,
         });
 
-        const client = new SubscriptionClient(`ws://localhost:${config.server.port}/graphql`, {
-            connectionParams: () => ({
-                token: ClientStorage.read(config.token.storage),
-            }),
-            reconnect: true,
+        const wsLink = new WebSocketLink({
+            options: {
+                connectionParams: async () => {
+                    const token = await ClientStorage.read(config.token.storage);
+                    return {
+                        headers: {
+                            [config.token.header]: token,
+                        },
+                    };
+                },
+                lazy: true,
+                reconnect: true,
+                timeout: 100,
+            },
+            uri: ApolloConnection.URI.replace("http", "ws"),
         });
-
-
-        const wsLink = new WebSocketLink(client);
 
         return split(
             ({query}) => {
-                const {kind, operation}: IDefinition = getMainDefinition(query);
-                return kind === "OperationIDefinition" && operation === "subscription";
+                const definition = getMainDefinition(query);
+                return (
+                    definition.kind === "OperationDefinition" &&
+                    definition.operation === "subscription"
+                );
             },
             wsLink,
             httpLink,
@@ -87,9 +97,9 @@ class ApolloConnection {
     }
 
     private static CreateErrorLink() {
-        return onError(({graphQLErrors, networkError, response}: ErrorResponse) => {
+        return onError(({graphQLErrors, networkError}: ErrorResponse): void => {
             if (graphQLErrors) {
-                graphQLErrors.forEach(({message, extensions, locations, path}) => {
+                graphQLErrors.forEach(({message, extensions}) => {
                     switch (extensions?.code) {
                         case "UNAUTHENTICATED": {
                             CoreStore.ReduxSaga.dispatch({type: ACTIONS.USER_LOGOUT, payload: UserInitState});

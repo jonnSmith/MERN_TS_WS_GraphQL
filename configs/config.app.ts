@@ -8,10 +8,10 @@ export default {
     sidebar: "Navigation"
   },
   server: {
-    port: 3000,
+    port: 5151,
   },
   client: {
-    port: 8080,
+    port: 8484,
   },
   mongodb: {
     uri: 'mongodb://localhost/neurochat',

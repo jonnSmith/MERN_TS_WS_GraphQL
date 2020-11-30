@@ -1,20 +1,17 @@
 import * as jwt from 'jsonwebtoken';
 import express = require('express');
 import {createServer} from "http";
-import { ApolloServer } from 'apollo-server-express';
-import { makeExecutableSchema } from 'graphql-tools';
-import ExecutableSchema from './src/schema';
+import {ApolloServer} from 'apollo-server-express';
+import {makeExecutableSchema} from 'graphql-tools';
+import scheme from './src/schema';
 import config from './../configs/config.app';
 import User from "./src/common/user/user.model";
-import { SubscriptionServer } from 'subscriptions-transport-ws';
 import {execute, subscribe} from "graphql";
+import {Server} from 'ws';
+// tslint:disable-next-line:no-submodule-imports
+import { useServer } from 'graphql-ws/lib/use/ws';
 
-const schema = makeExecutableSchema(ExecutableSchema);
-
-/**
- * Connect to the mongodb database using
- * the mongoose library.
- */
+const schema = makeExecutableSchema(scheme);
 const mongoose = require('mongoose');
 mongoose.connect(
   config.mongodb.uri,
@@ -26,16 +23,16 @@ mongoose.connect(
   }
 );
 
-const cluster = require('cluster');
-const numCPUs = require('os').cpus().length;
-if (cluster.isMaster) {
-  for (let i = 0; i < numCPUs; i++) {
-    cluster.fork();
-  }
-  cluster.on('exit', (worker, code, signal) => {
-    console.log(`worker ${worker.process.pid} died`);
-  });
-} else {
+// const cluster = require('cluster');
+// const numCPUs = require('os').cpus().length;
+// if (cluster.isMaster) {
+//   for (let i = 0; i < numCPUs; i++) {
+//     cluster.fork();
+//   }
+//   cluster.on('exit', (worker, code, signal) => {
+//     console.log(`worker ${worker.process.pid} died`);
+//   });
+// } else {
   /**
    * Create the server which we will send our
    * GraphQL queries to.
@@ -59,7 +56,7 @@ if (cluster.isMaster) {
     },
   });
 
-  const PORT = config.server.port;
+  const port = config.server.port;
   const app = express();
 
   const session = require('express-session');
@@ -73,31 +70,25 @@ if (cluster.isMaster) {
   apollo.applyMiddleware({app});
   const server = createServer(app);
 
-  server.listen(PORT, () => {
-    // tslint:disable-next-line:no-unused-expression
-    const ws = new SubscriptionServer({
-      schema,
-      execute,
-      subscribe,
-      onConnect: (connectionParams) => {
-        // @ts-ignore
-        if (!connectionParams?.token) {
-          return null;
-        }
-        try {
-          // @ts-ignore
-          const data: any = jwt.verify(connectionParams?.token as string, config.token.secret);
-          return data?.id ? {data} : null;
-        } catch (e) {
-          console.debug(e);
-          return null;
-        }
-      },
-    }, {
-      server,
-      path: '/graphql',
-    });
-    ws.server.addListener('connection', (client => {console.debug(client)}))
-    // console.debug('HTTP:WS CLUSTER STARTED', ws);
+  const wsServer = new Server({
+    server,
+    path: '/graphql',
+    host: 'localhost',
+    port,
   });
-}
+
+  useServer(
+      {
+        schema,
+        execute,
+        subscribe,
+      },
+      wsServer,
+  );
+
+  server.listen(port, 'localhost', () => {
+    console.debug(`HTTP:WS CLUSTER STARTED :${port}`, wsServer.address(), server.address());
+  });
+
+
+// }

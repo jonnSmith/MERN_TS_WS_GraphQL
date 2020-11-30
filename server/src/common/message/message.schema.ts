@@ -29,7 +29,7 @@ export const messageTypeDefs = `
   }
   
   type updateAction {
-    id: ID
+    id: String
     action: String
   }
   
@@ -79,7 +79,7 @@ export const messageResolvers = {
   },
   Subscription: {
     chatUpdated: {
-      subscribe: () => PubSub.asyncIterator('CHAT_UPDATED'),
+      subscribe: () => PubSub.asyncIterator(['CHAT_UPDATED']),
     }
   },
   Message: {
