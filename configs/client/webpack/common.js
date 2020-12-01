@@ -44,9 +44,9 @@ module.exports = {
   plugins: [
     new HtmlWebpackPlugin({template: 'index.html.ejs',}),
     new FaviconsWebpackPlugin({
-      logo: 'assets/img/logo.svg',
-      publicPath: '/',
-      outputPath: '/',
+      logo: './assets/img/logo.svg',
+      publicPath: './',
+      outputPath: './',
     })
   ],
   externals: {

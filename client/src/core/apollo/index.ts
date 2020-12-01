@@ -24,7 +24,6 @@ import {History} from "history";
 class ApolloConnection {
 
   public static get client() {
-    // tslint:disable-next-line:no-unused-expression
     if (!ApolloConnection.Client) {
       new ApolloConnection();
     }
@@ -40,8 +39,6 @@ class ApolloConnection {
 
   private static Client: ApolloClient<any>;
   private static History: History;
-
-  private static URI: string = `//localhost`;
 
   private static CreateApolloCache = (): ApolloCache<any> => {
     return new InMemoryCache();
@@ -93,9 +90,10 @@ class ApolloConnection {
             },
           };
         },
-        lazy: true,
-        reconnect: true,
-        timeout: 50,
+        lazy: config.client.apollo.wsLink.lazy,
+        reconnect: config.client.apollo.wsLink.reconnect,
+        reconnectionAttempts: config.client.apollo.wsLink.reconnectionAttempts,
+        timeout: config.client.apollo.wsLink.timeout,
       },
       uri: `ws:${config.server.host}:${config.server.ws}/${config.server.path}`,
     });

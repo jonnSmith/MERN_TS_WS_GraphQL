@@ -1,12 +1,12 @@
 import {IWorkspaceModel} from "@appchat/data/workspace/interfaces";
 
 interface IUserModel {
-    id: string;
-    email: string;
-    firstName: string;
-    lastName: string;
-    token: string;
-    workspace: IWorkspaceModel;
+    id: string | null;
+    email: string | null;
+    firstName?: string | null;
+    lastName?: string | null;
+    token?: string | null;
+    workspace?: IWorkspaceModel;
 }
 
 interface IUserReducer {

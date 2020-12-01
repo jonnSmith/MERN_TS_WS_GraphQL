@@ -1,15 +1,12 @@
 import {SetFloatingTextInputRefs} from "@appchat/ui/templates/functions";
 import {SignInFormInitialObject} from "@appchat/ui/templates/user/constants";
-import {ISignInForm, ISignInProps, ISignUpForm} from "@appchat/ui/templates/user/interfaces";
+import {ISignInForm, ISignInProps} from "@appchat/ui/templates/user/interfaces";
 import * as React from "react";
 import {Button, CardActions, TextField} from "react-md";
 
 const UserSignIn = (props: ISignInProps) => {
 
-    const { onSubmit } = props;
-    const [email, setEmail] = React.useState("");
-    const [password, setPass] = React.useState("");
-
+    const {onSubmit} = props;
     const[SignInForm, updateSignInForm] = React.useState(SignInFormInitialObject);
 
     const sendSignInForm = (event: React.FormEvent) => {

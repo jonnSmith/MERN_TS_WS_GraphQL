@@ -5,39 +5,48 @@ import {Button, CardActions, TextField} from "react-md";
 
 const MessageSend = (props: IMessageSendProps) => {
 
-    const {onSubmit, loading} = props;
+  const {onSubmit, loading} = props;
 
-    const[MessageForm, updateMessageForm] = React.useState(MessageFormInitialObject);
+  const [MessageForm, updateMessageForm] = React.useState(MessageFormInitialObject);
 
-    const sendMessageForm = (event: React.FormEvent) => {
-        event.preventDefault();
-        onSubmit(MessageForm);
-    };
+  const messageTextRef = React.useRef();
 
-    return(<form className="md-grid text-fields__application"
-        onSubmit={(event: React.FormEvent) => { sendMessageForm(event); }}
-    >
-        <TextField
-            id="text"
-            name="text"
-            onChange={ (value) => { updateMessageForm({...MessageForm, ...{ text: value as string}}); } }
-            rows={2}
-            maxLength={200}
-            label="Message text"
-            className="md-cell md-cell--12"
-            disabled={loading}
-        />
-        <CardActions className="md-cell md-cell--12">
-            <Button
-                raised
-                primary
-                className="md-cell--right"
-                disabled={Object.keys(MessageForm).some((key: keyof IMessageSendForm) => !MessageForm[key])}
-                type="submit">
-                Send
-            </Button>
-        </CardActions>
-    </form>);
+  const sendMessageForm = (event: React.FormEvent) => {
+    event.preventDefault();
+    onSubmit(MessageForm);
+    updateMessageForm({...MessageForm, ...{text: ""}});
+  };
+
+  return (<form className="md-grid text-fields__application"
+                onSubmit={(event: React.FormEvent) => {
+                  sendMessageForm(event);
+                }}
+  >
+    <TextField
+      id="text"
+      name="text"
+      onChange={(value) => {
+        updateMessageForm({...MessageForm, ...{text: value as string}});
+      }}
+      value={MessageForm.text}
+      rows={2}
+      maxLength={200}
+      label="Message text"
+      className="md-cell md-cell--12"
+      disabled={loading}
+      ref={messageTextRef}
+    />
+    <CardActions className="md-cell md-cell--12">
+      <Button
+        raised
+        primary
+        className="md-cell--right"
+        disabled={Object.keys(MessageForm).some((key: keyof IMessageSendForm) => !MessageForm[key])}
+        type="submit">
+        Send
+      </Button>
+    </CardActions>
+  </form>);
 };
 
 export {MessageSend};

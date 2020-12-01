@@ -9,13 +9,11 @@ import {Route} from "react-router-dom";
 class CoreNavigation {
 
     public static links(auth: boolean) {
-        // tslint:disable-next-line:no-unused-expression
         if (!CoreNavigation.NavigationLinks.length) { new CoreNavigation(); }
         return CoreNavigation.NavigationLinks.filter( (l) => l.props.auth && auth || !l.props.auth && !auth);
     }
 
     public static routes(auth: boolean) {
-        // tslint:disable-next-line:no-unused-expression
         if (!CoreNavigation.NavigationRoutes.length) { new CoreNavigation(); }
         return CoreNavigation.NavigationRoutes.filter( (r) => r.props.auth && auth || !r.props.auth && !auth);
     }

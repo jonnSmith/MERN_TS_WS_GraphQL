@@ -8,7 +8,7 @@ import {execute, subscribe} from "graphql";
 import {SubscriptionServer} from 'subscriptions-transport-ws';
 import {graphqlHTTP} from "express-graphql";
 
-import {ContextMiddleware, OnConnectMiddleware} from "./src/core/midddlewares/token";
+import {ContextMiddleware, OnConnectMiddleware} from "./src/core/midddleware/token";
 import {CoreBus} from "./src/core/bus";
 
 const schema = makeExecutableSchema(ExecutableSchema);

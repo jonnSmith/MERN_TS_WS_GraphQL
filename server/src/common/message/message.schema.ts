@@ -1,5 +1,5 @@
 // tslint:disable-next-line:no-submodule-imports
-import { ForbiddenError } from '@apollo/server/errors';
+import {ForbiddenError} from '@apollo/server/errors';
 import {CoreBus} from "../../core/bus";
 
 import User from '../user/user.model';
@@ -41,6 +41,14 @@ export const messageTypeDefs = `
 
 const PubSub = CoreBus.pubsub;
 
+const ActionKeys = {
+  UPDATE: 'MESSAGE_UPDATED',
+  CREATE: 'MESSAGE_ADDED',
+  DELETE: 'MESSAGE_DELETED'
+}
+
+const UPDATE_ACTION_TRIGGER = 'CHAT_UPDATED';
+
 export const messageResolvers = {
   Query: {
     messages: async (_, {}, context) => {
@@ -65,7 +73,7 @@ export const messageResolvers = {
           text,
           userId: user?.id,
         });
-        await PubSub.publish('CHAT_UPDATED', {chatUpdated: { ...{message, ...{user}}, action: 'create'}});
+        await PubSub.publish(UPDATE_ACTION_TRIGGER, {chatUpdated: { ...{message, ...{user}}, action: ActionKeys.CREATE}});
         return message.toObject();
       }
       catch(e) {
@@ -76,7 +84,8 @@ export const messageResolvers = {
     deleteMessage: async (_, { id }, context) => {
       try {
         const message: any = await Message.findByIdAndRemove(id);
-        await PubSub.publish('CHAT_UPDATED', {chatUpdated: { message, action: 'delete'}});
+        const updated: any= await Message.findOne({}).sort({createdAt: -1});
+        await PubSub.publish(UPDATE_ACTION_TRIGGER, {chatUpdated: { message: updated, action: ActionKeys.DELETE}});
         return message.toObject();
       } catch(e) {
         throw new ForbiddenError('Message forbidden to delete.');
@@ -85,7 +94,7 @@ export const messageResolvers = {
   },
   Subscription: {
     chatUpdated: {
-      subscribe: () => PubSub.asyncIterator(['CHAT_UPDATED']),
+      subscribe: () => PubSub.asyncIterator([UPDATE_ACTION_TRIGGER]),
     }
   },
   Message: {
