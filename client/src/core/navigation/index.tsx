@@ -42,6 +42,7 @@ class CoreNavigation {
                             path={ROUTES[props.id as keyof typeof ROUTES]}
                             key={props.id}
                             auth={props.auth}
+                            sensitive={false}
                             render={ () => <RouteComponent /> }
                         />);
                     });

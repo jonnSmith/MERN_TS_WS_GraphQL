@@ -20,13 +20,12 @@ interface IMessageFilter {
 }
 
 interface IMessageReducer {
-  action: ActionTypes;
-  message: IMessageModel;
+  message?: IMessageModel;
 }
 
 interface IMessagesReducer {
   action: ActionTypes;
-  messages: Map<string, IMessageModel>;
+  message: IMessageModel;
 }
 
 export {IMessageModel, IMessageReducer, IMessagesReducer, IMessageFilter};

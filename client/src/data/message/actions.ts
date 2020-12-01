@@ -22,4 +22,4 @@ const MessagesUpdated = (data: IMessagesReducer): ICommonAction => ({
   type: ACTIONS.MESSAGES_UPDATED
 });
 
-export {MessageAdded};
+export {MessageAdded, MessageUpdated, MessageDeleted, MessagesUpdated};

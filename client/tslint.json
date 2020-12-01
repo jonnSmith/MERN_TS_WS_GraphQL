@@ -10,7 +10,8 @@
     "no-namespace": false,
     "no-console": false,
     "no-string-literal": false,
-    "no-unused-expression": false
+    "no-unused-expression": false,
+    "no-empty": false
   },
   "rulesDirectory": []
 }

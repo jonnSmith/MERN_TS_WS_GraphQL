@@ -10,7 +10,7 @@ interface IUserModel {
 }
 
 interface IUserReducer {
-    user: IUserModel;
+    user?: IUserModel;
 }
 
 export { IUserModel, IUserReducer };

@@ -1,4 +1,6 @@
-import {IMessageModel, IMessageReducer} from "@appchat/data/message/interfaces";
+import {ACTIONS} from "@appchat/core/store/constants";
+import {IMessageModel, IMessagesReducer} from "@appchat/data/message/interfaces";
+import {Map} from "typescript";
 
 const MessageInitObject: IMessageModel = {
   createdAt: null,
@@ -16,9 +18,9 @@ const MessageInitObject: IMessageModel = {
   workspaceId: null,
 };
 
-const MessageInitState: IMessageReducer = {
-  action: null,
-  message: MessageInitObject,
+const MessagesInitState: IMessagesReducer = {
+  action: ACTIONS.MESSAGE_PRELOADED,
+  message: MessageInitObject
 };
 
 const MessageFields = `
@@ -33,4 +35,4 @@ const MessageFields = `
     }
   }`;
 
-export { MessageInitObject, MessageInitState, MessageFields };
+export { MessageInitObject, MessagesInitState, MessageFields };

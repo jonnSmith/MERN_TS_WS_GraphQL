@@ -9,6 +9,7 @@ interface INavigationData {
     id: RouteString | ActionsString;
     label: string;
     payload?: any;
+    visible?: boolean;
 }
 
 export { INavigationData };

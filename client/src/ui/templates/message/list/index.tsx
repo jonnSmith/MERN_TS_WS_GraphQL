@@ -5,22 +5,70 @@ import {UserInitState} from "@appchat/data/user/constants";
 import {IMessageListProps} from "@appchat/ui/elements/message/interfaces";
 import {MessagesListItem} from "@appchat/ui/elements/message/item";
 import * as React from "react";
-import { List } from "react-md";
+import {useEffect} from "react";
+import {List} from "react-md";
 import {useSelector} from "react-redux";
 
-const MessageList = (props: IMessageListProps) => {
-  const {message, active} = props;
-  const [deleteMessage, {data: deleted, loading: deleting}] = useMutation(DELETE_MESSAGE);
-  const { user } = useSelector((state: StateReturnTypes) => state.UserReducer);
+import {config} from "@appchat/core/config";
+import {MessageInitObject} from "@appchat/data/message/constants";
+import {IMessageModel} from "@appchat/data/message/interfaces";
+import * as moment from "moment";
+import {
+  DataTable,
+  TableBody,
+  TableColumn,
+  TableHeader,
+  TableRow,
+} from "react-md";
 
-  return <List>
-    <MessagesListItem
-      message={message}
-      user={user || UserInitState.user}
-      active={active}
-      onDelete={async () => { await deleteMessage({ variables: { id: message.id} }); }}
-      key={`message-stack`}
-    /></List>;
+const MessageList = (props: IMessageListProps) => {
+  const {active, onDelete} = props;
+
+  const userdata = useSelector((state: StateReturnTypes) => state.UserReducer.user);
+  const messagedata = useSelector((state: StateReturnTypes) => state.MessageReducer.message);
+
+  const [message, setMessage] = React.useState(MessageInitObject);
+  const [user, setUser] = React.useState(UserInitState.user);
+
+  useEffect(() => {
+    if (messagedata) {
+      setMessage(messagedata);
+    }
+    return (): void => {
+    };
+  }, [active, messagedata]);
+
+  useEffect(() => {
+    if (userdata) {
+      setUser(userdata);
+    }
+    return (): void => {
+    };
+  }, [userdata]);
+
+  return (<DataTable plain>
+    <TableHeader>
+      <TableRow>
+        <TableColumn>Message</TableColumn>
+        <TableColumn>User</TableColumn>
+      </TableRow>
+    </TableHeader>
+    <TableBody>
+      <TableRow key={message.id} selectable={false}>
+        <TableColumn>
+          <p>
+            {message.user.email}
+            ({moment.unix(message.createdAt as any / 1000).format(config.client.formats.message.date)}):
+          </p>
+          <p>{message.text}</p>
+        </TableColumn>
+        <TableColumn>
+          {user.email} {user.firstName}
+        </TableColumn>
+      </TableRow>
+    </TableBody>
+  </DataTable>
+);
 };
 
 export {MessageList};

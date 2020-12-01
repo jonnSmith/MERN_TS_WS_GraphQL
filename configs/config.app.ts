@@ -25,7 +25,7 @@ export default {
         lazy: true,
         reconnect: true,
         reconnectionAttempts: 10,
-        timeout: 3000,
+        timeout: 100,
       }
     },
     formats: {
@@ -42,6 +42,7 @@ export default {
         MESSAGE_ADDED: "Get new message",
         MESSAGE_DELETED: "Delete message from stream",
         MESSAGE_UPDATED: "Update message data",
+        MESSAGE_PRELOADED: "Preload latest message",
       },
       user: {
         USER_LOGIN: "Set user data",

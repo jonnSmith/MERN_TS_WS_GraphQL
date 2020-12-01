@@ -8,6 +8,7 @@ import {Switch} from "react-router-dom";
 
 const NavigationInterface = () => {
   const {user} = useSelector((state: StateReturnTypes) => state.UserReducer);
+
   return <NavigationDrawer
     drawerTitle={config.app.sidebar}
     toolbarTitle={config.app.name}
@@ -15,6 +16,7 @@ const NavigationInterface = () => {
     tabletDrawerType={NavigationDrawer.DrawerTypes.PERSISTENT_MINI}
     desktopDrawerType={NavigationDrawer.DrawerTypes.PERSISTENT_MINI}
     navItems={CoreNavigation.links(!!user?.token)}
+    drawerId={"routing"}
   >
     <Switch>
       {CoreNavigation.routes(!!user?.token)}
