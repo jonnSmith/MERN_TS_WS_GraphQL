@@ -2,9 +2,9 @@ import {RouteString} from "@appchat/core/navigation/types";
 import {ActionsString} from "@appchat/core/store/types";
 
 interface INavigationData {
-    auth: boolean;
+    auth?: boolean;
     active?: boolean;
-    exact: boolean;
+    exact?: boolean;
     icon: string;
     id: RouteString | ActionsString;
     label: string;

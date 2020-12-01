@@ -1,15 +1,13 @@
 import {IContainerPage} from "@appchat/ui/containers/interfaces";
 import * as React from "react";
-import {Card, CardText, CardTitle} from "react-md";
+import {Card, CardContent, CardTitle} from "react-md";
 
 const ContainerPage = (props: IContainerPage): React.ReactElement => {
-    const { children, title, className } = props;
-    return (<div className={`md-block-centered ${className}`}>
-        <Card>
+    const { children, title } = props;
+    return <Card fullWidth>
             <CardTitle title={title} />
-            <CardText>{children}</CardText>
-        </Card>
-    </div>);
+            <CardContent>{children}</CardContent>
+        </Card>;
 };
 
 export {ContainerPage};

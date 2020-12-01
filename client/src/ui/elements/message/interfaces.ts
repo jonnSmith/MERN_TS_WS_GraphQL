@@ -11,13 +11,12 @@ interface IMessageListItemProps {
 
 interface IMessageDeleteButtonProps {
   active?: boolean;
-  onClick?: (event: React.MouseEvent<HTMLElement>) => void;
+  id: string;
 }
 
 interface IMessageListProps {
   message?: IMessageModel;
   active?: boolean;
-  onDelete?: (event: React.MouseEvent<HTMLElement>, id: string) => void;
 }
 
 export { IMessageDeleteButtonProps, IMessageListItemProps, IMessageListProps };

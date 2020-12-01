@@ -8,39 +8,37 @@ import {MessageSend} from "@appchat/ui/templates/message/send";
 import * as React from "react";
 import {useEffect} from "react";
 import {useDispatch} from "react-redux";
+import {useUpdate} from "react-use";
+
 
 const ChatRoom = () => {
-
+  const update = useUpdate();
   const [sendMessage,
     {data: created, loading: sending}] = useMutation(CREATE_MESSAGE, {notifyOnNetworkStatusChange: true});
-
   const {data: preloaded, loading: preloading} = useQuery(PRELOAD_MESSAGE);
-
   const {data: updated, loading} = useSubscription(CHAT_UPDATED);
-
-  const [deleteMessage, {data: deleted, loading: deleting}] = useMutation(DELETE_MESSAGE);
 
   const dispatch = useDispatch();
 
   useEffect(() => {
     if (preloaded && !preloading) {
       dispatch({type: ACTIONS.MESSAGE_ADDED, payload: { message: preloaded.message } });
+      update();
     }
+    return () => { };
   }, [preloaded]);
 
   useEffect(() => {
     if (updated && !loading) {
       dispatch({type: ACTIONS.MESSAGE_ADDED, payload: { message: updated.chatUpdated.message } });
+      update();
     }
+    return () => { };
   }, [updated]);
 
   return (<ContainerPage title="Chat room">
     <section>
-      <MessageList
-        active={!loading}
-        onDelete= {
-          (event: React.MouseEvent<HTMLElement>, id: string) => { deleteMessage({ variables: { id } }); }
-      }/>
+      <MessageList active={!loading} />
       <MessageSend
         onSubmit={(variables: IMessageSendForm) => {
           sendMessage({variables});

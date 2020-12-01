@@ -25,10 +25,9 @@ const MessageSend = (props: IMessageSendProps) => {
     <TextField
       id="text"
       name="text"
-      onChange={(value) => {
-        updateMessageForm({...MessageForm, ...{text: value as string}});
-      }}
       value={MessageForm.text}
+      onChange={(event: React.ChangeEvent<any>) =>
+        updateMessageForm({...MessageForm, ...{text: event.currentTarget.value}})}
       rows={2}
       maxLength={200}
       label="Message text"
@@ -38,8 +37,7 @@ const MessageSend = (props: IMessageSendProps) => {
     />
     <CardActions className="md-cell md-cell--12">
       <Button
-        raised
-        primary
+        disableProgrammaticRipple disableRipple rippleTimeout={0} rippleClassNames=""
         className="md-cell--right"
         disabled={Object.keys(MessageForm).some((key: keyof IMessageSendForm) => !MessageForm[key])}
         type="submit">

@@ -1,3 +1,4 @@
+import {IUserModel} from "@appchat/data/user/interfaces";
 import {ReactElement} from "react";
 
 interface IContainerPage {
@@ -6,4 +7,13 @@ interface IContainerPage {
     className?: string;
 }
 
-export { IContainerPage };
+interface IContainerLayoutProps {
+    children?: ReactElement;
+    user?: IUserModel;
+}
+
+interface IAppProps {
+    user?: IUserModel;
+}
+
+export { IContainerPage, IAppProps, IContainerLayoutProps };

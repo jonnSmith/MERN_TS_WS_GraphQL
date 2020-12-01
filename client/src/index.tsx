@@ -1,35 +1,26 @@
 import {ApolloProvider} from "@apollo/react-hooks";
+import {App} from "@appchat/app";
 import {ApolloConnection} from "@appchat/core/apollo";
 import {CoreStore} from "@appchat/core/store";
+import {LayoutContainer} from "@appchat/ui/containers/layout";
+import {Configuration} from "@react-md/layout";
 import * as React from "react";
 import {render} from "react-dom";
 import {Provider} from "react-redux";
 import {Router} from "react-router-dom";
-import * as WebFontLoader from "webfontloader";
-
-import { App } from "./app";
-
-import "./../../node_modules/react-loader-spinner/dist/loader/css/CradleLoader.css";
-import "./../../node_modules/react-loader-spinner/dist/loader/css/Plane.css";
-import "./../../node_modules/react-loader-spinner/dist/loader/css/Triangle.css";
-import "./../../node_modules/react-md/dist/react-md.blue-green.min.css";
-
-WebFontLoader.load({
-    google: {
-        families: ["Roboto:300,400,500,700", "Material Icons"],
-    },
-});
+import "./index.scss";
 
 const Root = () => {
-    return (
-        <ApolloProvider client={ApolloConnection.client}>
-            <Provider store={CoreStore.ReduxSaga}>
-                <Router history={ApolloConnection.history}>
-                    <App />
-                </Router>
-            </Provider>
-        </ApolloProvider>);
+  return <Router history={ApolloConnection.history}>
+    <Provider store={CoreStore.ReduxSaga}>
+      <ApolloProvider client={ApolloConnection.client}>
+        <Configuration>
+          <LayoutContainer><App/></LayoutContainer>
+        </Configuration>
+      </ApolloProvider>
+    </Provider>
+  </Router>;
 };
 const rootEl = document.getElementById("root");
 
-render(<Root />, rootEl);
+render(<Root/>, rootEl);

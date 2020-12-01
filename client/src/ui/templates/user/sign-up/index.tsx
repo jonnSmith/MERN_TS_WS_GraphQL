@@ -13,10 +13,6 @@ const UserSignUp = (props: ISignUpProps) => {
 
     const[SignUpForm, updateSignUpForm] = React.useState(SignUpFormInitialObject);
 
-    React.useLayoutEffect(() => {
-        SetFloatingTextInputRefs([emailRef, passwordRef]);
-    }, [emailRef, passwordRef]);
-
     const sendSignUpForm = (event: React.FormEvent) => {
         event.preventDefault();
         onSubmit(SignUpForm);
@@ -29,7 +25,7 @@ const UserSignUp = (props: ISignUpProps) => {
         <TextField
             id="email"
             name="email"
-            onChange={ (value) => { updateSignUpForm({...SignUpForm, ...{ email: value as string}}); } }
+            onChange={ (value: any) => { updateSignUpForm({...SignUpForm, ...{ email: value as string}}); } }
             type="email"
             label="Email or Username"
             className="md-cell md-cell--12"
@@ -38,7 +34,7 @@ const UserSignUp = (props: ISignUpProps) => {
         <TextField
             id="password"
             name="password"
-            onChange={(value) => updateSignUpForm({...SignUpForm, ...{ password: value as string}})}
+            onChange={(value: any) => updateSignUpForm({...SignUpForm, ...{ password: value as string}})}
             type="password"
             label="Password"
             className="md-cell md-cell--12"
@@ -47,7 +43,7 @@ const UserSignUp = (props: ISignUpProps) => {
         <TextField
             id="firstName"
             name="firstName"
-            onChange={(value) => updateSignUpForm({...SignUpForm, ...{ firstName: value as string}})}
+            onChange={(value: any) => updateSignUpForm({...SignUpForm, ...{ firstName: value as string}})}
             type="text"
             label="First Name"
             className="md-cell md-cell--12"
@@ -55,15 +51,14 @@ const UserSignUp = (props: ISignUpProps) => {
         <TextField
             id="lastName"
             name="lastName"
-            onChange={(value) => updateSignUpForm({...SignUpForm, ...{ lastName: value as string}})}
+            onChange={(value: any) => updateSignUpForm({...SignUpForm, ...{ lastName: value as string}})}
             type="text"
             label="Last Name"
             className="md-cell md-cell--12"
         />
         <CardActions className="md-cell md-cell--12">
             <Button
-                raised
-                secondary
+                disableProgrammaticRipple disableRipple rippleTimeout={0} rippleClassNames=""
                 className="md-cell--right"
                 disabled={Object.keys(SignUpForm).some((key: keyof ISignUpForm) => !SignUpForm[key])}
                 type="submit"

@@ -20,6 +20,7 @@ const SignUp = () => {
     const RegisterUser = (variables: ISignUpForm) => {
         signUp({variables});
     };
+
     return (
         <ContainerPage className="sign-out" title="Sign Out">
             <UserSignUp onSubmit={(variables) => { RegisterUser(variables); } }/>
