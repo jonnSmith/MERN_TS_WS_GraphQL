@@ -84,6 +84,7 @@
     "redux-saga": "^1.1.3",
     "redux-starter-kit": "^0.7.0",
     "redux-thunk": "^2.3.0",
+    "request": "2.79.0",
     "sequelize": "^5.19.3",
     "subscriptions-transport-ws": "^0.9.18",
     "typescript": "^3.6.3",

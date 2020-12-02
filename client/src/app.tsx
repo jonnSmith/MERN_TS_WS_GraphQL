@@ -3,7 +3,7 @@ import {ApolloConnection} from "@appchat/core/apollo";
 import {ACTIONS} from "@appchat/core/store/constants";
 import {GET_ME} from "@appchat/data/user/queries";
 import {LayoutContainer} from "@appchat/ui/containers/layout";
-import {RouterSwitch} from "@appchat/ui/containers/navigation/switch";
+import {RouterSwitch} from "@appchat/ui/containers/switch";
 import {ConnectedRouter} from "connected-react-router";
 import * as React from "react";
 import {useDispatch} from "react-redux";
