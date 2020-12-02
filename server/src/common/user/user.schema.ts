@@ -1,11 +1,12 @@
 import * as jwt from 'jsonwebtoken';
 import Workspace from '../workspace/workspace.model';
-import { Sequelize } from 'sequelize';
-import {AuthenticationError, UserInputError} from "apollo-server";
-import { combineResolvers } from 'graphql-resolvers';
+// tslint:disable-next-line:no-submodule-imports
+import {UserInputError} from '@apollo/server/errors';
 import User from './user.model';
-import { isAuthenticated, isMessageOwner } from '../../helpers/authorization';
 import config from '../../../../configs/config.app';
+import {CoreBus} from "../../core/bus";
+
+// TODO: Remove password field from User data type
 
 export const userTypeDefs = `
 
@@ -13,9 +14,9 @@ export const userTypeDefs = `
     id: ID!
     workspaceId: String
     workspace: Workspace
-    email: String!
-    password: String!
-    firstName: String!
+    email: String
+    password: String
+    firstName: String
     lastName: String
     token: String
   }
@@ -27,7 +28,7 @@ export const userTypeDefs = `
   extend type Query {
     users(filter: UserFilterInput): [User]
     user(id: String!): User
-    currentUser: User
+    currentUser: User 
   }
 
   input UserInput {
@@ -48,6 +49,8 @@ export const userTypeDefs = `
 
 `;
 
+const PubSub = CoreBus.pubsub;
+
 export const userResolvers = {
   Query: {
     async users(_, { filter = {} }) {
@@ -58,19 +61,9 @@ export const userResolvers = {
       const user: any = await User.findById(id);
       return user.toObject();
     },
-    async currentUser(_, {}, user) {
-      const { id } = user;
-      if (!id) { return null; }
-      try {
-        const userDocument = await User.findById(id);
-        if (!userDocument) { return null; }
-        const userObject = userDocument.toObject();
-        userObject.token = jwt.sign({id: userObject.id}, config.token.secret);
-        return userObject;
-      }
-      catch (e) {
-        throw new AuthenticationError(e);
-      }
+    async currentUser(_, {}, context) {
+      const { user } = await context;
+      return user && user.id ? { ...user, ...{ token: jwt.sign({ id: user.id }, config.token.secret) } } : null;
     },
   },
   Mutation: {

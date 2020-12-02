@@ -9,7 +9,9 @@
     "trailing-comma": false,
     "no-namespace": false,
     "no-console": false,
-    "no-string-literal": false
+    "no-string-literal": false,
+    "no-unused-expression": false,
+    "no-empty": false
   },
   "rulesDirectory": []
 }

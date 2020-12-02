@@ -1,14 +1,10 @@
-import { combineResolvers } from 'graphql-resolvers';
-import { ForbiddenError } from 'apollo-server';
-
-import pubsub, { EVENTS } from '../../helpers/subscription';
-import { isAuthenticated, isMessageOwner } from '../../helpers/authorization';
+// tslint:disable-next-line:no-submodule-imports
+import {ForbiddenError} from '@apollo/server/errors';
+import {CoreBus} from "../../core/bus";
 
 import User from '../user/user.model';
 import Workspace from '../workspace/workspace.model';
 import Message from './message.model';
-
-const DEFAULT_FILTER = { skip: 0, limit: 100, order: 'asc'};
 
 export const messageTypeDefs = `
 
@@ -21,135 +17,85 @@ export const messageTypeDefs = `
     workspace: Workspace
     createdAt: String!
   }
-  
-  input MessageFilterInput {
-    skip: Int
-    limit: Int
-    order: String
-  }
 
   extend type Query {
-    stream(filter: MessageFilterInput): MessageConnection!
-    count: MessagesCount
+    messages: [Message]
     message(id: ID!): Message!
+    preloadMessage: Message
   }
 
   extend type Mutation {
-    createMessage(text: String!, filter: MessageFilterInput): Message
-    deleteMessage(id: ID!, filter: MessageFilterInput): Message
+    createMessage(text: String!): Message
+    deleteMessage(id: ID!): Message
   }
   
-  type MessageConnection {
-    messages: [Message]
-  }
-  
-  type MessagesCount {
-    total: Int
+  type updateAction {
+    message: Message
+    action: String
   }
   
   extend type Subscription {
-    messageUpdated: MessageUpdated
-    messageCreated: MessageCreated
-    messageDeleted: MessageDeleted
+    chatUpdated: updateAction
   }
-  
-  type MessageUpdated {
-    messages: [Message]
-  }
-  
-  type MessageCreated {
-    message: Message
-  }
-  
-  type MessageDeleted {
-    message: Message
-  }
-
 `;
+
+const PubSub = CoreBus.pubsub;
+
+const ActionKeys = {
+  UPDATE: 'MESSAGE_UPDATED',
+  CREATE: 'MESSAGE_ADDED',
+  DELETE: 'MESSAGE_DELETED'
+}
+
+const UPDATE_ACTION_TRIGGER = 'CHAT_UPDATED';
 
 export const messageResolvers = {
   Query: {
-    stream: async (parent, { filter = DEFAULT_FILTER }, { _ }) => {
-      let messages: any[] = await Message.find({}, null, {
-        skip: filter.skip,
-        limit: filter.limit,
-        sort:{
-          createdAt: filter.order
-        }
-      });
+    messages: async (_, {}, context) => {
+      let messages: any[] = await Message.find({}, null, {});
       messages = messages.map(m => m.toObject());
       return { messages };
     },
-    message: combineResolvers(
-      isAuthenticated,
-      async (_, { id }) => {
-        const message: any = await Message.findById(id);
-        return message.toObject();
-      },
-    ),
-    count: combineResolvers(
-      isAuthenticated,
-      async (_, {  }) => {
-        const total: number = await Message.countDocuments({});
-        return { total };
-      },
-    ),
+    message: async (_, { id }, context) => {
+      const message: any = await Message.findById(id);
+      return message.toObject();
+    },
+    preloadMessage: async (_, {}, context) => {
+      const message: any= await Message.findOne({}).sort({createdAt: -1});
+      return message.toObject();
+    },
   },
-
   Mutation: {
-    createMessage: combineResolvers(
-        isAuthenticated,
-      async (parent, { text, filter = DEFAULT_FILTER }, { user }) => {
-        let message: any = await Message.create({
-          text: text,
-          userId: user.id,
-          workspaceId: user.workspaceId
+    createMessage: async (_, { text }, context) => {
+      try {
+        const { user } = await context;
+        const message: any = await Message.create({
+          text,
+          userId: user?.id,
         });
-        if(!message) {
-          throw new ForbiddenError('Message forbidden to create.');
-        }
-        pubsub.publish(EVENTS.MESSAGE.CREATED, { messageCreated: { message }, });
-        const messages: any[] = await Message.find({}, null, {
-          skip: filter.skip,
-          limit: filter.limit,
-          sort:{
-            createdAt: filter.order
-          }
-        });
-        if(!messages) {
-          throw new ForbiddenError('Message forbidden to query.');
-        }
-        pubsub.publish(EVENTS.MESSAGE.UPDATED, {
-          messageUpdated: { messages },
-        });
+        await PubSub.publish(UPDATE_ACTION_TRIGGER, {chatUpdated: { ...{message, ...{user}}, action: ActionKeys.CREATE}});
         return message.toObject();
-      },
-    ),
-    deleteMessage: combineResolvers(
-      isAuthenticated,
-      isMessageOwner,
-      async (parent, { id, filter = DEFAULT_FILTER }, { _ }) => {
+      }
+      catch(e) {
+        console.debug(e);
+        throw new ForbiddenError('Message forbidden to create.');
+      }
+    },
+    deleteMessage: async (_, { id }, context) => {
+      try {
         const message: any = await Message.findByIdAndRemove(id);
-        if(!message) {
-          throw new ForbiddenError('Message forbidden to delete.');
-        }
-        pubsub.publish(EVENTS.MESSAGE.DELETED, { messageDeleted: { message }, });
-        const messages: any[] = await Message.find({}, null, {
-          skip: filter.skip,
-          limit: filter.limit,
-          sort:{
-            createdAt: filter.order
-          }
-        });
-        if(!messages) {
-          throw new ForbiddenError('Message forbidden to query.');
-        }
-        pubsub.publish(EVENTS.MESSAGE.UPDATED, {
-          messageUpdated: { messages },
-        });
+        const updated: any= await Message.findOne({}).sort({createdAt: -1});
+        await PubSub.publish(UPDATE_ACTION_TRIGGER, {chatUpdated: { message: updated, action: ActionKeys.DELETE}});
         return message.toObject();
-      },
-    ),
+      } catch(e) {
+        throw new ForbiddenError('Message forbidden to delete.');
+      }
+    },
+  },
+  Subscription: {
+    chatUpdated: {
+      subscribe: () => PubSub.asyncIterator([UPDATE_ACTION_TRIGGER]),
+    }
   },
   Message: {
     async user(message: { userId: string }) {
@@ -165,17 +111,6 @@ export const messageResolvers = {
         return workspace.toObject();
       }
       return null;
-    },
-  },
-  Subscription: {
-    messageCreated: {
-      subscribe: () => pubsub.asyncIterator(EVENTS.MESSAGE.CREATED),
-    },
-    messageDeleted: {
-      subscribe: () => pubsub.asyncIterator(EVENTS.MESSAGE.DELETED),
-    },
-    messageUpdated: {
-      subscribe: () => pubsub.asyncIterator(EVENTS.MESSAGE.UPDATED),
     },
   },
 };

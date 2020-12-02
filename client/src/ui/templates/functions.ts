@@ -1,14 +1,21 @@
-const SetFloatingTextInputRefs = (refs) => {
-    let timeout;
-    timeout = setTimeout(() => {
+import {Ref} from "react";
+import {TextFieldComponent} from "react-md/lib/TextFields/TextField";
+
+const SetFloatingTextInputRefs = (refs: Array<Ref<TextFieldComponent>>) => {
+  let timeout: NodeJS.Timeout;
+  timeout = setTimeout(() => {
+    refs.forEach((ref: Ref<TextFieldComponent>) => {
+      try {
         // @ts-ignore
-        refs.forEach((ref) => {
-            ref?.current?.state?.floating = true;
-        });
-    }, 0);
-    return () => {
-        clearTimeout(timeout);
-    };
+        ref.current.state.floating = true;
+      } catch (e) {
+        console.debug(e);
+      }
+    });
+  }, 0);
+  return () => {
+    clearTimeout(timeout);
+  };
 };
 
-export { SetFloatingTextInputRefs };
+export {SetFloatingTextInputRefs};

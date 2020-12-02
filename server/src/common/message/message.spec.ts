@@ -3,6 +3,7 @@ import { messageResolvers, messageTypeDefs } from './message.schema';
 import { userTypeDefs } from '../user/user.schema';
 import { rootTypeDefs } from '../root';
 import { workspaceTypeDefs } from '../workspace/workspace.schema';
+// tslint:disable-next-line:no-implicit-dependencies
 import EasyGraphQLTester = require('easygraphql-tester');
 
 const schema = makeExecutableSchema({

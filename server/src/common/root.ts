@@ -1,7 +1,7 @@
 export const rootTypeDefs = `
   type Query
   type Mutation
-  type Subscription 
+  type Subscription
   schema {
     query: Query
     mutation: Mutation

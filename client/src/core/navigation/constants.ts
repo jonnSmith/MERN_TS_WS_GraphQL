@@ -7,7 +7,7 @@ const NavigationData: INavigationData[] = [
     {
         active: false,
         auth: false,
-        exact: true,
+        exact: false,
         icon: "person",
         id: "SignIn",
         label: "Sign In",
@@ -16,7 +16,7 @@ const NavigationData: INavigationData[] = [
     {
         active: false,
         auth: false,
-        exact: true,
+        exact: false,
         icon: "person_add",
         id: "SignUp",
         label: "Sign Up",
@@ -25,7 +25,7 @@ const NavigationData: INavigationData[] = [
     {
         active: false,
         auth: true,
-        exact: true,
+        exact: false,
         icon: "account_box",
         id: "Account",
         label: "User Info",
@@ -34,7 +34,7 @@ const NavigationData: INavigationData[] = [
     {
         active: false,
         auth: true,
-        exact: true,
+        exact: false,
         icon: "chat",
         id: "ChatRoom",
         label: "Chat Room",
@@ -61,7 +61,8 @@ const NavigationData: INavigationData[] = [
 
 const NavigationPathsSecurity: INavigationPathsSecurity = {} as INavigationPathsSecurity;
 NavigationData
-    .filter((r) => typeof ROUTES[r.id] !== "undefined"  )
-    .forEach( (r) => { NavigationPathsSecurity[ROUTES[r.id]] = r.auth; });
+    .filter((r) => typeof ROUTES[r.id as keyof typeof ROUTES] !== "undefined"  )
+    .forEach( (r) => { // @ts-ignore
+        NavigationPathsSecurity[ROUTES[r.id as keyof typeof ROUTES]] = r.auth; });
 
 export { NavigationData, NavigationPathsSecurity, INavigationData };

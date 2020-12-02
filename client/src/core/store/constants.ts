@@ -1,7 +1,5 @@
-const ACTIONS = {
-    USER_LOGIN: "Set user data",
-    USER_LOGOUT: "Delete user data",
-    USER_UPDATED: "User data updated",
-};
+import {config} from "@appchat/core/config";
+
+const ACTIONS = {...config.client.actions.messages, ...config.client.actions.user};
 
 export { ACTIONS };

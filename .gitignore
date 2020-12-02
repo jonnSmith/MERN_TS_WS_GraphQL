@@ -4,3 +4,7 @@ build
 *.lock
 .idea
 .vscode
+configs/**/**.js
+configs/**/**.map
+client/**/**.js
+client/**/**.map

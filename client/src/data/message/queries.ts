@@ -1,99 +1,35 @@
+import {MessageFields} from "@appchat/data/message/constants";
 import gql from "graphql-tag";
 
 const CREATE_MESSAGE = gql`
-  mutation CreateMessage($text: String!, $filter: MessageFilterInput) {
-    message: createMessage(text: $text, filter: $filter) {
-      id
-      text
-      createdAt
-      user {
-        id
-        email
-      }
-    }
-  }
-`;
-
-const MESSAGE_CREATED = gql`
-  subscription {
-    messageCreated {
-      message {
-        id
-        text
-        createdAt
-        user {
-          id
-          email
-        }
-      }
-    }
+  mutation CreateMessage($text: String!) {
+    message: createMessage(text: $text) ${MessageFields}
   }
 `;
 
 const DELETE_MESSAGE = gql`
-  mutation($id: ID!, $filter: MessageFilterInput) {
-    deleteMessage(id: $id, filter: $filter) {
-      id
-    }
+  mutation($id: ID!) {
+    deleteMessage(id: $id) ${MessageFields}
   }
 `;
 
-const MESSAGE_DELETED = gql`
-  subscription {
-    messageDeleted {
-      message {
-        id
-      }
+const CHAT_UPDATED = gql`
+  subscription chatUpdated {
+    chatUpdated {
+      action
+      message ${MessageFields}
     }
-  }
-`;
+  }`;
 
-const GET_PAGINATED_MESSAGES = gql`
-  query($filter: MessageFilterInput) {
-    stream(filter: $filter) {
-      messages {
-        id
-        text
-        createdAt
-        user {
-          id
-          email
-        }
-      }
-    }
-  }
-`;
-
-const MESSAGE_UPDATED = gql`
-  subscription {
-    messageUpdated {
-      messages {
-        id
-        text
-        createdAt
-        user {
-          id
-          email
-        }
-      }
-    }
-  }
-`;
-
-const MESSAGES_COUNT = gql`
-  query {
-    count {
-      total
-    }
+const PRELOAD_MESSAGE = gql`
+  {
+    message: preloadMessage ${MessageFields}
   }
 `;
 
 export {
-    MESSAGE_CREATED,
-    MESSAGE_DELETED,
-    MESSAGE_UPDATED,
-    MESSAGES_COUNT,
     CREATE_MESSAGE,
     DELETE_MESSAGE,
-    GET_PAGINATED_MESSAGES
+    CHAT_UPDATED,
+    PRELOAD_MESSAGE
 };

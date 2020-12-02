@@ -1,9 +1,14 @@
 import {ACTIONS} from "@appchat/core/store/constants";
-import * as UserReducers from "@appchat/data/user/reducers";
+import {AllReducers} from "@appchat/core/store/reducers";
 
 type ActionsString = keyof typeof ACTIONS;
 
-type StateReducers = typeof UserReducers;
-type StateReturnTypes = Record<keyof StateReducers, ReturnType<typeof UserReducers[keyof StateReducers]>>;
+type StateReducers = typeof AllReducers;
+type StateReturnTypes = Record<keyof typeof AllReducers, any>;
 
-export { ActionsString, StateReducers, StateReturnTypes };
+type SupportedStorageEngines = "localStorage" | "sessionStorage";
+type StorageEngines = {
+    [key in SupportedStorageEngines]: Storage;
+};
+
+export { ActionsString, StateReducers, StateReturnTypes, StorageEngines, SupportedStorageEngines };

@@ -1,8 +1,20 @@
 import {IUserModel} from "@appchat/data/user/interfaces";
 
-const UserInitState: {user: IUserModel} = { user: null };
+const UserInitState: { user: IUserModel } = {
+  user: {
+    email: null,
+    firstName: null,
+    id: null,
+    lastName: null,
+    token: null,
+    workspace: {
+      id: null,
+      name: null,
+    }
+  }
+};
 
-const UserFields  = `{
+const UserFields = `{
   id
   email
   firstName
@@ -14,4 +26,4 @@ const UserFields  = `{
   }
 }`;
 
-export { UserInitState, UserFields };
+export {UserInitState, UserFields};

@@ -1,6 +1,6 @@
 interface IWorkspaceModel {
-    id: string;
-    name: string;
+    id: string | null;
+    name: string | null;
 }
 
 export {IWorkspaceModel};
