@@ -8,23 +8,24 @@ import * as React from "react";
 import {useDispatch} from "react-redux";
 
 const SignUp = () => {
-    const [signUp, {data}] = useMutation(SIGN_UP);
-    const dispatch = useDispatch();
+  const [signUp, {data}] = useMutation(SIGN_UP);
+  const dispatch = useDispatch();
 
-    React.useLayoutEffect(() => {
-        if (data?.user) {
-            dispatch({type: ACTIONS.USER_LOGIN, payload: data});
-        }
-    }, [data?.user]);
+  React.useLayoutEffect(() => {
+    if (data?.user) {
+      dispatch({type: ACTIONS.USER_LOGIN, payload: data});
+    }
+  }, [data?.user]);
 
-    const RegisterUser = (variables: ISignUpForm) => {
-        signUp({variables});
-    };
+  const RegisterUser = (variables: ISignUpForm) => {
+    signUp({variables});
+  };
 
-    return (
-        <ContainerPage className="sign-out" title="Sign Out">
-            <UserSignUp onSubmit={(variables) => { RegisterUser(variables); } }/>
-        </ContainerPage>);
+  return (<ContainerPage className="sign-out" title="Sign Out">
+    <UserSignUp onSubmit={(variables) => {
+      RegisterUser(variables);
+    }}/>
+  </ContainerPage>);
 };
 
 export default SignUp;

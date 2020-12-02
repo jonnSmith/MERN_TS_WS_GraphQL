@@ -1,6 +1,9 @@
 import {StateReturnTypes} from "@appchat/core/store/types";
 import {UserInitState} from "@appchat/data/user/constants";
 import {IMessageListProps} from "@appchat/ui/elements/message/interfaces";
+import {Avatar, AvatarProps} from "@react-md/avatar";
+import {FontIcon} from "@react-md/icon";
+import {List, ListItem, ListSubheader} from "@react-md/list";
 import * as React from "react";
 import {useEffect} from "react";
 import {useSelector} from "react-redux";
@@ -34,18 +37,21 @@ const MessageList = (props: IMessageListProps) => {
     };
   }, [userdata]);
 
-  return (<div>
-            <p>
-              {message.user.email}
-              ({moment.unix(message.createdAt as any / 1000).format(ConfigSettings.client.formats.message.date)}):
-            </p>
-            <p>
-              {message.text}
-            </p>
-            <p>
-              {user.email} {user.firstName}
-            </p>
-          </div>);
+  return (<List>
+    <ListSubheader>Welcome, {user.firstName} {user.lastName} <small>({user.email})</small></ListSubheader>
+    <ListItem
+      id={`three-line-item-${message.createdAt}`}
+      secondaryText={message.text}
+      leftAddon={<Avatar><FontIcon>folder</FontIcon></Avatar>}
+      leftAddonType="avatar"
+      rightAddon={user.id === message.user.id && <FontIcon>folder</FontIcon>}
+      rightAddonPosition="top"
+      threeLines
+    >
+      {message.user.email}:
+      ({moment.unix(message.createdAt as any / 1000).format(ConfigSettings.client.formats.message.date)})
+    </ListItem>
+  </List>);
 };
 
 export {MessageList};
