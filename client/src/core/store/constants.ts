@@ -1,5 +1,5 @@
-import {config} from "@appchat/core/config";
+import {ConfigSettings} from "@appchat/core/config";
 
-const ACTIONS = {...config.client.actions.messages, ...config.client.actions.user};
+const ACTIONS = {...ConfigSettings.client.actions.messages, ...ConfigSettings.client.actions.user};
 
 export { ACTIONS };

@@ -5,7 +5,7 @@ import * as React from "react";
 import {useEffect} from "react";
 import {useSelector} from "react-redux";
 
-import {config} from "@appchat/core/config";
+import {ConfigSettings} from "@appchat/core/config";
 import {MessageInitObject} from "@appchat/data/message/constants";
 import * as moment from "moment";
 
@@ -37,7 +37,7 @@ const MessageList = (props: IMessageListProps) => {
   return (<div>
             <p>
               {message.user.email}
-              ({moment.unix(message.createdAt as any / 1000).format(config.client.formats.message.date)}):
+              ({moment.unix(message.createdAt as any / 1000).format(ConfigSettings.client.formats.message.date)}):
             </p>
             <p>
               {message.text}

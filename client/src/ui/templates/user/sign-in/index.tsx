@@ -1,8 +1,8 @@
-import {SetFloatingTextInputRefs} from "@appchat/ui/templates/functions";
 import {SignInFormInitialObject} from "@appchat/ui/templates/user/constants";
-import {ISignInForm, ISignInProps} from "@appchat/ui/templates/user/interfaces";
+import {ISignInProps} from "@appchat/ui/templates/user/interfaces";
 import * as React from "react";
 import {Button, CardActions, TextField} from "react-md";
+import {CSSTransitionClassNames} from "react-transition-group/CSSTransition";
 
 const UserSignIn = (props: ISignInProps) => {
 
@@ -45,7 +45,10 @@ const UserSignIn = (props: ISignInProps) => {
       <Button
         className="md-cell--right"
         type="submit"
-        disableProgrammaticRipple disableRipple rippleTimeout={0} rippleClassNames="">
+        disableProgrammaticRipple
+        disableRipple
+        rippleTimeout={0}
+        rippleClassNames={"appear" as CSSTransitionClassNames}>
         Sign In
       </Button>
     </CardActions>

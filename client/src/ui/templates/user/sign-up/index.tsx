@@ -1,8 +1,8 @@
-import {SetFloatingTextInputRefs} from "@appchat/ui/templates/functions";
 import {SignUpFormInitialObject} from "@appchat/ui/templates/user/constants";
 import {ISignUpForm, ISignUpProps} from "@appchat/ui/templates/user/interfaces";
 import * as React from "react";
 import {Button, CardActions, TextField} from "react-md";
+import {CSSTransitionClassNames} from "react-transition-group/CSSTransition";
 
 const UserSignUp = (props: ISignUpProps) => {
 
@@ -58,10 +58,12 @@ const UserSignUp = (props: ISignUpProps) => {
         />
         <CardActions className="md-cell md-cell--12">
             <Button
-                disableProgrammaticRipple disableRipple rippleTimeout={0} rippleClassNames=""
-                className="md-cell--right"
-                disabled={Object.keys(SignUpForm).some((key: keyof ISignUpForm) => !SignUpForm[key])}
-                type="submit"
+              disableProgrammaticRipple
+              disableRipple
+              rippleTimeout={0}
+              rippleClassNames={"appear" as CSSTransitionClassNames}
+              className="md-cell--right"
+              type="submit"
             >
                 Sign Up
             </Button>
