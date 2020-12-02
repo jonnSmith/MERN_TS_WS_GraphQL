@@ -20,29 +20,31 @@ const ChatRoom = () => {
 
   React.useEffect(() => {
     if (preloaded && !preloading) {
-      dispatch({type: ACTIONS.MESSAGE_ADDED, payload: { message: preloaded.message } });
+      dispatch({type: ACTIONS.MESSAGE_ADDED, payload: {message: preloaded.message}});
       update();
     }
   }, [preloaded?.message, preloading]);
 
   React.useEffect(() => {
     if (updated && !loading) {
-      dispatch({type: ACTIONS.MESSAGE_ADDED, payload: { message: updated.chatUpdated.message } });
+      dispatch({type: ACTIONS.MESSAGE_ADDED, payload: {message: updated.chatUpdated.message}});
       update();
     }
   }, [updated?.chatUpdated, loading]);
 
+  // TODO: operate with data for performance saving, cleanup after
+  // Last sent your message: JSON.stringify(created)
+  // Stream update from websocket: JSON.stringify(updated)
+  // Last message loaded on start: JSON.stringify(preloaded)
+
   return (<ContainerPage title="Chat room">
     <section>
-      <MessageList active={!loading} />
+      <MessageList active={!loading}/>
       <MessageSend
         onSubmit={(variables: IMessageSendForm) => {
           sendMessage({variables});
         }}
         loading={sending}/>
-      <p>1 {JSON.stringify(created)}</p>
-      <p>2 {JSON.stringify(updated)}</p>
-      <p>3 {JSON.stringify(preloaded)}</p>
     </section>
   </ContainerPage>);
 };

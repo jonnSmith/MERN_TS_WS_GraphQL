@@ -30,7 +30,7 @@ const MessageSend = (props: IMessageSendProps) => {
       onChange={(event: React.ChangeEvent<any>) =>
         updateMessageForm({...MessageForm, ...{text: event.currentTarget.value}})}
       maxLength={200}
-      label="Message text"
+      label="Write your message here..."
       className="md-cell md-cell--12"
       disabled={loading}
       ref={messageTextRef}

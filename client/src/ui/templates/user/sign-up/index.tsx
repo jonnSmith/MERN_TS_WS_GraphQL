@@ -1,5 +1,5 @@
 import {SignUpFormInitialObject} from "@appchat/ui/templates/user/constants";
-import {ISignUpProps} from "@appchat/ui/templates/user/interfaces";
+import {ISignUpForm, ISignUpProps} from "@appchat/ui/templates/user/interfaces";
 import * as React from "react";
 import {Button, CardActions, TextField} from "react-md";
 import {CSSTransitionClassNames} from "react-transition-group/CSSTransition";
@@ -33,6 +33,7 @@ const UserSignUp = (props: ISignUpProps) => {
       label="Email or Username"
       className="md-cell md-cell--12"
       ref={emailRef}
+      required={true}
     />
     <TextField
       id="password"
@@ -43,6 +44,7 @@ const UserSignUp = (props: ISignUpProps) => {
       label="Password"
       className="md-cell md-cell--12"
       ref={passwordRef}
+      required={true}
     />
     <TextField
       id="firstName"
@@ -52,10 +54,12 @@ const UserSignUp = (props: ISignUpProps) => {
       type="text"
       label="First Name"
       className="md-cell md-cell--12"
+      required={true}
     />
     <TextField
       id="lastName"
       name="lastName"
+      required={true}
       onChange={
         (event: React.ChangeEvent<any>) =>
           updateSignUpForm({...SignUpForm, ...{lastName: event.currentTarget.value}})}
@@ -71,6 +75,7 @@ const UserSignUp = (props: ISignUpProps) => {
         rippleClassNames={"appear" as CSSTransitionClassNames}
         className="md-cell--right"
         type="submit"
+        disabled={Object.keys(SignUpForm).some((key: keyof ISignUpForm) => !SignUpForm[key])}
       >
         Sign Up
       </Button>
