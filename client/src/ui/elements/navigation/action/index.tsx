@@ -12,7 +12,7 @@ const NavigationAction = (props: INavigationData) => {
     return (
         <Button
             disableProgrammaticRipple disableRipple rippleTimeout={0} rippleClassNames=""
-            onClick={() => { dispatch({type, payload}); }}><FontIcon>{icon}</FontIcon> {label}</Button>
+            onMouseDown={() => { dispatch({type, payload}); }}><FontIcon>{icon}</FontIcon> {label}</Button>
     );
 };
 

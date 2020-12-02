@@ -3,7 +3,6 @@ import {App} from "@appchat/app";
 import {ApolloConnection} from "@appchat/core/apollo";
 import {CoreStore} from "@appchat/core/store";
 import {LayoutContainer} from "@appchat/ui/containers/layout";
-import {Configuration} from "@react-md/layout";
 import {ConnectedRouter} from "connected-react-router";
 import * as React from "react";
 import {render} from "react-dom";
@@ -14,9 +13,7 @@ const Root = () => {
   return <ApolloProvider client={ApolloConnection.client}>
     <Provider store={CoreStore.ReduxSaga}>
       <ConnectedRouter history={ApolloConnection.history}>
-        <Configuration>
-          <LayoutContainer><App/></LayoutContainer>
-        </Configuration>
+        <LayoutContainer><App/></LayoutContainer>
       </ConnectedRouter>
     </Provider>
   </ApolloProvider>;

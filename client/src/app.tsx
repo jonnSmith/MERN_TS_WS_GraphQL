@@ -25,7 +25,7 @@ const App = (props: IAppProps) => {
   // }, [userdata]);
 
   return <Switch>
-      {CoreNavigation.routes(!!user?.token)}
+      {CoreNavigation.pages(!!user?.token)}
     </Switch>;
 };
 

@@ -6,17 +6,18 @@ import {StateReturnTypes} from "@appchat/core/store/types";
 import {UserInitState} from "@appchat/data/user/constants";
 import {GET_ME} from "@appchat/data/user/queries";
 import {IContainerLayoutProps} from "@appchat/ui/containers/interfaces";
-import { Layout, useLayoutNavigation } from "@react-md/layout";
-import { ENTER, useCrossFade } from "@react-md/transition";
+import {Layout, useLayoutNavigation} from "@react-md/layout";
+import {ENTER, useCrossFade} from "@react-md/transition";
 import * as React from "react";
 import {useEffect, useState} from "react";
 import {useDispatch, useSelector} from "react-redux";
-import { Link, useLocation } from "react-router-dom";
+import {Link, useLocation} from "react-router-dom";
 import {useUpdate} from "react-use";
+import {Configuration} from "@react-md/layout";
 
 const LayoutContainer = (props: IContainerLayoutProps): React.ReactElement => {
   const {children} = props;
-  const { pathname } = useLocation();
+  const {pathname} = useLocation();
   const update = useUpdate();
   // tslint:disable-next-line:variable-name
   // const [_rendered, transitionProps, dispatch] = useCrossFade();
@@ -34,7 +35,8 @@ const LayoutContainer = (props: IContainerLayoutProps): React.ReactElement => {
       dispatchSaga({type: data.user ? ACTIONS.USER_LOGIN : ACTIONS.USER_LOGOUT, payload: data});
       update();
     }
-    return (): void => { };
+    return (): void => {
+    };
   }, [data, loading]);
 
   // const [user, setUser] = useState(UserInitState.user);
@@ -50,7 +52,7 @@ const LayoutContainer = (props: IContainerLayoutProps): React.ReactElement => {
     return <><p>Critical error: {JSON.stringify(error)} </p><a href="/">Reload</a> </>;
   }
 
-  return (
+  return <Configuration>
     <Layout
       title={config.app.name}
       navHeaderTitle={config.app.sidebar}
@@ -59,7 +61,7 @@ const LayoutContainer = (props: IContainerLayoutProps): React.ReactElement => {
     >
       {!loading && children}
     </Layout>
-  );
+  </Configuration>;
 };
 
 export {LayoutContainer};
