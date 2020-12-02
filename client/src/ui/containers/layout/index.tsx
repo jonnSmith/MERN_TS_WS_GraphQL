@@ -3,17 +3,14 @@ import {config} from "@appchat/core/config";
 import {CoreNavigation} from "@appchat/core/navigation";
 import {ACTIONS} from "@appchat/core/store/constants";
 import {StateReturnTypes} from "@appchat/core/store/types";
-import {UserInitState} from "@appchat/data/user/constants";
 import {GET_ME} from "@appchat/data/user/queries";
 import {IContainerLayoutProps} from "@appchat/ui/containers/interfaces";
 import {Layout, useLayoutNavigation} from "@react-md/layout";
-import {ENTER, useCrossFade} from "@react-md/transition";
+import {Configuration} from "@react-md/layout";
 import * as React from "react";
-import {useEffect, useState} from "react";
 import {useDispatch, useSelector} from "react-redux";
 import {Link, useLocation} from "react-router-dom";
 import {useUpdate} from "react-use";
-import {Configuration} from "@react-md/layout";
 
 const LayoutContainer = (props: IContainerLayoutProps): React.ReactElement => {
   const {children} = props;
@@ -52,7 +49,7 @@ const LayoutContainer = (props: IContainerLayoutProps): React.ReactElement => {
     return <><p>Critical error: {JSON.stringify(error)} </p><a href="/">Reload</a> </>;
   }
 
-  return <Configuration>
+  return <Configuration disableRipple={true} disableProgrammaticRipple={true}>
     <Layout
       title={config.app.name}
       navHeaderTitle={config.app.sidebar}
