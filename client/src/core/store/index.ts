@@ -1,5 +1,7 @@
+import {ApolloConnection} from "@appchat/core/apollo";
 import { rootReducers } from "@appchat/core/store/reducers";
 import { rootSaga } from "@appchat/core/store/sagas";
+import { routerMiddleware } from "connected-react-router";
 import { applyMiddleware, compose, createStore, Store } from "redux";
 import createSagaMiddleware, { SagaMiddleware } from "redux-saga";
 
@@ -23,9 +25,13 @@ class CoreStore {
             ((process.env.NODE_ENV !== "production" && window["__REDUX_DEVTOOLS_EXTENSION_COMPOSE__"]) ||
             compose);
         CoreStore.InitStore = CoreStore.InitStore || createStore(
-            rootReducers,
+            rootReducers(ApolloConnection.history),
             {},
-            CoreStore.ComposeEnhancer(applyMiddleware(CoreStore.SagaMiddleware))
+            CoreStore.ComposeEnhancer(
+              applyMiddleware(
+                routerMiddleware(ApolloConnection.history),
+                CoreStore.SagaMiddleware)
+            )
         );
         if (!CoreStore.sagaIsRunning) {
             CoreStore.sagaIsRunning = CoreStore.SagaMiddleware.run(rootSaga).isRunning();
