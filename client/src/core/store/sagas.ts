@@ -5,10 +5,7 @@ import { all, fork } from "redux-saga/effects";
 const AllSagas = {...UserSagas, ...MessageSagas};
 
 const rootSaga = function* root() {
-    yield all(
-      {
-          ...Object.keys(AllSagas).map( (key: keyof typeof AllSagas) => fork(AllSagas[key]))
-      });
+    yield all(Object.keys(AllSagas).map( (key: keyof typeof AllSagas) => fork(AllSagas[key])));
 };
 
 export {rootSaga};

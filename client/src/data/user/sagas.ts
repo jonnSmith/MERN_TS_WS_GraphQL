@@ -15,6 +15,7 @@ function* userStatusChanged() {
 }
 
 function* updateUser(action: ICommonAction) {
+    console.debug("user-saga", action);
     const path: Pathname = ApolloConnection.history?.location?.pathname as Pathname;
     const auth = NavigationPathsSecurity[path as keyof typeof ROUTES];
     const {user} = action?.payload;
