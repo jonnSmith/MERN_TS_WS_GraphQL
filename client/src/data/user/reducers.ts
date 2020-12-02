@@ -5,6 +5,10 @@ import {IUserReducer} from "@appchat/data/user/interfaces";
 
 const UserReducer = (state: IUserReducer = UserInitState, action: ICommonAction): IUserReducer => {
     switch (action.type) {
+        case ACTIONS.USER_LOGIN:
+            return {...state, ...action.payload};
+        case ACTIONS.USER_LOGOUT:
+            return {...state, ...action.payload};
         case ACTIONS.USER_UPDATED:
             return {...state, ...action.payload};
     }

@@ -6,6 +6,7 @@ import {ACTIONS} from "@appchat/core/store/constants";
 import {ICommonAction} from "@appchat/core/store/interfaces";
 import {ClientStorage} from "@appchat/core/store/storage";
 import {userUpdated} from "@appchat/data/user/actions";
+import { push } from "connected-react-router";
 import {Pathname} from "history";
 import {put, takeLatest} from "redux-saga/effects";
 
@@ -21,8 +22,12 @@ function* updateUser(action: ICommonAction) {
     if (action.type === ACTIONS.USER_LOGOUT) {
         ApolloConnection.client.clearStore();
     }
-    if (user?.token && !auth) { ApolloConnection.history.replace(ROUTES.Account); }
-    if (!user?.token && auth) { ApolloConnection.history.replace(ROUTES.SignIn); }
+    if (user?.token && !auth) {
+        yield put(push(ROUTES.Account));
+    }
+    if (!user?.token && auth) {
+        yield put(push(ROUTES.SignIn));
+    }
     yield put(userUpdated(action.payload));
 }
 
