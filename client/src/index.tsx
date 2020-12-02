@@ -4,22 +4,22 @@ import {ApolloConnection} from "@appchat/core/apollo";
 import {CoreStore} from "@appchat/core/store";
 import {LayoutContainer} from "@appchat/ui/containers/layout";
 import {Configuration} from "@react-md/layout";
+import {ConnectedRouter} from "connected-react-router";
 import * as React from "react";
 import {render} from "react-dom";
 import {Provider} from "react-redux";
-import {Router} from "react-router-dom";
 import "./index.scss";
 
 const Root = () => {
-  return <Router history={ApolloConnection.history}>
+  return <ApolloProvider client={ApolloConnection.client}>
     <Provider store={CoreStore.ReduxSaga}>
-      <ApolloProvider client={ApolloConnection.client}>
+      <ConnectedRouter history={ApolloConnection.history}>
         <Configuration>
           <LayoutContainer><App/></LayoutContainer>
         </Configuration>
-      </ApolloProvider>
+      </ConnectedRouter>
     </Provider>
-  </Router>;
+  </ApolloProvider>;
 };
 const rootEl = document.getElementById("root");
 
