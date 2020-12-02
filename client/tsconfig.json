@@ -7,14 +7,20 @@
     "removeComments": true,
     "strict": false,
     "sourceMap": true,
-    "target": "es5",
+    "target": "es6",
     "baseUrl": "./",
     "paths": {
       "@appchat/*": ["src/*/index", "src/*"]
-    }
+    },
+    "lib": ["es6", "es5", "dom"],
+    "types": ["node"],
+    "typeRoots": [
+      "./../../node_modules/@types"
+    ],
+    "allowSyntheticDefaultImports": true
   },
   "include": ["./**/*.ts", "./**/*.tsx"],
-  "exclude": ["./src/legacy", "./../node_modules"],
+  "exclude": ["./src/legacy", "./../node_modules", "./tests"],
   "awesomeTypescriptLoaderOptions": {
     "reportFiles": [
       "./src/**/*"

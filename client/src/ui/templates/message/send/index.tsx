@@ -2,6 +2,7 @@ import {MessageFormInitialObject} from "@appchat/ui/templates/message/constants"
 import {IMessageSendForm, IMessageSendProps} from "@appchat/ui/templates/message/interfaces";
 import * as React from "react";
 import {Button, CardActions, TextField} from "react-md";
+import {CSSTransitionClassNames} from "react-transition-group/CSSTransition";
 
 const MessageSend = (props: IMessageSendProps) => {
 
@@ -28,7 +29,6 @@ const MessageSend = (props: IMessageSendProps) => {
       value={MessageForm.text}
       onChange={(event: React.ChangeEvent<any>) =>
         updateMessageForm({...MessageForm, ...{text: event.currentTarget.value}})}
-      rows={2}
       maxLength={200}
       label="Message text"
       className="md-cell md-cell--12"
@@ -37,7 +37,10 @@ const MessageSend = (props: IMessageSendProps) => {
     />
     <CardActions className="md-cell md-cell--12">
       <Button
-        disableProgrammaticRipple disableRipple rippleTimeout={0} rippleClassNames=""
+        disableProgrammaticRipple
+        disableRipple
+        rippleTimeout={0}
+        rippleClassNames={"appear" as CSSTransitionClassNames}
         className="md-cell--right"
         disabled={Object.keys(MessageForm).some((key: keyof IMessageSendForm) => !MessageForm[key])}
         type="submit">

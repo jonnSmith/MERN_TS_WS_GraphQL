@@ -27,11 +27,8 @@ class CoreStore {
         CoreStore.InitStore = CoreStore.InitStore || createStore(
             rootReducers(ApolloConnection.history),
             {},
-            CoreStore.ComposeEnhancer(
-              applyMiddleware(
-                routerMiddleware(ApolloConnection.history),
-                CoreStore.SagaMiddleware)
-            )
+          // tslint:disable-next-line:max-line-length
+            CoreStore.ComposeEnhancer(applyMiddleware(routerMiddleware(ApolloConnection.history), CoreStore.SagaMiddleware))
         );
         if (!CoreStore.sagaIsRunning) {
             CoreStore.sagaIsRunning = CoreStore.SagaMiddleware.run(rootSaga).isRunning();

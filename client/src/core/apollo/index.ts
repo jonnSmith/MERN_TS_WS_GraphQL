@@ -14,7 +14,7 @@ import {setContext} from "@apollo/client/link/context";
 import {ErrorResponse, onError} from "@apollo/client/link/error";
 import {WebSocketLink} from "@apollo/client/link/ws";
 import {getMainDefinition} from "@apollo/client/utilities";
-import {config} from "@appchat/core/config";
+import {ConfigSettings} from "@appchat/core/config";
 import {CoreStore} from "@appchat/core/store";
 import {ACTIONS} from "@appchat/core/store/constants";
 import {ClientStorage} from "@appchat/core/store/storage";
@@ -38,7 +38,7 @@ class ApolloConnection {
   }
 
   private static Client: ApolloClient<any>;
-  private static History: History;
+  private static History: History<unknown>;
 
   private static CreateApolloCache = (): ApolloCache<any> => {
     return new InMemoryCache();
@@ -58,7 +58,7 @@ class ApolloConnection {
 
   private static CreateAuthLink() {
     const AuthLink = setContext(async (_, {headers}) => {
-      const token = await ClientStorage.read(config.token.storage);
+      const token = await ClientStorage.read(ConfigSettings.token.storage);
       // TODO: headers always undefined - check and fix/refactor if needed
       // console.debug(token, headers);
       if (!token) {
@@ -67,7 +67,7 @@ class ApolloConnection {
       return {
         headers: {
           ...headers,
-          [config.token.header]: token,
+          [ConfigSettings.token.header]: token,
         },
       };
     });
@@ -76,26 +76,26 @@ class ApolloConnection {
 
   private static CreateTerminatingLink() {
     const httpLink = createHttpLink({
-      uri: `http://${config.server.host}:${config.server.port}/${config.server.path}`,
+      uri: `http://${ConfigSettings.server.host}:${ConfigSettings.server.port}/${ConfigSettings.server.path}`,
       useGETForQueries: false,
     });
 
     const wsLink = new WebSocketLink({
       options: {
         connectionParams: async () => {
-          const token = await ClientStorage.read(config.token.storage);
+          const token = await ClientStorage.read(ConfigSettings.token.storage);
           return {
             headers: {
-              [config.token.header]: token,
+              [ConfigSettings.token.header]: token,
             },
           };
         },
-        lazy: config.client.apollo.wsLink.lazy,
-        reconnect: config.client.apollo.wsLink.reconnect,
-        reconnectionAttempts: config.client.apollo.wsLink.reconnectionAttempts,
-        timeout: config.client.apollo.wsLink.timeout,
+        lazy: ConfigSettings.client.apollo.wsLink.lazy,
+        reconnect: ConfigSettings.client.apollo.wsLink.reconnect,
+        reconnectionAttempts: ConfigSettings.client.apollo.wsLink.reconnectionAttempts,
+        timeout: ConfigSettings.client.apollo.wsLink.timeout,
       },
-      uri: `ws:${config.server.host}:${config.server.ws}/${config.server.path}`,
+      uri: `ws:${ConfigSettings.server.host}:${ConfigSettings.server.ws}/${ConfigSettings.server.path}`,
     });
 
     // @ts-ignore
@@ -156,12 +156,12 @@ class ApolloConnection {
       cache,
       defaultOptions: {
         query: {
-          errorPolicy: config.client.apollo.options.ErrorPolicy as ErrorPolicy,
-          fetchPolicy: config.client.apollo.options.FetchPolicy as FetchPolicy,
+          errorPolicy: ConfigSettings.client.apollo.options.ErrorPolicy as ErrorPolicy,
+          fetchPolicy: ConfigSettings.client.apollo.options.FetchPolicy as FetchPolicy,
         },
         watchQuery: {
-          errorPolicy: config.client.apollo.options.ErrorPolicy as ErrorPolicy,
-          fetchPolicy: config.client.apollo.options.FetchPolicy as FetchPolicy,
+          errorPolicy: ConfigSettings.client.apollo.options.ErrorPolicy as ErrorPolicy,
+          fetchPolicy: ConfigSettings.client.apollo.options.FetchPolicy as FetchPolicy,
         }
       },
       link,

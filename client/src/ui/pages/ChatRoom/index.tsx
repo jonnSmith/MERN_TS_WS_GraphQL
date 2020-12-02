@@ -1,15 +1,13 @@
 import {useMutation, useQuery, useSubscription} from "@apollo/react-hooks";
 import {ACTIONS} from "@appchat/core/store/constants";
-import {CHAT_UPDATED, CREATE_MESSAGE, DELETE_MESSAGE, PRELOAD_MESSAGE} from "@appchat/data/message/queries";
+import {CHAT_UPDATED, CREATE_MESSAGE, PRELOAD_MESSAGE} from "@appchat/data/message/queries";
 import {ContainerPage} from "@appchat/ui/containers/page";
 import {IMessageSendForm} from "@appchat/ui/templates/message/interfaces";
 import {MessageList} from "@appchat/ui/templates/message/list";
 import {MessageSend} from "@appchat/ui/templates/message/send";
 import * as React from "react";
-import {useEffect} from "react";
 import {useDispatch} from "react-redux";
 import {useUpdate} from "react-use";
-
 
 const ChatRoom = () => {
   const update = useUpdate();
@@ -20,21 +18,19 @@ const ChatRoom = () => {
 
   const dispatch = useDispatch();
 
-  useEffect(() => {
+  React.useEffect(() => {
     if (preloaded && !preloading) {
       dispatch({type: ACTIONS.MESSAGE_ADDED, payload: { message: preloaded.message } });
       update();
     }
-    return () => { };
-  }, [preloaded]);
+  }, [preloaded?.message, preloading]);
 
-  useEffect(() => {
+  React.useEffect(() => {
     if (updated && !loading) {
       dispatch({type: ACTIONS.MESSAGE_ADDED, payload: { message: updated.chatUpdated.message } });
       update();
     }
-    return () => { };
-  }, [updated]);
+  }, [updated?.chatUpdated, loading]);
 
   return (<ContainerPage title="Chat room">
     <section>

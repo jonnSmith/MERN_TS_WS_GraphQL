@@ -1,4 +1,4 @@
-import {config} from "@appchat/core/config";
+import {ConfigSettings} from "@appchat/core/config";
 import {StorageEngines, SupportedStorageEngines} from "@appchat/core/store/types";
 
 class ClientStorage {
@@ -20,7 +20,7 @@ class ClientStorage {
     private constructor() {
         ClientStorage.Engine =
             ClientStorage.Engine ||
-            ClientStorage.Engines[config.token.engine as SupportedStorageEngines];
+            ClientStorage.Engines[ConfigSettings.token.engine as SupportedStorageEngines];
     }
 
 }

@@ -7,6 +7,14 @@ const MessageReducer = (state: IMessagesReducer = MessagesInitState, action: ICo
   switch (action.type) {
     case ACTIONS.MESSAGES_UPDATED:
       return {...state, ...action.payload};
+    case ACTIONS.MESSAGE_ADDED:
+      return {...state, ...action.payload};
+    case ACTIONS.MESSAGE_DELETED:
+      return {...state, ...action.payload};
+    case ACTIONS.MESSAGE_UPDATED:
+      return {...state, ...action.payload};
+    case ACTIONS.MESSAGE_PRELOADED:
+      return {...state, ...action.payload};
   }
   return state;
 };

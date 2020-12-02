@@ -9,7 +9,7 @@ function* messagesChanged() {
 }
 
 function* updateMessages(action: ICommonAction) {
-  console.debug(action);
+  console.debug("message-saga", action);
   const {message} = action?.payload;
   const messages = new Map();
   messages.set(message.id, message);

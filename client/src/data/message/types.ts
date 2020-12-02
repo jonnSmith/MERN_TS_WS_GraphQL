@@ -1,4 +1,6 @@
-import {config} from "@appchat/core/config";
+import {ConfigSettings} from "@appchat/core/config";
 
-type ActionTypes = keyof config.client.actions.messages;
+const { messages } = ConfigSettings.client.actions;
+type ActionTypes = keyof typeof messages | string;
+
 export {ActionTypes};

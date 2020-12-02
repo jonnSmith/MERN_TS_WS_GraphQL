@@ -4,6 +4,7 @@ import {Button} from "@react-md/button";
 import {FontIcon} from "@react-md/icon";
 import * as React from "react";
 import {useDispatch} from "react-redux";
+import {CSSTransitionClassNames} from "react-transition-group/CSSTransition";
 
 const NavigationAction = (props: INavigationData) => {
     const { label, icon, id, payload } = props;
@@ -11,8 +12,11 @@ const NavigationAction = (props: INavigationData) => {
     const dispatch = useDispatch();
     return (
         <Button
-            disableProgrammaticRipple disableRipple rippleTimeout={0} rippleClassNames=""
-            onClick={() => { dispatch({type, payload}); }}><FontIcon>{icon}</FontIcon> {label}</Button>
+            disableProgrammaticRipple
+            disableRipple
+            rippleTimeout={0}
+            rippleClassNames={"appear" as CSSTransitionClassNames}
+            onMouseDown={() => { dispatch({type, payload}); }}><FontIcon>{icon}</FontIcon> {label}</Button>
     );
 };
 
