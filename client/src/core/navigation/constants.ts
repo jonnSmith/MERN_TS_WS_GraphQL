@@ -52,7 +52,7 @@ const NavigationData: INavigationData[] = [
     {
         auth: true,
         exact: false,
-        icon: "close",
+        icon: "settings_power",
         id: "USER_LOGOUT",
         label: "Logout",
         payload: UserInitState

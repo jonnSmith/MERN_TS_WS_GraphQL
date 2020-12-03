@@ -32,6 +32,7 @@ const MessageFields = `
     workspaceId
     user {
       email
+      id
     }
   }`;
 
