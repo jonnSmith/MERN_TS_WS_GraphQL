@@ -5,11 +5,12 @@ interface INavigationData {
     auth?: boolean;
     active?: boolean;
     exact?: boolean;
-    icon: string;
+    icon?: string;
     id: RouteString | ActionsString;
     label: string;
     payload?: any;
     visible?: boolean;
+    style?: any;
 }
 
 export { INavigationData };

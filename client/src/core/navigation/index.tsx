@@ -40,14 +40,14 @@ class CoreNavigation {
     };
     if (item.payload) {
       NavItem.children = <NavigationAction
+        style={{marginLeft: "-15px"}}
         label={item.label}
         id={item.id}
-        icon={item.icon}
         payload={item.payload} />;
+      NavItem.leftAddon = (<FontIcon>{item.icon}</FontIcon>);
       NavItem.itemId = null;
       NavItem.to = null;
       NavItem.isCustom = true;
-      NavItem.leftAddon = null;
     }
     return NavItem;
   }

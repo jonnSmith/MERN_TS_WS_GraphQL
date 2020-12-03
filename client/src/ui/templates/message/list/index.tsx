@@ -13,7 +13,7 @@ import {MessageInitObject} from "@appchat/data/message/constants";
 import * as moment from "moment";
 
 const MessageList = (props: IMessageListProps) => {
-  const {active} = props;
+  const {active, callDelete} = props;
 
   const userdata = useSelector((state: StateReturnTypes) => state.UserReducer.user);
   const messagedata = useSelector((state: StateReturnTypes) => state.MessageReducer.message);
@@ -42,10 +42,13 @@ const MessageList = (props: IMessageListProps) => {
     <ListItem
       id={`three-line-item-${message.createdAt}`}
       secondaryText={message.text}
-      leftAddon={<Avatar><FontIcon>folder</FontIcon></Avatar>}
+      leftAddon={<Avatar color="purple"><FontIcon>comment</FontIcon></Avatar>}
       leftAddonType="avatar"
-      rightAddon={user.id === message.user.id && <FontIcon>folder</FontIcon>}
-      rightAddonPosition="top"
+      rightAddon={(user.id === message.user.id) && <FontIcon onClick={(event: React.MouseEvent<HTMLElement>) => {
+        event.preventDefault();
+        callDelete({variables: {id: message.id}});
+      }}>delete</FontIcon>}
+      rightAddonPosition="middle"
       threeLines
     >
       {message.user.email}:

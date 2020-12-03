@@ -14,9 +14,15 @@ interface IMessageDeleteButtonProps {
   id: string;
 }
 
+interface IMessageDeleteOptions {
+  variables: {
+    id: string;
+  };
+}
+
 interface IMessageListProps {
-  message?: IMessageModel;
+  callDelete?: (variables: IMessageDeleteOptions) => void;
   active?: boolean;
 }
 
-export { IMessageDeleteButtonProps, IMessageListItemProps, IMessageListProps };
+export { IMessageDeleteButtonProps, IMessageDeleteOptions, IMessageListItemProps, IMessageListProps };

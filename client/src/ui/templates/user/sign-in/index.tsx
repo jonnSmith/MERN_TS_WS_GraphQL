@@ -1,11 +1,11 @@
 import {SignInFormInitialObject} from "@appchat/ui/templates/user/constants";
-import {ISignInProps, ISignInForm} from "@appchat/ui/templates/user/interfaces";
+import {ISignInForm, ISignInProps} from "@appchat/ui/templates/user/interfaces";
+import { Divider } from "@react-md/divider";
 import * as React from "react";
 import {Button, CardActions, TextField} from "react-md";
 import {CSSTransitionClassNames} from "react-transition-group/CSSTransition";
 
 const UserSignIn = (props: ISignInProps) => {
-
   const {onSubmit} = props;
   const [SignInForm, updateSignInForm] = React.useState(SignInFormInitialObject);
 
@@ -14,15 +14,9 @@ const UserSignIn = (props: ISignInProps) => {
     onSubmit(SignInForm);
   };
 
-  const passwordRef = React.useRef();
-  const emailRef = React.useRef();
-
-  return (<form
-    className="md-grid text-fields__application md-grid--no-spacing"
-    onSubmit={(event) => { event.preventDefault(); sendSignInForm(event); }}
-  >
+  return (<form onSubmit={(event) => { event.preventDefault(); sendSignInForm(event); }}>
     <TextField
-      required
+      required={true}
       id="email"
       name="email"
       type="email"
@@ -31,8 +25,9 @@ const UserSignIn = (props: ISignInProps) => {
       onChange={(event: React.ChangeEvent<any>) =>
         updateSignInForm({...SignInForm, ...{email: event.currentTarget.value}})}
     />
+    <Divider />
     <TextField
-      required
+      required={true}
       id="password"
       name="password"
       type="password"
@@ -43,7 +38,7 @@ const UserSignIn = (props: ISignInProps) => {
     />
     <CardActions className="md-cell md-cell--12">
       <Button
-        className="md-cell--right"
+        themeType="outline"
         type="submit"
         disableProgrammaticRipple
         disableRipple

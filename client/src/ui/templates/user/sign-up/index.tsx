@@ -1,15 +1,14 @@
 import {SignUpFormInitialObject} from "@appchat/ui/templates/user/constants";
 import {ISignUpForm, ISignUpProps} from "@appchat/ui/templates/user/interfaces";
+import { Divider } from "@react-md/divider";
 import * as React from "react";
 import {Button, CardActions, TextField} from "react-md";
+import PasswordStrengthBar from "react-password-strength-bar";
 import {CSSTransitionClassNames} from "react-transition-group/CSSTransition";
 
 const UserSignUp = (props: ISignUpProps) => {
 
   const {onSubmit} = props;
-
-  const passwordRef = React.useRef();
-  const emailRef = React.useRef();
 
   const [SignUpForm, updateSignUpForm] = React.useState(SignUpFormInitialObject);
 
@@ -18,8 +17,7 @@ const UserSignUp = (props: ISignUpProps) => {
     onSubmit(SignUpForm);
   };
 
-  return (<form className="md-grid md-grid--no-spacing text-fields__application"
-    onSubmit={(event: React.FormEvent) => {
+  return (<form onSubmit={(event: React.FormEvent) => {
       event.preventDefault();
       sendSignUpForm(event);
     }}>
@@ -31,10 +29,9 @@ const UserSignUp = (props: ISignUpProps) => {
       }}
       type="email"
       label="Email or Username"
-      className="md-cell md-cell--12"
-      ref={emailRef}
       required={true}
     />
+    <Divider />
     <TextField
       id="password"
       name="password"
@@ -42,10 +39,9 @@ const UserSignUp = (props: ISignUpProps) => {
         updateSignUpForm({...SignUpForm, ...{password: event.currentTarget.value}})}
       type="password"
       label="Password"
-      className="md-cell md-cell--12"
-      ref={passwordRef}
       required={true}
     />
+    <PasswordStrengthBar password={SignUpForm.password} />
     <TextField
       id="firstName"
       name="firstName"
@@ -53,9 +49,9 @@ const UserSignUp = (props: ISignUpProps) => {
         updateSignUpForm({...SignUpForm, ...{firstName: event.currentTarget.value}})}
       type="text"
       label="First Name"
-      className="md-cell md-cell--12"
       required={true}
     />
+    <Divider />
     <TextField
       id="lastName"
       name="lastName"
@@ -65,15 +61,15 @@ const UserSignUp = (props: ISignUpProps) => {
           updateSignUpForm({...SignUpForm, ...{lastName: event.currentTarget.value}})}
       type="text"
       label="Last Name"
-      className="md-cell md-cell--12"
     />
-    <CardActions className="md-cell md-cell--12">
+    <Divider />
+    <CardActions>
       <Button
         disableProgrammaticRipple
         disableRipple
         rippleTimeout={0}
         rippleClassNames={"appear" as CSSTransitionClassNames}
-        className="md-cell--right"
+        themeType="outline"
         type="submit"
         disabled={Object.keys(SignUpForm).some((key: keyof ISignUpForm) => !SignUpForm[key])}
       >
