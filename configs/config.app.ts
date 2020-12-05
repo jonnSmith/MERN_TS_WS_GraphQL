@@ -58,6 +58,6 @@ export default {
     header: 'x-token',
     storage: 'token',
     secret: 'neurochat!secret',
-    engine: 'localStorage',
+    engine: 'sessionStorage',
   },
 };

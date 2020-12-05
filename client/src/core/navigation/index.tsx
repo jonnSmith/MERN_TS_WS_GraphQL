@@ -44,7 +44,7 @@ class CoreNavigation {
         label={item.label}
         id={item.id}
         payload={item.payload} />;
-      NavItem.leftAddon = (<FontIcon>{item.icon}</FontIcon>);
+      NavItem.leftAddon = (<FontIcon color={"deep-purple-500"}>{item.icon}</FontIcon>);
       NavItem.itemId = null;
       NavItem.to = null;
       NavItem.isCustom = true;
@@ -52,60 +52,46 @@ class CoreNavigation {
     return NavItem;
   }
 
+  private static navsReducer = (res: any, nav: INavigationData, i: number) => {
+    if (i === 1) {
+      const FirstPath = ROUTES[res.id as keyof typeof ROUTES];
+      const FirstNav = CoreNavigation.CreateNavItem(res);
+      res = {};
+      res[FirstPath] = FirstNav;
+    }
+    const path = ROUTES[nav.id as keyof typeof ROUTES];
+    res[path] = CoreNavigation.CreateNavItem(nav);
+    return res;
+  }
+
+  private static routesGenerator = (props: INavigationData) => {
+    const RouteComponent = Pages[props.id as keyof typeof ROUTES];
+    return <Route
+      exact={props.exact || false}
+      path={ROUTES[props.id as keyof typeof ROUTES]}
+      key={props.id}
+      component={RouteComponent}
+    />;
+  }
+
   private constructor() {
     // tslint:disable-next-line:max-line-length
     CoreNavigation.NavigationPrivateNavs = CoreNavigation.NavigationPrivateNavs || [...NavigationData].filter((n) => n.auth).reduce(
-        (result: any, item, index) => {
-          if (index === 1) {
-            const FirstPath = ROUTES[result.id as keyof typeof ROUTES];
-            const FirstNav = CoreNavigation.CreateNavItem(result);
-            result = {};
-            result[FirstPath] = FirstNav;
-          }
-          const path = ROUTES[item.id as keyof typeof ROUTES];
-          result[path] = CoreNavigation.CreateNavItem(item);
-          return result;
-        });
+        (result: any, item, index) => CoreNavigation.navsReducer(result, item, index));
 
     // tslint:disable-next-line:max-line-length
     CoreNavigation.NavigationPublicNavs = CoreNavigation.NavigationPublicNavs || [...NavigationData].filter((n) => !n.auth).reduce(
-      (result: any, item, index, array) => {
-        if (index === 1) {
-          const FirstPath = ROUTES[result.id as keyof typeof ROUTES];
-          const FirstNav = CoreNavigation.CreateNavItem(result);
-          result = {};
-          result[FirstPath] = FirstNav;
-        }
-        const path = ROUTES[item.id as keyof typeof ROUTES];
-        result[path] = CoreNavigation.CreateNavItem(item);
-        return result;
-    });
+      (result: any, item, index, array) => CoreNavigation.navsReducer(result, item, index) );
 
     CoreNavigation.NavigationPublicPages = [...NavigationData]
       .filter((n) => !n.payload)
       .filter((n) => !n.auth)
-      .map((props: INavigationData) => {
-        const RouteComponent = Pages[props.id as keyof typeof ROUTES];
-        return <Route
-          exact={props.exact || false}
-          path={ROUTES[props.id as keyof typeof ROUTES]}
-          key={props.id}
-          component={RouteComponent}
-        />;
-      });
+      .map((props: INavigationData) => CoreNavigation.routesGenerator(props));
 
     CoreNavigation.NavigationPrivatePages = [...NavigationData]
       .filter((n) => !n.payload)
       .filter((n) => n.auth)
-      .map((props: INavigationData) => {
-        const RouteComponent = Pages[props.id as keyof typeof ROUTES];
-        return <Route
-          exact={props.exact || false}
-          path={ROUTES[props.id as keyof typeof ROUTES]}
-          key={props.id}
-          component={RouteComponent}
-        />;
-      });
+      .map((props: INavigationData) => CoreNavigation.routesGenerator(props));
   }
 }
 
