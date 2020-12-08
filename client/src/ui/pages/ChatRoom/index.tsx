@@ -2,13 +2,13 @@ import {useMutation, useQuery, useSubscription} from "@apollo/react-hooks";
 import {ACTIONS} from "@appchat/core/store/constants";
 import {CHAT_UPDATED, CREATE_MESSAGE, DELETE_MESSAGE, PRELOAD_MESSAGE} from "@appchat/data/message/queries";
 import {ContainerPage} from "@appchat/ui/containers/page";
+import {IMessageDeleteOptions} from "@appchat/ui/elements/message/interfaces";
 import {IMessageSendForm} from "@appchat/ui/templates/message/interfaces";
 import {MessageList} from "@appchat/ui/templates/message/list";
 import {MessageSend} from "@appchat/ui/templates/message/send";
 import { Divider } from "@react-md/divider";
 import * as React from "react";
 import {useDispatch} from "react-redux";
-import {IMessageDeleteOptions} from "@appchat/ui/elements/message/interfaces";
 
 const ChatRoom = () => {
   const [sendMessage,
