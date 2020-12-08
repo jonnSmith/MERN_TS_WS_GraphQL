@@ -2,7 +2,7 @@ import {SignUpFormInitialObject} from "@appchat/ui/templates/user/constants";
 import {ISignUpForm, ISignUpProps} from "@appchat/ui/templates/user/interfaces";
 import { Divider } from "@react-md/divider";
 import * as React from "react";
-import {Button, CardActions, TextField} from "react-md";
+import {Button, CardActions, Password, TextField} from "react-md";
 import PasswordStrengthBar from "react-password-strength-bar";
 import {CSSTransitionClassNames} from "react-transition-group/CSSTransition";
 
@@ -32,14 +32,13 @@ const UserSignUp = (props: ISignUpProps) => {
       required={true}
     />
     <Divider />
-    <TextField
+    <Password
       id="password"
       name="password"
-      onChange={(event: React.ChangeEvent<any>) =>
-        updateSignUpForm({...SignUpForm, ...{password: event.currentTarget.value}})}
-      type="password"
       label="Password"
       required={true}
+      onChange={(event: React.ChangeEvent<any>) =>
+        updateSignUpForm({...SignUpForm, ...{password: event.currentTarget.value}})}
     />
     <PasswordStrengthBar password={SignUpForm.password} />
     <TextField

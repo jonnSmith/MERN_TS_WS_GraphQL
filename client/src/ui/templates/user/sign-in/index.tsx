@@ -2,7 +2,7 @@ import {SignInFormInitialObject} from "@appchat/ui/templates/user/constants";
 import {ISignInForm, ISignInProps} from "@appchat/ui/templates/user/interfaces";
 import { Divider } from "@react-md/divider";
 import * as React from "react";
-import {Button, CardActions, TextField} from "react-md";
+import {Button, CardActions, Password, TextField} from "react-md";
 import {CSSTransitionClassNames} from "react-transition-group/CSSTransition";
 
 const UserSignIn = (props: ISignInProps) => {
@@ -13,6 +13,9 @@ const UserSignIn = (props: ISignInProps) => {
     event.preventDefault();
     onSubmit(SignInForm);
   };
+
+  const checkFields = (formFields: ISignInForm) =>
+    Object.keys(formFields).some((key: keyof typeof formFields) => !formFields[key]);
 
   return (<form onSubmit={(event) => { event.preventDefault(); sendSignInForm(event); }}>
     <TextField
@@ -26,11 +29,10 @@ const UserSignIn = (props: ISignInProps) => {
         updateSignInForm({...SignInForm, ...{email: event.currentTarget.value}})}
     />
     <Divider />
-    <TextField
+    <Password
       required={true}
       id="password"
       name="password"
-      type="password"
       label="Password"
       value={SignInForm.password}
       onChange={(event: React.ChangeEvent<any>) =>
@@ -38,13 +40,14 @@ const UserSignIn = (props: ISignInProps) => {
     />
     <CardActions className="md-cell md-cell--12">
       <Button
-        themeType="outline"
+        theme={"secondary"}
+        themeType={"contained"}
         type="submit"
         disableProgrammaticRipple
         disableRipple
         rippleTimeout={0}
         rippleClassNames={"appear" as CSSTransitionClassNames}
-        disabled={Object.keys(SignInForm).some((key: keyof ISignInForm) => !SignInForm[key])}>
+        disabled={checkFields(SignInForm)}>
         Sign In
       </Button>
     </CardActions>

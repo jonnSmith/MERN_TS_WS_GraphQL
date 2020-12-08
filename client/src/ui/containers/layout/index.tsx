@@ -17,12 +17,13 @@ const LayoutContainer = (props: IContainerLayoutProps): React.ReactElement => {
     <Layout
       title={ConfigSettings.app.name}
       navHeaderTitle={ConfigSettings.app.sidebar}
+      navHeaderProps={{className: "rmd-app-bar--secondary", }}
       // @ts-ignore
       treeProps={useLayoutNavigation(CoreNavigation.navs(!!user?.token), pathname, Link)}
     >
       {children}
     </Layout>
-  </Configuration>;
+  </Configuration > ;
 };
 
 export {LayoutContainer};

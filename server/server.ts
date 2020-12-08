@@ -61,6 +61,10 @@ const subscriptionServer = SubscriptionServer.create({
   execute,
   subscribe,
   onConnect: OnConnectMiddleware,
+  onOperation: (message, params, webSocket) => {
+    // console.debug('m', message.type);
+    return params;
+  }
 }, {server: ws, path: `/${config.server.path}`});
 
 app.use(`/${config.server.path}`, graphqlHTTP(async (request, response, graphQLParams) => (
