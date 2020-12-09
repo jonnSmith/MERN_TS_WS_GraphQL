@@ -34,7 +34,8 @@ const MessageSend = (props: IMessageSendProps) => {
         rippleTimeout={0}
         rippleClassNames={"appear" as CSSTransitionClassNames}
         disabled={Object.keys(MessageForm).some((key: keyof IMessageSendForm) => !MessageForm[key])}
-        themeType="outline"
+        theme={"secondary"}
+        themeType={"contained"}
         type="submit">
         Send
       </Button>

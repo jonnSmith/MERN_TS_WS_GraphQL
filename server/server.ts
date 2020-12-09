@@ -6,9 +6,13 @@ import ExecutableSchema from './src/schema';
 import config from './../configs/config.app';
 import {execute, subscribe} from "graphql";
 import {graphqlHTTP} from "express-graphql";
-import {ContextMiddleware} from "./src/core/midddleware/token";
-import { Server as WSS} from 'ws'; // yarn add ws
+import {ContextMiddleware, WSMiddleware} from "./src/core/midddleware/token";
+import { Server as WSS} from 'ws';
 import { useServer } from 'graphql-ws/lib/use/ws';
+import Message from "./src/common/message/message.model";
+import * as jwt from "jsonwebtoken";
+import {Users} from "./src/core/bus/users";
+import User from "./src/common/user/user.model";
 
 const schema = makeExecutableSchema(ExecutableSchema);
 const mongoose = require('mongoose');
@@ -34,6 +38,8 @@ mongoose.connect(
 //   });
 // } else {
 
+
+
 const app = express();
 const session = require('express-session');
 const MongoStore = require('connect-mongo')(session);
@@ -54,26 +60,56 @@ const wss = new WSS({
   path: `/${config.server.path}`,
 });
 
+interface IOnlineUser {
+  email: string;
+  typing: boolean;
+}
+let onlineUsers: IOnlineUser[]  = [];
+
 useServer(
   {
     schema,
     execute,
     subscribe,
     onConnect: async (ctx) => {
-      // TODO: add preloaded messages mutation on connection
-      await ContextMiddleware(ctx.extra.request);
+      const { user } = await WSMiddleware(ctx);
+      ctx.extra.socket.on("close", async (socket, code, reason) => {
+        onlineUsers = user ? onlineUsers.filter( (u: IOnlineUser) => u.email !== user.email) : onlineUsers;
+        console.debug('close', onlineUsers)
+      });
+      const message: any = await Message.findOne({}).sort({createdAt: -1});
+      const author = await User.findById(message.userId);
+      return user ? { user: { ...user, ...{ token: jwt.sign({ id: user.id }, config.token.secret) } }, message: { ...message.toObject(), ...{user: author} } } : { user: null, message: null };
     },
-    onSubscribe: async (ctx) => {
+    onSubscribe: async (ctx, message) => {
+      const { user } = await WSMiddleware(ctx);
+      // if(message?.payload?.operationName === 'onlineUsers') {
+      //   if (user && (!onlineUsers.length || !onlineUsers.some((u: IOnlineUser) => u?.email === user.email))) {
+      //     const onlineUser: IOnlineUser = {
+      //       email: user.email,
+      //       typing: false
+      //     }
+      //     onlineUsers.push(onlineUser) ;
+      //   }
+      //   console.debug('online', onlineUsers);
+      // }
+      // if(message?.payload?.operationName === 'chatUpdated') {
+      //   const update: any = await Message.findOne({}).sort({createdAt: -1});
+      //   console.debug('update', update);
+      // }
       // TODO: add additional logic checking
-      await ContextMiddleware(ctx.extra.request);
     },
     onNext: async (ctx) => {
+      const { user } = await WSMiddleware(ctx);
+      // console.debug('next');
       // TODO: resolve WS Cluster problem through process/worker bus
-      await ContextMiddleware(ctx.extra.request);
     },
     onError: async (ctx, message) => {
       // TODO: add acceptable debugger
-      console.debug('error', message);
+      console.error('error', message);
+    },
+    onComplete: async (ctx) => {
+      // console.debug('complete');
     }
   },
   wss,

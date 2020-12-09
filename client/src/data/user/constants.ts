@@ -1,6 +1,7 @@
-import {IUserModel} from "@appchat/data/user/interfaces";
+import {IOnlineUserListReducer, IUserReducer} from "@appchat/data/user/interfaces";
 
-const UserInitState: { user: IUserModel } = {
+const UserInitState: IUserReducer = {
+  action: null,
   user: {
     email: null,
     firstName: null,
@@ -12,6 +13,11 @@ const UserInitState: { user: IUserModel } = {
       name: null,
     }
   }
+};
+
+const OnlineUserListInitState: IOnlineUserListReducer = {
+  action: null,
+  list: [],
 };
 
 const UserFields = `{
@@ -26,4 +32,4 @@ const UserFields = `{
   }
 }`;
 
-export {UserInitState, UserFields};
+export {UserInitState, OnlineUserListInitState, UserFields};

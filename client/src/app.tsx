@@ -1,32 +1,46 @@
-import {useQuery} from "@apollo/react-hooks";
+import {useSubscription} from "@apollo/react-hooks";
 import {ApolloConnection} from "@appchat/core/apollo";
 import {ACTIONS} from "@appchat/core/store/constants";
-import {GET_ME} from "@appchat/data/user/queries";
+import {StateReturnTypes} from "@appchat/core/store/types";
+import {CHAT_UPDATED} from "@appchat/data/message/queries";
+import {ONLINE_USERS} from "@appchat/data/user/queries";
 import {LayoutContainer} from "@appchat/ui/containers/layout";
 import {RouterSwitch} from "@appchat/ui/containers/switch";
 import {ConnectedRouter} from "connected-react-router";
 import * as React from "react";
-import {useDispatch} from "react-redux";
+import {useEffect} from "react";
+import {useDispatch, useSelector, useStore} from "react-redux";
 
 const App = () => {
 
-  const {data, loading, error} = useQuery(GET_ME, {notifyOnNetworkStatusChange: true});
+  const { user, action } = useSelector((state: StateReturnTypes) => state.UserReducer);
+  const [loaded, setLoaded] = React.useState(false);
+
+  useEffect(() => {
+    console.debug(action);
+  }, [action]);
+
+  const {data: online, loading: refreshing} = useSubscription(ONLINE_USERS);
+  const {data: updated, loading: updating} = useSubscription(CHAT_UPDATED);
+
   const dispatch = useDispatch();
 
   React.useEffect(() => {
-    if (data && typeof data?.user !== "undefined" && !loading) {
-      dispatch({type: data.user ? ACTIONS.USER_LOGIN : ACTIONS.USER_LOGOUT, payload: data});
+    if (updated && !updating) {
+      console.debug("updated", updated);
+      dispatch({type: ACTIONS.MESSAGE_ADDED, payload: {message: updated.chatUpdated.message}});
     }
-    return (): void => {
-    };
-  }, [data, loading]);
+  }, [updated?.chatUpdated, updating]);
 
-  if (error) {
-    return <><p>Critical error: {JSON.stringify(error)} </p><a href="/">Reload</a> </>;
-  }
+  React.useEffect(() => {
+    if (online && !refreshing) {
+      console.debug("online", online);
+      dispatch({type: ACTIONS.ONLINE_CHANGED, payload: {list: online?.onlineUsers?.list}});
+    }
+  }, [online?.onlineUsers, refreshing]);
 
   return <ConnectedRouter history={ApolloConnection.history}>
-      {!loading && <LayoutContainer><RouterSwitch /></LayoutContainer>}
+    <LayoutContainer user={user} ><RouterSwitch/></LayoutContainer>
     </ConnectedRouter>;
 };
 

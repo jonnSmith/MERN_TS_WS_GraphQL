@@ -6,6 +6,7 @@ import {FontIcon} from "@react-md/icon";
 import {LayoutNavigationItem, LayoutNavigationTree} from "@react-md/layout";
 import * as React from "react";
 import {Route} from "react-router-dom";
+import {UserOnlineButton} from "@appchat/ui/templates/user/online/button";
 
 class CoreNavigation {
 
@@ -44,7 +45,7 @@ class CoreNavigation {
         label={item.label}
         id={item.id}
         payload={item.payload} />;
-      NavItem.leftAddon = (<FontIcon color={"deep-purple-500"}>{item.icon}</FontIcon>);
+      NavItem.leftAddon = (<FontIcon>{item.icon}</FontIcon>);
       NavItem.itemId = null;
       NavItem.to = null;
       NavItem.isCustom = true;

@@ -5,6 +5,7 @@ import {UserInputError} from '@apollo/server/errors';
 import User from './user.model';
 import config from '../../../../configs/config.app';
 import {CoreBus} from "../../core/bus";
+import {ONLINE_USERS_TRIGGER} from "../../core/bus/actions";
 
 // TODO: Remove password field from User data type
 
@@ -28,7 +29,6 @@ export const userTypeDefs = `
   extend type Query {
     users(filter: UserFilterInput): [User]
     user(id: String!): User
-    currentUser: User 
   }
 
   input UserInput {
@@ -46,6 +46,20 @@ export const userTypeDefs = `
     signInUser(email: String!, password: String!): User
     signUpUser(email: String!, password: String!, firstName: String!, lastName: String): User
   }
+  
+  extend type Subscription {
+    onlineUsers: OnlineUsersAction
+  }
+  
+  type OnlineUsersAction {
+    action: String
+    list: [OnlineUser]
+  }
+  
+  type OnlineUser {
+    email: String
+    typing: Boolean
+  }
 
 `;
 
@@ -60,10 +74,6 @@ export const userResolvers = {
     async user(_, { id }) {
       const user: any = await User.findById(id);
       return user.toObject();
-    },
-    async currentUser(_, {}, context) {
-      const { user } = await context;
-      return user && user.id ? { ...user, ...{ token: jwt.sign({ id: user.id }, config.token.secret) } } : null;
     },
   },
   Mutation: {
@@ -103,6 +113,11 @@ export const userResolvers = {
         throw new UserInputError(e);
       }
       return userObject;
+    }
+  },
+  Subscription: {
+    onlineUsers: {
+      subscribe: () => PubSub.asyncIterator([ONLINE_USERS_TRIGGER]),
     }
   },
   User: {

@@ -48,6 +48,8 @@ export default {
         USER_LOGIN: "Set user data",
         USER_LOGOUT: "Delete user data",
         USER_UPDATED: "User data updated",
+        ONLINE_CHANGED: "Online users list changed",
+        ONLINE_UPDATED: "Online users updated"
       }
     },
   },

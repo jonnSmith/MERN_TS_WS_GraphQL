@@ -5,6 +5,7 @@ import {CoreBus} from "../../core/bus";
 import User from '../user/user.model';
 import Workspace from '../workspace/workspace.model';
 import Message from './message.model';
+import {ACTIONS, UPDATE_CHAT_TRIGGER} from "../../core/bus/actions";
 
 export const messageTypeDefs = `
 
@@ -41,14 +42,6 @@ export const messageTypeDefs = `
 
 const PubSub = CoreBus.pubsub;
 
-const ActionKeys = {
-  UPDATE: 'MESSAGE_UPDATED',
-  CREATE: 'MESSAGE_ADDED',
-  DELETE: 'MESSAGE_DELETED'
-}
-
-const UPDATE_ACTION_TRIGGER = 'CHAT_UPDATED';
-
 export const messageResolvers = {
   Query: {
     messages: async (_, {}, context) => {
@@ -73,7 +66,7 @@ export const messageResolvers = {
           text,
           userId: user?.id,
         });
-        await PubSub.publish(UPDATE_ACTION_TRIGGER, {chatUpdated: { ...{message, ...{user}}, action: ActionKeys.CREATE}});
+        await PubSub.publish(UPDATE_CHAT_TRIGGER, {chatUpdated: { ...{message, ...{user}}, action: ACTIONS.MESSAGE.CREATE}});
         return message.toObject();
       }
       catch(e) {
@@ -85,7 +78,7 @@ export const messageResolvers = {
       try {
         const message: any = await Message.findByIdAndRemove(id);
         const updated: any= await Message.findOne({}).sort({createdAt: -1});
-        await PubSub.publish(UPDATE_ACTION_TRIGGER, {chatUpdated: { message: updated, action: ActionKeys.DELETE}});
+        await PubSub.publish(UPDATE_CHAT_TRIGGER, {chatUpdated: { message: updated, action: ACTIONS.MESSAGE.DELETE}});
         return message.toObject();
       } catch(e) {
         throw new ForbiddenError('Message forbidden to delete.');
@@ -94,7 +87,7 @@ export const messageResolvers = {
   },
   Subscription: {
     chatUpdated: {
-      subscribe: () => PubSub.asyncIterator([UPDATE_ACTION_TRIGGER]),
+      subscribe: () => PubSub.asyncIterator([UPDATE_CHAT_TRIGGER]),
     }
   },
   Message: {

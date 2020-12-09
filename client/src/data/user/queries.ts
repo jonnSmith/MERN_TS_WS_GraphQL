@@ -23,10 +23,15 @@ const SIGN_UP = gql`
   }
 `;
 
-const GET_ME = gql`
-  {
-    user: currentUser ${UserFields}
-  }
-`;
+const ONLINE_USERS = gql`
+  subscription onlineUsers {
+    onlineUsers {
+      action
+      list {
+        email
+        typing
+      }
+    }
+  }`;
 
-export { SIGN_IN, SIGN_UP, GET_ME };
+export { SIGN_IN, SIGN_UP, ONLINE_USERS };
