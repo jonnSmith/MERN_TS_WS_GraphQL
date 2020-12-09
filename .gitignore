@@ -7,4 +7,5 @@ build
 configs/**/**.js
 configs/**/**.map
 client/**/**.js
+!client/src/serviceWorker.js
 client/**/**.map
