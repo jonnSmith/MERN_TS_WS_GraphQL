@@ -1,15 +1,14 @@
 import express = require('express');
 import cors = require('cors');
-import {createServer} from "http";
+import {createServer, Server} from "http";
 import {makeExecutableSchema} from 'graphql-tools';
 import ExecutableSchema from './src/schema';
 import config from './../configs/config.app';
 import {execute, subscribe} from "graphql";
-import {SubscriptionServer} from 'subscriptions-transport-ws';
 import {graphqlHTTP} from "express-graphql";
-
-import {ContextMiddleware, OnConnectMiddleware} from "./src/core/midddleware/token";
-import {CoreBus} from "./src/core/bus";
+import {ContextMiddleware} from "./src/core/midddleware/token";
+import { Server as WSS} from 'ws'; // yarn add ws
+import { useServer } from 'graphql-ws/lib/use/ws';
 
 const schema = makeExecutableSchema(ExecutableSchema);
 const mongoose = require('mongoose');
@@ -24,7 +23,6 @@ mongoose.connect(
 );
 
 // TODO: Check clusters and add a common bus (Redis) if needed
-
 // const cluster = require('cluster');
 // const numCPUs = require('os').cpus().length;
 // if (cluster.isMaster) {
@@ -36,8 +34,6 @@ mongoose.connect(
 //   });
 // } else {
 
-const PubSub = CoreBus.pubsub;
-
 const app = express();
 const session = require('express-session');
 const MongoStore = require('connect-mongo')(session);
@@ -48,63 +44,53 @@ app.use(session({
   secret: config.token.secret
 }), cors());
 
-
-const ws = createServer((req, res) => {
+const server: Server = createServer((req, res) => {
   res.writeHead(400);
   res.end();
 })
 
-ws.listen(config.server.ws, () => console.debug('websocket listening on port ', config.server.ws))
+const wss = new WSS({
+  server,
+  path: `/${config.server.path}`,
+});
 
-const subscriptionServer = SubscriptionServer.create({
-  schema,
-  execute,
-  subscribe,
-  onConnect: OnConnectMiddleware,
-  onOperation: (message, params, webSocket) => {
-    // console.debug('m', message.type);
-    return params;
-  }
-}, {server: ws, path: `/${config.server.path}`});
+useServer(
+  {
+    schema,
+    execute,
+    subscribe,
+    onConnect: async (ctx) => {
+      // TODO: add preloaded messages mutation on connection
+      await ContextMiddleware(ctx.extra.request);
+    },
+    onSubscribe: async (ctx) => {
+      // TODO: add additional logic checking
+      await ContextMiddleware(ctx.extra.request);
+    },
+    onNext: async (ctx) => {
+      // TODO: resolve WS Cluster problem through process/worker bus
+      await ContextMiddleware(ctx.extra.request);
+    },
+    onError: async (ctx, message) => {
+      // TODO: add acceptable debugger
+      console.debug('error', message);
+    }
+  },
+  wss,
+);
 
-app.use(`/${config.server.path}`, graphqlHTTP(async (request, response, graphQLParams) => (
+server.listen(config.server.ws,() =>  console.debug(`websocket started on ${config.server.ws}`));
+
+app.use(`/${config.server.path}`, graphqlHTTP(
+  async (request, response, graphQLParams) => (
     {
       schema,
       graphiql: true,
       context: ContextMiddleware(request),
     }
   )
-  )
-);
+));
 
-app.listen(config.server.port, () => console.log('http server listening on ', config.server.port))
-
-// TODO: Apply updates for graphql-ws if any or cleanup commented code
-
-// apollo.applyMiddleware({app});
-// const server = createServer(app);
-//
-//
-// server.listen(port, () => {
-//   console.debug(`HTTP:WS CLUSTER STARTED :${port}`, server);
-// });
-
-// const wsServer = new Server({
-//   server,
-//   path: '/graphql',
-//   host: 'localhost',
-//   port,
-//   perMessageDeflate: false,
-// });
-//
-// useServer(
-//     {
-//       schema,
-//       execute,
-//       subscribe,
-//     },
-//     wsServer,
-// );
-
+app.listen(config.server.port, () => console.debug(`http graphql started on ${config.server.port}`));
 
 // }

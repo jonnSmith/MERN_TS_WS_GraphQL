@@ -12,8 +12,8 @@ import {
 } from "@apollo/client";
 import {setContext} from "@apollo/client/link/context";
 import {ErrorResponse, onError} from "@apollo/client/link/error";
-import {WebSocketLink} from "@apollo/client/link/ws";
 import {getMainDefinition} from "@apollo/client/utilities";
+import {WSLink} from "@appchat/core/apollo/wslink";
 import {ConfigSettings} from "@appchat/core/config";
 import {CoreStore} from "@appchat/core/store";
 import {ACTIONS} from "@appchat/core/store/constants";
@@ -45,11 +45,10 @@ class ApolloConnection {
   }
 
   private static CreateApolloLink = (): ApolloLink => {
-    const FromLink: ApolloLink = from([
+    return from([
       ApolloConnection.CreateAuthLink(),
       ApolloConnection.CreateErrorLink(),
       ApolloConnection.CreateTerminatingLink()]);
-    return FromLink;
   }
 
   private static CreateClient(options: ApolloClientOptions<any>) {
@@ -57,7 +56,7 @@ class ApolloConnection {
   }
 
   private static CreateAuthLink() {
-    const AuthLink = setContext(async (_, {headers}) => {
+    return setContext(async (_, {headers}) => {
       const token = await ClientStorage.read(ConfigSettings.token.storage);
       // TODO: headers always undefined - check and fix/refactor if needed
       // console.debug(token, headers);
@@ -71,7 +70,6 @@ class ApolloConnection {
         },
       };
     });
-    return AuthLink;
   }
 
   private static CreateTerminatingLink() {
@@ -80,29 +78,20 @@ class ApolloConnection {
       useGETForQueries: false,
     });
 
-    const wsLink = new WebSocketLink({
-      options: {
-        connectionParams: async () => {
-          const token = await ClientStorage.read(ConfigSettings.token.storage);
-          return {
-            headers: {
-              [ConfigSettings.token.header]: token,
-            },
-          };
-        },
-        lazy: ConfigSettings.client.apollo.wsLink.lazy,
-        reconnect: ConfigSettings.client.apollo.wsLink.reconnect,
-        reconnectionAttempts: ConfigSettings.client.apollo.wsLink.reconnectionAttempts,
-        timeout: ConfigSettings.client.apollo.wsLink.timeout,
+    const wsLink = new WSLink({
+      connectionParams: async () => {
+        const token = await ClientStorage.read(ConfigSettings.token.storage);
+        return {
+          headers: {
+            [ConfigSettings.token.header]: token,
+          },
+        };
       },
-      uri: `ws:${ConfigSettings.server.host}:${ConfigSettings.server.ws}/${ConfigSettings.server.path}`,
+      lazy: ConfigSettings.client.apollo.wsLink.lazy,
+      url: `ws:${ConfigSettings.server.host}:${ConfigSettings.server.ws}/${ConfigSettings.server.path}`,
     });
 
-    // @ts-ignore
-    // tslint:disable-next-line:max-line-length
-    wsLink.subscriptionClient.maxConnectTimeGenerator.duration = () => wsLink.subscriptionClient.maxConnectTimeGenerator.max;
-
-    const SplitLink = split(
+    return split(
       ({query}) => {
         const definition = getMainDefinition(query);
         return (
@@ -113,11 +102,10 @@ class ApolloConnection {
       wsLink,
       httpLink,
     );
-    return SplitLink;
   }
 
   private static CreateErrorLink() {
-    const ErrorLink = onError(({graphQLErrors, networkError}: ErrorResponse): void => {
+    return onError(({graphQLErrors, networkError}: ErrorResponse): void => {
       if (graphQLErrors) {
         graphQLErrors.forEach(({message, extensions}) => {
           switch (extensions?.code) {
@@ -141,11 +129,10 @@ class ApolloConnection {
       }
       if (networkError) {
         if (!graphQLErrors) {
-          console.error("networkError", networkError.message);
+          console.error("networkError", networkError);
         }
       }
     });
-    return ErrorLink;
   }
 
   private constructor() {
