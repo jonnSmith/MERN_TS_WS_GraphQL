@@ -1,5 +1,6 @@
 import {SignInFormInitialObject} from "@appchat/ui/templates/user/constants";
-import {ISignInForm, ISignInProps} from "@appchat/ui/templates/user/interfaces";
+import {ISignInProps} from "@appchat/ui/templates/user/interfaces";
+import {checkFields} from "@appchat/ui/templates/user/transformers";
 import { Divider } from "@react-md/divider";
 import * as React from "react";
 import {Button, CardActions, Password, TextField} from "react-md";
@@ -13,9 +14,6 @@ const UserSignIn = (props: ISignInProps) => {
     event.preventDefault();
     onSubmit(SignInForm);
   };
-
-  const checkFields = (formFields: ISignInForm) =>
-    Object.keys(formFields).some((key: keyof typeof formFields) => !formFields[key]);
 
   return (<form onSubmit={(event) => { event.preventDefault(); sendSignInForm(event); }}>
     <TextField

@@ -9,7 +9,7 @@ import * as React from "react";
 import {useDispatch, useSelector} from "react-redux";
 import {CSSTransitionClassNames} from "react-transition-group/CSSTransition";
 
-const NavigationAction = (props: INavigationData) => {
+const ActionButton = (props: INavigationData) => {
   const {label, id, payload, style, mutation} = props;
   const type = ACTIONS[id as keyof typeof ACTIONS];
   let mutate: ((options?: MutationFunctionOptions<any, any>) => Promise<FetchResult<any>>);
@@ -39,4 +39,4 @@ const NavigationAction = (props: INavigationData) => {
   );
 };
 
-export {NavigationAction};
+export {ActionButton};

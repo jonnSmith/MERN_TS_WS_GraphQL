@@ -1,7 +1,7 @@
 import {ACTIONS} from "@appchat/core/store/constants";
 import {ICommonAction} from "@appchat/core/store/interfaces";
-import {OnlineUserListInitState, UserInitState} from "@appchat/data/user/constants";
-import {IOnlineUserListReducer, IUserReducer} from "@appchat/data/user/interfaces";
+import {OnlineTogglePanelInitState, OnlineUserListInitState, UserInitState} from "@appchat/data/user/constants";
+import {IOnlineTogglePanelReducer, IOnlineUserListReducer, IUserReducer} from "@appchat/data/user/interfaces";
 
 const UserReducer = (state: IUserReducer = UserInitState, action: ICommonAction): IUserReducer => {
     switch (action.type) {
@@ -28,7 +28,7 @@ const OnlineUserListReducer = (
 };
 
 const OnlineUserPanelReducer = (
-  state: IOnlineUserListReducer = OnlineUserListInitState,
+  state: IOnlineTogglePanelReducer = OnlineTogglePanelInitState,
   action: ICommonAction): IOnlineUserListReducer => {
     switch (action.type) {
         case ACTIONS.ONLINE_TOGGLE:

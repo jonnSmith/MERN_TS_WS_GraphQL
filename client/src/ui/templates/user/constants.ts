@@ -10,4 +10,9 @@ const SignInFormInitialObject = {
     password: "",
 };
 
-export {SignUpFormInitialObject, SignInFormInitialObject};
+const UpdateFormInitialObject = {
+    firstName: "",
+    lastName: "",
+};
+
+export {SignUpFormInitialObject, SignInFormInitialObject, UpdateFormInitialObject};

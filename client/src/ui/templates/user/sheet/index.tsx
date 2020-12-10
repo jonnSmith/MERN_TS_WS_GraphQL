@@ -1,7 +1,7 @@
 import {ACTIONS} from "@appchat/core/store/constants";
 import {StateReturnTypes} from "@appchat/core/store/types";
 import {IOnlineUserData} from "@appchat/data/user/interfaces";
-import {IOnlineUserSheetProps} from "@appchat/ui/templates/user/online/interfaces";
+import {IOnlineUserSheetProps} from "@appchat/ui/templates/user/interfaces";
 import {Avatar} from "@react-md/avatar";
 import {List, ListItem, ListSubheader} from "@react-md/list";
 import {Sheet} from "@react-md/sheet";

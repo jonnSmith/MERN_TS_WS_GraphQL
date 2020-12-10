@@ -30,7 +30,7 @@ module.exports = {
       "@appchat/core": "/src/core",
       "@appchat/data": "/src/data",
     },
-    extensions: ['.ts', '.tsx', '.js', '.jsx'],
+    extensions: ['.ts', '.tsx', '.js', '.jsx', 'json'],
   },
   optimization: {
     moduleIds: "named",

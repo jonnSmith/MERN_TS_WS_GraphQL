@@ -33,6 +33,8 @@ const MessageFields = `
     user {
       email
       id
+      firstName
+      lastName
     }
   }`;
 

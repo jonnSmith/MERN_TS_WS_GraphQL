@@ -17,6 +17,8 @@ import User from "./src/common/user/user.model";
 import {ACTIONS, ONLINE_USERS_TRIGGER} from "./src/core/bus/actions";
 import {CoreBus} from "./src/core/bus";
 import * as moment from "moment";
+import helmet = require('helmet');
+import NoIntrospection from "graphql-disable-introspection"
 
 const schema = makeExecutableSchema(ExecutableSchema);
 const mongoose = require('mongoose');
@@ -53,6 +55,8 @@ app.use(session({
   saveUninitialized: true,
   secret: config.token.secret
 }), cors());
+app.disable('x-powered-by');
+app.use(helmet());
 
 const server: Server = createServer((req, res) => {
   res.writeHead(400);
@@ -86,7 +90,7 @@ useServer(
       message.createdAt = moment(message.createdAt).unix();
       const authorData: any = await User.findById(message.userId);
       const author = authorData.toObject();
-      console.debug("author", author);
+      // console.debug("author", author);
       return { user: { ...user, ...{ token: jwt.sign({ id: user.id }, config.token.secret) } }, message: { ...message, ...{user: author} }, list: UsersMap.online };
     },
     onSubscribe: async (ctx, message) => {
@@ -131,6 +135,8 @@ app.use(`/${config.server.path}`, graphqlHTTP(
       schema,
       graphiql: true,
       context: ContextMiddleware(request),
+      // TODO: Fix 'rule is not function' and revert disable introspection
+      // validationRules: [NoIntrospection]
     }
   )
 ));

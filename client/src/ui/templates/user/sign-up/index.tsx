@@ -1,6 +1,7 @@
 import {SignUpFormInitialObject} from "@appchat/ui/templates/user/constants";
-import {ISignUpForm, ISignUpProps} from "@appchat/ui/templates/user/interfaces";
-import { Divider } from "@react-md/divider";
+import {ISignUpProps} from "@appchat/ui/templates/user/interfaces";
+import {checkFields} from "@appchat/ui/templates/user/transformers";
+import {Divider} from "@react-md/divider";
 import * as React from "react";
 import {Button, CardActions, Password, TextField} from "react-md";
 import PasswordStrengthBar from "react-password-strength-bar";
@@ -71,7 +72,7 @@ const UserSignUp = (props: ISignUpProps) => {
         theme={"secondary"}
         themeType={"contained"}
         type="submit"
-        disabled={Object.keys(SignUpForm).some((key: keyof ISignUpForm) => !SignUpForm[key])}
+        disabled={checkFields(SignUpForm)}
       >
         Sign Up
       </Button>

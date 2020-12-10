@@ -21,7 +21,6 @@ const CHAT_UPDATED = gql`
     }
   }`;
 
-
 export {
     CREATE_MESSAGE,
     DELETE_MESSAGE,

@@ -11,10 +11,10 @@ import {Pathname} from "history";
 import {put, takeLatest} from "redux-saga/effects";
 
 function* userStatusChanged() {
-  yield takeLatest([ACTIONS.USER_LOGIN, ACTIONS.USER_LOGOUT], updateUser);
+  yield takeLatest([ACTIONS.USER_LOGIN, ACTIONS.USER_LOGOUT], setUser);
 }
 
-function* updateUser(action: ICommonAction) {
+function* setUser(action: ICommonAction) {
   // console.debug("user-saga", action);
   const path: Pathname = ApolloConnection.history?.location?.pathname as Pathname;
   const auth = NavigationPathsSecurity[path as keyof typeof ROUTES];
@@ -24,7 +24,7 @@ function* updateUser(action: ICommonAction) {
     ApolloConnection.client.clearStore();
   }
   if (user?.token && !auth) {
-    yield put(push(ROUTES.Account));
+    yield put(push(ROUTES.ChatRoom));
   }
   if (!user?.token && auth) {
     yield put(push(ROUTES.SignIn));
