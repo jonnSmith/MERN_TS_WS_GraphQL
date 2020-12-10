@@ -27,4 +27,18 @@ const OnlineUserListReducer = (
     return state;
 };
 
-export { UserReducer, OnlineUserListReducer };
+const OnlineUserPanelReducer = (
+  state: IOnlineUserListReducer = OnlineUserListInitState,
+  action: ICommonAction): IOnlineUserListReducer => {
+    switch (action.type) {
+        case ACTIONS.ONLINE_TOGGLE:
+            return {...state, ...action.payload};
+        case ACTIONS.ONLINE_OPEN:
+            return {...state, ...action.payload};
+        case ACTIONS.ONLINE_CLOSE:
+            return {...state, ...action.payload};
+    }
+    return state;
+};
+
+export { UserReducer, OnlineUserListReducer, OnlineUserPanelReducer };

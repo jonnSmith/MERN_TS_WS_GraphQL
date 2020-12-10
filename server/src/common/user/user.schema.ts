@@ -1,11 +1,13 @@
 import * as jwt from 'jsonwebtoken';
 import Workspace from '../workspace/workspace.model';
-// tslint:disable-next-line:no-submodule-imports
 import {UserInputError} from '@apollo/server/errors';
 import User from './user.model';
 import config from '../../../../configs/config.app';
 import {CoreBus} from "../../core/bus";
-import {ONLINE_USERS_TRIGGER} from "../../core/bus/actions";
+import {ACTIONS, ONLINE_USERS_TRIGGER, UPDATE_CHAT_TRIGGER} from "../../core/bus/actions";
+import Message from "../message/message.model";
+import {UsersMap} from "../../core/bus/users";
+import {IOnlineUserData} from "../../core/bus/interfaces";
 
 // TODO: Remove password field from User data type
 
@@ -45,15 +47,16 @@ export const userTypeDefs = `
     deleteUser(id: String!): User
     signInUser(email: String!, password: String!): User
     signUpUser(email: String!, password: String!, firstName: String!, lastName: String): User
+    signOutUser(email: String!): OnlineUsersData
   }
   
   extend type Subscription {
-    onlineUsers: OnlineUsersAction
+    onlineUsers: OnlineUsersData
   }
   
-  type OnlineUsersAction {
-    action: String
+  type OnlineUsersData {
     list: [OnlineUser]
+    action: String
   }
   
   type OnlineUser {
@@ -96,6 +99,17 @@ export const userResolvers = {
         const user: any = await User.create({email, password, firstName, lastName});
         userObject = user.toObject();
         userObject.token = jwt.sign({id: user.id}, config.token.secret);
+
+        const onlineUser: IOnlineUserData = {
+          email: userObject.email,
+          typing: false
+        }
+        UsersMap.set(onlineUser);
+        await PubSub.publish(ONLINE_USERS_TRIGGER, {onlineUsers: { list: UsersMap.online , action: ACTIONS.USER.CONNECT}});
+
+        const message: any = await Message.findOne({}).sort({createdAt: -1});
+        const author = await User.findById(message.userId);
+        await PubSub.publish(UPDATE_CHAT_TRIGGER, {chatUpdated: { ...{message, ...{user: author}}, action: ACTIONS.MESSAGE.UPDATE}});
       } catch (e) {
         throw new UserInputError(e);
       }
@@ -109,10 +123,27 @@ export const userResolvers = {
         const match: boolean = await user.comparePassword(password);
         userObject = match ? user.toObject() : null;
         userObject.token = jwt.sign({id: user.id}, config.token.secret);
+
+        const onlineUser: IOnlineUserData = {
+          email: userObject.email,
+          typing: false
+        }
+        UsersMap.set(onlineUser);
+        await PubSub.publish(ONLINE_USERS_TRIGGER, {onlineUsers: { list: UsersMap.online , action: ACTIONS.USER.CONNECT}});
+
+        const message: any = await Message.findOne({}).sort({createdAt: -1});
+        const author = await User.findById(message.userId);
+        await PubSub.publish(UPDATE_CHAT_TRIGGER, {chatUpdated: { ...{message, ...{user: author}}, action: ACTIONS.MESSAGE.UPDATE}});
       } catch (e) {
         throw new UserInputError(e);
       }
       return userObject;
+    },
+    async signOutUser(_, data) {
+      const {email} = data;
+      UsersMap.remove(email);
+      await PubSub.publish(ONLINE_USERS_TRIGGER, {onlineUsers: { list: UsersMap.online, action: ACTIONS.USER.DISCONNECT}});
+      return { list: UsersMap.online };
     }
   },
   Subscription: {

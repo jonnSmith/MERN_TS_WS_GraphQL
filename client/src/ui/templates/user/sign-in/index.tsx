@@ -38,6 +38,7 @@ const UserSignIn = (props: ISignInProps) => {
       onChange={(event: React.ChangeEvent<any>) =>
       updateSignInForm({...SignInForm, ...{password: event.currentTarget.value}})}
     />
+    <Divider />
     <CardActions className="md-cell md-cell--12">
       <Button
         theme={"secondary"}

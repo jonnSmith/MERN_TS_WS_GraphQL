@@ -11,8 +11,12 @@ import { Server as WSS} from 'ws';
 import { useServer } from 'graphql-ws/lib/use/ws';
 import Message from "./src/common/message/message.model";
 import * as jwt from "jsonwebtoken";
-import {Users} from "./src/core/bus/users";
+import {UsersMap} from "./src/core/bus/users";
+import {IOnlineUserData} from "./src/core/bus/interfaces";
 import User from "./src/common/user/user.model";
+import {ACTIONS, ONLINE_USERS_TRIGGER} from "./src/core/bus/actions";
+import {CoreBus} from "./src/core/bus";
+import * as moment from "moment";
 
 const schema = makeExecutableSchema(ExecutableSchema);
 const mongoose = require('mongoose');
@@ -38,7 +42,7 @@ mongoose.connect(
 //   });
 // } else {
 
-
+const PubSub = CoreBus.pubsub;
 
 const app = express();
 const session = require('express-session');
@@ -60,12 +64,6 @@ const wss = new WSS({
   path: `/${config.server.path}`,
 });
 
-interface IOnlineUser {
-  email: string;
-  typing: boolean;
-}
-let onlineUsers: IOnlineUser[]  = [];
-
 useServer(
   {
     schema,
@@ -73,31 +71,40 @@ useServer(
     subscribe,
     onConnect: async (ctx) => {
       const { user } = await WSMiddleware(ctx);
+      if(!user) { return { user: null, message: null, list: [] }; }
+      const onlineUser: IOnlineUserData = {
+        email: user.email,
+        typing: false
+      }
+      UsersMap.set(onlineUser);
       ctx.extra.socket.on("close", async (socket, code, reason) => {
-        onlineUsers = user ? onlineUsers.filter( (u: IOnlineUser) => u.email !== user.email) : onlineUsers;
-        console.debug('close', onlineUsers)
+        UsersMap.remove(user.email);
+        await PubSub.publish(ONLINE_USERS_TRIGGER, {onlineUsers: { list: UsersMap.online, action: ACTIONS.USER.DISCONNECT}});
       });
-      const message: any = await Message.findOne({}).sort({createdAt: -1});
-      const author = await User.findById(message.userId);
-      return user ? { user: { ...user, ...{ token: jwt.sign({ id: user.id }, config.token.secret) } }, message: { ...message.toObject(), ...{user: author} } } : { user: null, message: null };
+      const messageData: any = await Message.findOne({}).sort({createdAt: -1});
+      const message = messageData.toObject();
+      message.createdAt = moment(message.createdAt).unix();
+      const authorData: any = await User.findById(message.userId);
+      const author = authorData.toObject();
+      console.debug("author", author);
+      return { user: { ...user, ...{ token: jwt.sign({ id: user.id }, config.token.secret) } }, message: { ...message, ...{user: author} }, list: UsersMap.online };
     },
     onSubscribe: async (ctx, message) => {
       const { user } = await WSMiddleware(ctx);
-      // if(message?.payload?.operationName === 'onlineUsers') {
-      //   if (user && (!onlineUsers.length || !onlineUsers.some((u: IOnlineUser) => u?.email === user.email))) {
-      //     const onlineUser: IOnlineUser = {
-      //       email: user.email,
-      //       typing: false
-      //     }
-      //     onlineUsers.push(onlineUser) ;
-      //   }
-      //   console.debug('online', onlineUsers);
-      // }
-      // if(message?.payload?.operationName === 'chatUpdated') {
-      //   const update: any = await Message.findOne({}).sort({createdAt: -1});
-      //   console.debug('update', update);
-      // }
-      // TODO: add additional logic checking
+      if(!user) { return; }
+      if(message?.payload?.operationName === 'onlineUsers') {
+        const onlineUser: IOnlineUserData = {
+          email: user.email,
+          typing: false
+        }
+        UsersMap.set(onlineUser);
+        await PubSub.publish(ONLINE_USERS_TRIGGER, {
+          onlineUsers: {
+            list: UsersMap.online,
+            action: ACTIONS.USER.CONNECT
+          }
+        });
+      }
     },
     onNext: async (ctx) => {
       const { user } = await WSMiddleware(ctx);
@@ -109,6 +116,7 @@ useServer(
       console.error('error', message);
     },
     onComplete: async (ctx) => {
+      const { user } = await WSMiddleware(ctx);
       // console.debug('complete');
     }
   },

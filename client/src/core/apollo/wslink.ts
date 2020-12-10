@@ -1,10 +1,11 @@
 import { ApolloLink, FetchResult, Observable, Operation } from "@apollo/client";
 import {CoreStore} from "@appchat/core/store";
 import {ACTIONS} from "@appchat/core/store/constants";
+import {IMessageModel} from "@appchat/data/message/interfaces";
+import {IUserModel} from "@appchat/data/user/interfaces";
+import {IOnlineUserData} from "@appchat/data/user/interfaces";
 import {GraphQLError, print} from "graphql";
 import {Client, ClientOptions, createClient} from "graphql-ws";
-import {IUserModel} from "@appchat/data/user/interfaces";
-import {IMessageModel} from "@appchat/data/message/interfaces";
 
 class WSLink extends ApolloLink {
 
@@ -13,14 +14,22 @@ class WSLink extends ApolloLink {
   constructor(options: ClientOptions) {
     super();
     this.client = this.client || createClient(options);
-    this.client.on("connected", (socket, payload: {user: IUserModel, message: IMessageModel}) => {
-      const {user, message} = payload;
-      CoreStore.ReduxSaga.dispatch({type: user ? ACTIONS.USER_LOGIN : ACTIONS.USER_LOGOUT, payload: {user} });
-      if (message && user) {
-        CoreStore.ReduxSaga.dispatch(
-          {type: ACTIONS.MESSAGE_PRELOADED, payload: { message } }
-          );
-      }
+    this.client.on(
+      "connected",
+      (socket, payload: {user: IUserModel, message: IMessageModel, list: IOnlineUserData[]}) => {
+        const {user, message, list} = payload;
+        CoreStore.ReduxSaga.dispatch({type: user ? ACTIONS.USER_LOGIN : ACTIONS.USER_LOGOUT, payload: {user} });
+        if (message && user) {
+          CoreStore.ReduxSaga.dispatch(
+            {type: ACTIONS.MESSAGE_PRELOADED, payload: { message } }
+            );
+        }
+        if (list && user) {
+          CoreStore.ReduxSaga.dispatch({type: ACTIONS.ONLINE_CHANGED, payload: {list}});
+        }
+    });
+    this.client.on("closed", (event) => {
+      console.debug("closed", event);
     });
   }
 

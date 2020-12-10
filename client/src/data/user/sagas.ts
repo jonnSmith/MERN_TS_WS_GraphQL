@@ -42,4 +42,14 @@ function* updateOnlineUserList(action: ICommonAction) {
   yield put(onlineUserListUpdated({list, action: ACTIONS.ONLINE_UPDATED}));
 }
 
-export {userStatusChanged, onlineUserListChanged};
+function* onlineUserPanelToggled() {
+  yield takeLatest([ACTIONS.ONLINE_TOGGLE], toggleOnlineUserList);
+}
+
+function* toggleOnlineUserList(action: ICommonAction) {
+  console.debug("toggle-user-saga", action);
+  const { list } = action.payload;
+  yield put(onlineUserListUpdated({list, action: ACTIONS.ONLINE_UPDATED}));
+}
+
+export {userStatusChanged, onlineUserListChanged, onlineUserPanelToggled};

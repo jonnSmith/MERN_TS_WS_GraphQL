@@ -1,8 +1,8 @@
 import {ApolloConnection} from "@appchat/core/apollo";
-import { rootReducers } from "@appchat/core/store/reducers";
-import { rootSaga } from "@appchat/core/store/sagas";
-import { routerMiddleware } from "connected-react-router";
-import { applyMiddleware, compose, createStore, Store } from "redux";
+import {rootReducers} from "@appchat/core/store/reducers";
+import {rootSaga} from "@appchat/core/store/sagas";
+import {routerMiddleware} from "connected-react-router";
+import {applyMiddleware, compose, createStore, Store} from "redux";
 import createSagaMiddleware, { SagaMiddleware } from "redux-saga";
 
 class CoreStore {

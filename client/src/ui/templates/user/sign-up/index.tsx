@@ -68,7 +68,8 @@ const UserSignUp = (props: ISignUpProps) => {
         disableRipple
         rippleTimeout={0}
         rippleClassNames={"appear" as CSSTransitionClassNames}
-        themeType="outline"
+        theme={"secondary"}
+        themeType={"contained"}
         type="submit"
         disabled={Object.keys(SignUpForm).some((key: keyof ISignUpForm) => !SignUpForm[key])}
       >

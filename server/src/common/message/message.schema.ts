@@ -22,7 +22,6 @@ export const messageTypeDefs = `
   extend type Query {
     messages: [Message]
     message(id: ID!): Message!
-    preloadMessage: Message
   }
 
   extend type Mutation {
@@ -51,10 +50,6 @@ export const messageResolvers = {
     },
     message: async (_, { id }, context) => {
       const message: any = await Message.findById(id);
-      return message.toObject();
-    },
-    preloadMessage: async (_, {}, context) => {
-      const message: any= await Message.findOne({}).sort({createdAt: -1});
       return message.toObject();
     },
   },

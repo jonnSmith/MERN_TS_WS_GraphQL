@@ -23,6 +23,17 @@ const SIGN_UP = gql`
   }
 `;
 
+const SIGN_OUT = gql`
+  mutation($email: String!) {
+    OnlineUsersData: signOutUser(email: $email) {
+      action
+      list {
+        email
+        typing
+      }
+    }
+  }`;
+
 const ONLINE_USERS = gql`
   subscription onlineUsers {
     onlineUsers {
@@ -34,4 +45,4 @@ const ONLINE_USERS = gql`
     }
   }`;
 
-export { SIGN_IN, SIGN_UP, ONLINE_USERS };
+export { SIGN_IN, SIGN_UP, ONLINE_USERS, SIGN_OUT };

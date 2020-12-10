@@ -1,6 +1,5 @@
-import {useMutation, useQuery, useSubscription} from "@apollo/react-hooks";
-import {ACTIONS} from "@appchat/core/store/constants";
-import {CHAT_UPDATED, CREATE_MESSAGE, DELETE_MESSAGE, PRELOAD_MESSAGE} from "@appchat/data/message/queries";
+import {useMutation} from "@apollo/react-hooks";
+import {CREATE_MESSAGE, DELETE_MESSAGE} from "@appchat/data/message/queries";
 import {ContainerPage} from "@appchat/ui/containers/page";
 import {IMessageDeleteOptions} from "@appchat/ui/templates/message/interfaces";
 import {IMessageSendForm} from "@appchat/ui/templates/message/interfaces";

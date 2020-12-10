@@ -1,12 +1,9 @@
 // development config
-const { merge } = require('webpack-merge');
-const path = require('path');
 const webpack = require('webpack');
+const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 const FaviconsWebpackPlugin = require('favicons-webpack-plugin')
-
-const commonConfig = require('./common');
 
 module.exports = {
   mode: 'development',
@@ -17,6 +14,7 @@ module.exports = {
     filename: 'bundle.js',
   },
   devServer: {
+    historyApiFallback: true,
     headers: {
       "Access-Control-Allow-Origin": "*",
       "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, PATCH, OPTIONS",
@@ -104,5 +102,7 @@ module.exports = {
       logo: './src/assets/img/logo.svg',
       publicPath: './',
       outputPath: './',
-    })],
+    }),
+    new webpack.ContextReplacementPlugin(/any-promise/)
+  ],
 };
