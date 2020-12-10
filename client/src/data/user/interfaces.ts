@@ -1,5 +1,5 @@
-import {IWorkspaceModel} from "@appchat/data/workspace/interfaces";
 import {ActionTypes} from "@appchat/data/message/types";
+import {IWorkspaceModel} from "@appchat/data/workspace/interfaces";
 
 interface IUserModel {
   id: string | null;
@@ -25,4 +25,9 @@ interface IOnlineUserListReducer {
   action?: ActionTypes | null;
 }
 
-export {IUserModel, IUserReducer, IOnlineUserData, IOnlineUserListReducer};
+interface IOnlineTogglePanelReducer {
+  open?: boolean | null;
+  action?: ActionTypes | null;
+}
+
+export {IUserModel, IUserReducer, IOnlineUserData, IOnlineUserListReducer, IOnlineTogglePanelReducer};

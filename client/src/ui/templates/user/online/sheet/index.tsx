@@ -1,22 +1,28 @@
+import {ACTIONS} from "@appchat/core/store/constants";
 import {StateReturnTypes} from "@appchat/core/store/types";
 import {IOnlineUserData} from "@appchat/data/user/interfaces";
 import {IOnlineUserSheetProps} from "@appchat/ui/templates/user/online/interfaces";
 import {Avatar} from "@react-md/avatar";
-import {FontIcon} from "@react-md/icon";
 import {List, ListItem, ListSubheader} from "@react-md/list";
 import {Sheet} from "@react-md/sheet";
 import * as React from "react";
-import {useSelector} from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
 
 const UserOnlineSheet = (SheetProps: IOnlineUserSheetProps) => {
-  const {visible, hide, position} = SheetProps;
-
+  const {position} = SheetProps;
   const {list} = useSelector((state: StateReturnTypes) => state.OnlineUserListReducer);
+  const {open, action} = useSelector((state: StateReturnTypes) => state.OnlineUserPanelReducer);
+
+  const dispatch = useDispatch();
+
+  const hide = () => {
+    dispatch({type: ACTIONS.ONLINE_TOGGLE, payload: { open: false, type: ACTIONS.ONLINE_CLOSE}});
+  };
 
   return <Sheet
     id="online-user-sheet"
     aria-label="Online users"
-    visible={visible}
+    visible={open}
     onRequestClose={hide}
     position={position}
   >

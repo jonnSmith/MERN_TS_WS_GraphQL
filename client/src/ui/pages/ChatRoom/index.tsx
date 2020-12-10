@@ -5,10 +5,7 @@ import {IMessageDeleteOptions} from "@appchat/ui/templates/message/interfaces";
 import {IMessageSendForm} from "@appchat/ui/templates/message/interfaces";
 import {MessageList} from "@appchat/ui/templates/message/list";
 import {MessageSend} from "@appchat/ui/templates/message/send";
-import {UserOnlineButton} from "@appchat/ui/templates/user/online/button";
-import {UserOnlineSheet} from "@appchat/ui/templates/user/online/sheet";
 import {Divider} from "@react-md/divider";
-import {useToggle} from "@react-md/utils";
 import * as React from "react";
 
 const ChatRoom = () => {
@@ -16,7 +13,6 @@ const ChatRoom = () => {
     {loading: sending}] = useMutation(CREATE_MESSAGE);
   const [deleteMessage,
     {loading: deleting}] = useMutation(DELETE_MESSAGE);
-  const [visible, show, hide] = useToggle(false);
 
   return (<ContainerPage title="Chat room">
     <section>
@@ -29,8 +25,6 @@ const ChatRoom = () => {
           sendMessage({variables});
         }}
         loading={sending}/>
-        <UserOnlineButton show={show} />
-        <UserOnlineSheet visible={visible} hide={hide} position={"right"} />
     </section>
   </ContainerPage>);
 };

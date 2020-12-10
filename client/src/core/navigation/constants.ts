@@ -70,6 +70,7 @@ const NavigationData: INavigationData[] = [
 ];
 
 const NavigationPathsSecurity: INavigationPathsSecurity = {} as INavigationPathsSecurity;
+
 NavigationData
     .filter((r) => typeof ROUTES[r.id as keyof typeof ROUTES] !== "undefined"  )
     .forEach( (r) => { // @ts-ignore

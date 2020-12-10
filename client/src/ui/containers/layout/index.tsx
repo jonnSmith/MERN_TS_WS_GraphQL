@@ -1,6 +1,7 @@
 import {ConfigSettings} from "@appchat/core/config";
 import {CoreNavigation} from "@appchat/core/navigation";
 import {IContainerLayoutProps} from "@appchat/ui/containers/interfaces";
+import {UserOnlineSheet} from "@appchat/ui/templates/user/online/sheet";
 import {Layout, LayoutNavigationItem, LayoutNavigationTree, useLayoutNavigation} from "@react-md/layout";
 import {Configuration} from "@react-md/layout";
 import * as React from "react";
@@ -30,6 +31,7 @@ const LayoutContainer = (props: IContainerLayoutProps): React.ReactElement => {
     >
       {children}
     </Layout>
+    {!!user?.token && <UserOnlineSheet position={"right"} />}
   </Configuration >;
 };
 

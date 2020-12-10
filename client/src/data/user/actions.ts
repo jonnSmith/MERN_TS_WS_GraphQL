@@ -1,7 +1,7 @@
 import {ACTIONS} from "@appchat/core/store/constants";
 import {ICommonAction} from "@appchat/core/store/interfaces";
 import {UserInitState} from "@appchat/data/user/constants";
-import {IOnlineUserListReducer, IUserReducer} from "@appchat/data/user/interfaces";
+import {IOnlineTogglePanelReducer, IOnlineUserListReducer, IUserReducer} from "@appchat/data/user/interfaces";
 
 const userLogin = (data: IUserReducer): ICommonAction => ({
     payload: data,
@@ -23,4 +23,9 @@ const onlineUserListUpdated = (data: IOnlineUserListReducer): ICommonAction => (
     type: ACTIONS.ONLINE_UPDATED,
 });
 
-export { userLogin, userLogout, userUpdated, onlineUserListUpdated };
+const toggleOnlineUserPanel = (data: IOnlineTogglePanelReducer): ICommonAction => ({
+    payload: data,
+    type: ACTIONS.ONLINE_UPDATED,
+});
+
+export { userLogin, userLogout, userUpdated, onlineUserListUpdated, toggleOnlineUserPanel };

@@ -30,8 +30,10 @@ const NavigationAction = (props: INavigationData) => {
         event.preventDefault();
         if (mutate && user && !loading) {
           mutate({variables: { email: user.email }}).then(() => {
-            dispatch({type, payload});
+            if (payload) { dispatch({type, payload}); }
           });
+        } else if (user && payload) {
+          dispatch({type, payload});
         }
       }}>{label}</Button>
   );
