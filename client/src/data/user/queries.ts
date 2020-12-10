@@ -23,6 +23,15 @@ const SIGN_UP = gql`
   }
 `;
 
+const UPDATE_USER = gql`
+  mutation(
+    $firstName: String
+    $lastName: String
+    $id: ID!
+  ) {
+    user: updateUser(id: $id, firstName: $firstName, lastName: $lastName) ${UserFields}
+  }`;
+
 const SIGN_OUT = gql`
   mutation($email: String!) {
     OnlineUsersData: signOutUser(email: $email) {
@@ -45,4 +54,4 @@ const ONLINE_USERS = gql`
     }
   }`;
 
-export { SIGN_IN, SIGN_UP, ONLINE_USERS, SIGN_OUT };
+export { SIGN_IN, SIGN_UP, UPDATE_USER, ONLINE_USERS, SIGN_OUT };

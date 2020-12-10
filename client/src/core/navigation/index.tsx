@@ -1,6 +1,6 @@
 import {INavigationData, NavigationData} from "@appchat/core/navigation/constants";
 import {ROUTES} from "@appchat/core/navigation/enums";
-import {NavigationAction} from "@appchat/ui/elements/navigation/action";
+import {ActionButton} from "@appchat/ui/elements/action";
 import * as Pages from "@appchat/ui/pages";
 import {FontIcon} from "@react-md/icon";
 import {LayoutNavigationItem, LayoutNavigationTree} from "@react-md/layout";
@@ -40,8 +40,8 @@ class CoreNavigation {
       to: path,
     };
     if (item.payload || item.mutation) {
-      NavItem.children = <NavigationAction
-        style={{marginLeft: "-15px"}}
+      NavItem.children = <ActionButton
+        style={{position: "absolute", top: 0, left: 0, width: "100%", height: "100%"}}
         query={item.query}
         mutation={item.mutation}
         label={item.label}

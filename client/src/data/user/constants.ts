@@ -1,4 +1,4 @@
-import {IOnlineUserListReducer, IUserReducer} from "@appchat/data/user/interfaces";
+import {IOnlineTogglePanelReducer, IOnlineUserListReducer, IUserReducer} from "@appchat/data/user/interfaces";
 
 const UserInitState: IUserReducer = {
   action: null,
@@ -20,6 +20,11 @@ const OnlineUserListInitState: IOnlineUserListReducer = {
   list: [],
 };
 
+const OnlineTogglePanelInitState: IOnlineTogglePanelReducer = {
+  action: null,
+  open: false,
+};
+
 const UserFields = `{
   id
   email
@@ -32,4 +37,4 @@ const UserFields = `{
   }
 }`;
 
-export {UserInitState, OnlineUserListInitState, UserFields};
+export {UserInitState, OnlineUserListInitState, UserFields, OnlineTogglePanelInitState};

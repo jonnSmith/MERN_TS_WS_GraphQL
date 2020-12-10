@@ -17,38 +17,38 @@ const MessageList = (props: IMessageListProps) => {
   const {message} = useSelector((state: StateReturnTypes) => state.MessageReducer);
 
   return (<List>
-    <ListSubheader>Welcome, {user.firstName} {user.lastName} <small>({user.email})</small></ListSubheader>
-    <ListItem
-      id={`three-line-item-${message.createdAt}`}
-      secondaryText={message.text}
-      leftAddon={
-        <Avatar style={{border: "none"}} color="gray">
-          {(user.firstName && user.lastName) ?
-            `${user.firstName.charAt(0).toUpperCase()}${user.lastName.charAt(0).toUpperCase()}` :
-            <FontIcon>messsage</FontIcon> }
-        </Avatar>}
-      leftAddonType="avatar"
-      rightAddon={(user.id === message.user.id) &&
+    <ListSubheader>Welcome, {user?.firstName} {user?.lastName}&nbsp;<small>({user?.email})</small></ListSubheader>
+      <ListItem
+        id={`three-line-item-${message.createdAt}`}
+        secondaryText={message.text}
+        leftAddon={
+          <Avatar style={{border: "none"}} color="gray">
+            {(message?.user?.firstName && message?.user?.lastName) ?
+              `${message?.user?.firstName.charAt(0).toUpperCase()}${message?.user?.lastName.charAt(0).toUpperCase()}` :
+              <FontIcon>messsage</FontIcon>}
+          </Avatar>}
+        leftAddonType="avatar"
+        rightAddon={(user?.id === message.user.id) &&
         <BadgedButton
           disableProgrammaticRipple
           disableRipple
           rippleTimeout={0}
           rippleClassNames={"appear" as CSSTransitionClassNames}
-          buttonChildren={<FontIcon >delete</FontIcon>}
+          buttonChildren={<FontIcon>delete</FontIcon>}
           theme={"error"}
           disabled={!active}
           onClick={(event: React.MouseEvent<HTMLElement>) => {
             event.preventDefault();
             callDelete({variables: {id: message.id}});
           }}/>
-      }
-      rightAddonType="icon"
-      threeLines
-    >
-      {message.user.email}:
-      ({moment.unix(message.createdAt as any / 1000).format(ConfigSettings.client.formats.message.date)})
-    </ListItem>
-  </List>);
+        }
+        rightAddonType="icon"
+        threeLines
+      >
+        {message.user.email}:
+        ({moment.unix(message.createdAt as any / 1000).format(ConfigSettings.client.formats.message.date)})
+      </ListItem>
+    </List>);
 };
 
 export {MessageList};
