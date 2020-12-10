@@ -6,9 +6,17 @@ import ExecutableSchema from './src/schema';
 import config from './../configs/config.app';
 import {execute, subscribe} from "graphql";
 import {graphqlHTTP} from "express-graphql";
-import {ContextMiddleware} from "./src/core/midddleware/token";
-import { Server as WSS} from 'ws'; // yarn add ws
+import {ContextMiddleware, WSMiddleware} from "./src/core/midddleware/token";
+import { Server as WSS} from 'ws';
 import { useServer } from 'graphql-ws/lib/use/ws';
+import Message from "./src/common/message/message.model";
+import * as jwt from "jsonwebtoken";
+import {UsersMap} from "./src/core/bus/users";
+import {IOnlineUserData} from "./src/core/bus/interfaces";
+import User from "./src/common/user/user.model";
+import {ACTIONS, ONLINE_USERS_TRIGGER} from "./src/core/bus/actions";
+import {CoreBus} from "./src/core/bus";
+import * as moment from "moment";
 
 const schema = makeExecutableSchema(ExecutableSchema);
 const mongoose = require('mongoose');
@@ -33,6 +41,8 @@ mongoose.connect(
 //     console.log(`worker ${worker.process.pid} died`);
 //   });
 // } else {
+
+const PubSub = CoreBus.pubsub;
 
 const app = express();
 const session = require('express-session');
@@ -60,20 +70,54 @@ useServer(
     execute,
     subscribe,
     onConnect: async (ctx) => {
-      // TODO: add preloaded messages mutation on connection
-      await ContextMiddleware(ctx.extra.request);
+      const { user } = await WSMiddleware(ctx);
+      if(!user) { return { user: null, message: null, list: [] }; }
+      const onlineUser: IOnlineUserData = {
+        email: user.email,
+        typing: false
+      }
+      UsersMap.set(onlineUser);
+      ctx.extra.socket.on("close", async (socket, code, reason) => {
+        UsersMap.remove(user.email);
+        await PubSub.publish(ONLINE_USERS_TRIGGER, {onlineUsers: { list: UsersMap.online, action: ACTIONS.USER.DISCONNECT}});
+      });
+      const messageData: any = await Message.findOne({}).sort({createdAt: -1});
+      const message = messageData.toObject();
+      message.createdAt = moment(message.createdAt).unix();
+      const authorData: any = await User.findById(message.userId);
+      const author = authorData.toObject();
+      console.debug("author", author);
+      return { user: { ...user, ...{ token: jwt.sign({ id: user.id }, config.token.secret) } }, message: { ...message, ...{user: author} }, list: UsersMap.online };
     },
-    onSubscribe: async (ctx) => {
-      // TODO: add additional logic checking
-      await ContextMiddleware(ctx.extra.request);
+    onSubscribe: async (ctx, message) => {
+      const { user } = await WSMiddleware(ctx);
+      if(!user) { return; }
+      if(message?.payload?.operationName === 'onlineUsers') {
+        const onlineUser: IOnlineUserData = {
+          email: user.email,
+          typing: false
+        }
+        UsersMap.set(onlineUser);
+        await PubSub.publish(ONLINE_USERS_TRIGGER, {
+          onlineUsers: {
+            list: UsersMap.online,
+            action: ACTIONS.USER.CONNECT
+          }
+        });
+      }
     },
     onNext: async (ctx) => {
+      const { user } = await WSMiddleware(ctx);
+      // console.debug('next');
       // TODO: resolve WS Cluster problem through process/worker bus
-      await ContextMiddleware(ctx.extra.request);
     },
     onError: async (ctx, message) => {
       // TODO: add acceptable debugger
-      console.debug('error', message);
+      console.error('error', message);
+    },
+    onComplete: async (ctx) => {
+      const { user } = await WSMiddleware(ctx);
+      // console.debug('complete');
     }
   },
   wss,

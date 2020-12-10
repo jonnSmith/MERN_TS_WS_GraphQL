@@ -4,6 +4,7 @@ import {NavigationAction} from "@appchat/ui/elements/navigation/action";
 import * as Pages from "@appchat/ui/pages";
 import {FontIcon} from "@react-md/icon";
 import {LayoutNavigationItem, LayoutNavigationTree} from "@react-md/layout";
+import {Text} from "@react-md/typography";
 import * as React from "react";
 import {Route} from "react-router-dom";
 
@@ -38,14 +39,18 @@ class CoreNavigation {
       parentId: null,
       to: path,
     };
-    if (item.payload) {
+    if (item.payload || item.mutation) {
       NavItem.children = <NavigationAction
         style={{marginLeft: "-15px"}}
+        query={item.query}
+        mutation={item.mutation}
         label={item.label}
         id={item.id}
         payload={item.payload} />;
-      NavItem.leftAddon = (<FontIcon color={"deep-purple-500"}>{item.icon}</FontIcon>);
-      NavItem.itemId = null;
+      NavItem.contentComponent = Text,
+      NavItem.leftAddon = (<FontIcon>{item.icon}</FontIcon>);
+      NavItem.itemId = `${item.id.toLowerCase()}`;
+      NavItem.parentId = null;
       NavItem.to = null;
       NavItem.isCustom = true;
     }
@@ -59,7 +64,7 @@ class CoreNavigation {
       res = {};
       res[FirstPath] = FirstNav;
     }
-    const path = ROUTES[nav.id as keyof typeof ROUTES];
+    const path = (nav.payload || nav.mutation) ? nav.id.toLowerCase() : ROUTES[nav.id as keyof typeof ROUTES];
     res[path] = CoreNavigation.CreateNavItem(nav);
     return res;
   }

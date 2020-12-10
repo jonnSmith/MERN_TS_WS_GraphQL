@@ -6,8 +6,8 @@ const ContextMiddleware = async (req) => {
   return GetUserByToken(GetHeadersToken(req));
 };
 
-const OnConnectMiddleware = async (connectionParams, webSocket) => {
-  return GetUserByToken(GetHeadersToken(connectionParams));
+const WSMiddleware = async (ctx) => {
+  return GetUserByToken(GetHeadersToken(ctx.connectionParams));
 }
 
 const GetHeadersToken = (request) => {
@@ -28,4 +28,4 @@ const GetUserByToken = async (token) => {
   return { user: null };
 }
 
-export {ContextMiddleware, OnConnectMiddleware};
+export {ContextMiddleware, WSMiddleware};

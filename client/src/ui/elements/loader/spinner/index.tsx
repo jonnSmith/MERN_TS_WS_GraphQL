@@ -1,14 +1,15 @@
+import { Overlay } from "@react-md/overlay";
+import {CircularProgress} from "@react-md/progress";
 import * as React from "react";
-import Loader from "react-loader-spinner";
 
 const LoaderSpinner = () => {
-    return (<Loader
-        type="Grid"
-        color="#00BFFF"
-        height={100}
-        width={100}
-        timeout={3000}
-
-    />);
+    return <Overlay color="black"
+                    style={{backgroundColor: "rgba(0,0,0,0.88)"}}
+                    visible={true} id="loading-overlay"
+                    onRequestClose={() => { console.debug("request close"); }} >
+        <CircularProgress
+          id="loading-spinner"
+          style={{top: "50%", marginTop: "-5rem", left: "50%" , marginLeft: "-5rem", position: "fixed" }}/>
+    </Overlay>;
 };
-export { LoaderSpinner };
+export {LoaderSpinner};

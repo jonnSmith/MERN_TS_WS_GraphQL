@@ -7,6 +7,8 @@ import {render} from "react-dom";
 import {Provider} from "react-redux";
 import "./index.scss";
 
+const rootElement = document.getElementById("root");
+
 render(<ApolloProvider client={ApolloConnection.client}>
     <Provider store={CoreStore.ReduxSaga}><App /></Provider>
-  </ApolloProvider>, document.getElementById("root"));
+  </ApolloProvider>, rootElement);

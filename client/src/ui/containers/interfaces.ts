@@ -10,10 +10,16 @@ interface IContainerPage {
 interface IContainerLayoutProps {
     children?: ReactElement;
     user?: IUserModel;
+    loaded?: boolean;
+}
+
+interface ISwitchRouterProps {
+    user?: IUserModel;
+    loaded?: boolean;
 }
 
 interface IAppProps {
     user?: IUserModel;
 }
 
-export { IContainerPage, IAppProps, IContainerLayoutProps };
+export { IContainerPage, IAppProps, IContainerLayoutProps, ISwitchRouterProps };

@@ -21,15 +21,9 @@ const CHAT_UPDATED = gql`
     }
   }`;
 
-const PRELOAD_MESSAGE = gql`
-  {
-    message: preloadMessage ${MessageFields}
-  }
-`;
 
 export {
     CREATE_MESSAGE,
     DELETE_MESSAGE,
     CHAT_UPDATED,
-    PRELOAD_MESSAGE
 };

@@ -2,6 +2,7 @@ import {ROUTES} from "@appchat/core/navigation/enums";
 import {INavigationData} from "@appchat/core/navigation/interfaces";
 import {INavigationPathsSecurity} from "@appchat/core/navigation/types";
 import {UserInitState} from "@appchat/data/user/constants";
+import {SIGN_OUT} from "@appchat/data/user/queries";
 
 const NavigationData: INavigationData[] = [
     {
@@ -52,14 +53,24 @@ const NavigationData: INavigationData[] = [
     {
         auth: true,
         exact: false,
+        icon: "contacts",
+        id: "ONLINE_TOGGLE",
+        label: "Online users",
+        payload: {open: true, action: "ONLINE_OPEN" }
+    },
+    {
+        auth: true,
+        exact: false,
         icon: "settings_power",
         id: "USER_LOGOUT",
         label: "Logout",
-        payload: UserInitState
-    },
+        mutation: SIGN_OUT,
+        payload: UserInitState,
+    }
 ];
 
 const NavigationPathsSecurity: INavigationPathsSecurity = {} as INavigationPathsSecurity;
+
 NavigationData
     .filter((r) => typeof ROUTES[r.id as keyof typeof ROUTES] !== "undefined"  )
     .forEach( (r) => { // @ts-ignore

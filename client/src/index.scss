@@ -3,7 +3,15 @@
 $rmd-theme-light: false;
 $rmd-theme-primary: $rmd-purple-a-700;
 $rmd-theme-secondary: $rmd-deep-purple-a-200;
+$rmd-icon-color: $rmd-blue-500;
+$rmd-circular-progress-size: 10rem;
 // other variable overrides
+
+.rmd-utils--keyboard {
+  .rmd-tree-item__content--focused {
+    box-shadow: none !important;
+  }
+}
 
 @import '~react-md/dist/react-md';
 @include react-md-utils;
