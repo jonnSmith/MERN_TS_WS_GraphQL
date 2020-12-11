@@ -87,10 +87,10 @@ useServer(
       });
       const messageData: any = await Message.findOne({}).sort({createdAt: -1});
       const message = messageData.toObject();
-      message.createdAt = moment(message.createdAt).unix();
+      const dateFormatted = new Date(message.createdAt);
+      message.createdAt = `${moment(dateFormatted).unix()}000`;
       const authorData: any = await User.findById(message.userId);
       const author = authorData.toObject();
-      // console.debug("author", author);
       return { user: { ...user, ...{ token: jwt.sign({ id: user.id }, config.token.secret) } }, message: { ...message, ...{user: author} }, list: UsersMap.online };
     },
     onSubscribe: async (ctx, message) => {

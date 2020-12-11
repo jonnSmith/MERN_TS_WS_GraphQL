@@ -96,6 +96,15 @@ export const userResolvers = {
       const updated: any = await User.findByIdAndUpdate(user.id, {firstName, lastName}, {new: true});
       const data = updated.toObject();
       data.token = jwt.sign({id: user.id}, config.token.secret);
+      const message: any = await Message.findOne({}).sort({createdAt: -1});
+      if(`${message.userId}` === `${id}`) {
+        await PubSub.publish(UPDATE_CHAT_TRIGGER, {
+          chatUpdated: {
+            ...{message, ...{user: data}},
+            action: ACTIONS.MESSAGE.UPDATE
+          }
+        });
+      }
       return data;
     },
     async deleteUser(_, { id }) {

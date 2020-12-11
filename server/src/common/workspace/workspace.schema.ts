@@ -1,4 +1,6 @@
 import Workspace from './workspace.model';
+import {ONLINE_USERS_TRIGGER, WORKSPACES_TRIGGER} from "../../core/bus/actions";
+import {CoreBus} from "../../core/bus";
 
 /**
  * Export a string which contains our GraphQL type definitions.
@@ -20,27 +22,29 @@ export const workspaceTypeDefs = `
     limit: Int
   }
 
-  # Extending the root Query type.
   extend type Query {
     workspaces(filter: WorkspaceFilterInput): [Workspace]
     workspace(id: String!): Workspace
   }
 
-  # Extending the root Mutation type.
   extend type Mutation {
     addWorkspace(input: WorkspaceInput!): Workspace
     editWorkspace(id: String!, input: WorkspaceInput!): Workspace
   }
+  
+   extend type Subscription {
+    workspaceList: WorkspaceData
+  }
+  
+  type WorkspaceData {
+    list: [Workspace]
+    action: String
+  }
 
 `;
 
-/**
- * Exporting our resolver functions. Note that:
- * 1. They can use async/await or return a Promise which
- *    Apollo will resolve for us.
- * 2. The resolver property names match exactly with the
- *    schema types.
- */
+const PubSub = CoreBus.pubsub;
+
 export const workspaceResolvers: any = {
   Query: {
     async workspaces(_, { filter }) {
@@ -62,4 +66,9 @@ export const workspaceResolvers: any = {
       return workspace.toObject();
     },
   },
+  Subscription: {
+    onlineUsers: {
+      subscribe: () => PubSub.asyncIterator([WORKSPACES_TRIGGER]),
+    }
+  }
 };

@@ -40,7 +40,7 @@ const UserUpdate = (props: IUpdateProps) => {
         updateUserForm({...UserForm, ...{lastName: event.currentTarget.value}})}
     />
     <Divider/>
-    <CardActions className="md-cell md-cell--12">
+    <CardActions className="md-cell md-cell--12" style={{justifyContent: "flex-start"}}>
       <Button
         theme={"secondary"}
         themeType={"contained"}

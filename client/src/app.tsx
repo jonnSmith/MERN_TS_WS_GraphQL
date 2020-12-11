@@ -37,8 +37,10 @@ const App = () => {
   }, [online?.onlineUsers, refreshing]);
 
   window.onunload = async (event: Event) => {
-    await signOut({variables: {email: user?.email}});
-    dispatch({type: ACTIONS.USER_LOGOUT, payload: { user: null }});
+    if (user?.email) {
+      await signOut({variables: {email: user?.email}});
+      dispatch({type: ACTIONS.USER_LOGOUT, payload: {user: null}});
+    }
   };
 
   return <ConnectedRouter history={ApolloConnection.history}>
