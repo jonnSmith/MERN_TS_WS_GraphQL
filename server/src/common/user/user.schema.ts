@@ -53,7 +53,7 @@ export const userTypeDefs = `
     deleteUser(id: String!): User
     signInUser(email: String!, password: String!): User
     signUpUser(email: String!, password: String!, firstName: String!, lastName: String): User
-    signOutUser(email: String): OnlineUsersData
+    signOutUser(email: String!): OnlineUsersData
   }
   
   extend type Subscription {

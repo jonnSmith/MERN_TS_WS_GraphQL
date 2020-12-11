@@ -1,5 +1,5 @@
 import Workspace from './workspace.model';
-import {ONLINE_USERS_TRIGGER, WORKSPACES_TRIGGER} from "../../core/bus/actions";
+import {WORKSPACES_TRIGGER} from "../../core/bus/actions";
 import {CoreBus} from "../../core/bus";
 
 /**
@@ -32,7 +32,7 @@ export const workspaceTypeDefs = `
     editWorkspace(id: String!, input: WorkspaceInput!): Workspace
   }
   
-   extend type Subscription {
+  extend type Subscription {
     workspaceList: WorkspaceData
   }
   
@@ -67,7 +67,7 @@ export const workspaceResolvers: any = {
     },
   },
   Subscription: {
-    onlineUsers: {
+    workspaceList: {
       subscribe: () => PubSub.asyncIterator([WORKSPACES_TRIGGER]),
     }
   }

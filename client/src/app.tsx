@@ -31,7 +31,7 @@ const App = () => {
 
   React.useEffect(() => {
     if (online && !refreshing) {
-      // console.debug("online", online);
+      console.debug("online", online);
       dispatch({type: ACTIONS.ONLINE_CHANGED, payload: {list: online?.onlineUsers?.list}});
     }
   }, [online?.onlineUsers, refreshing]);
@@ -41,7 +41,6 @@ const App = () => {
       await signOut({variables: {email: user?.email}});
       await dispatch({type: ACTIONS.USER_LOGOUT, payload: {user: null}});
     }
-    return false;
   };
 
   return <ConnectedRouter history={ApolloConnection.history}>
