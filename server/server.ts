@@ -16,9 +16,9 @@ import {IOnlineUserData} from "./src/core/bus/interfaces";
 import User from "./src/common/user/user.model";
 import {ACTIONS, ONLINE_USERS_TRIGGER} from "./src/core/bus/actions";
 import {CoreBus} from "./src/core/bus";
-import * as moment from "moment";
-import helmet = require('helmet');
-import NoIntrospection from "graphql-disable-introspection"
+// import * as moment from "moment";
+// import helmet = require('helmet');
+// import NoIntrospection from "graphql-disable-introspection"
 
 const schema = makeExecutableSchema(ExecutableSchema);
 const mongoose = require('mongoose');
@@ -55,8 +55,8 @@ app.use(session({
   saveUninitialized: true,
   secret: config.token.secret
 }), cors());
-app.disable('x-powered-by');
-app.use(helmet());
+// app.disable('x-powered-by');
+// app.use(helmet());
 
 const server: Server = createServer((req, res) => {
   res.writeHead(400);
@@ -87,8 +87,7 @@ useServer(
       });
       const messageData: any = await Message.findOne({}).sort({createdAt: -1});
       const message = messageData.toObject();
-      const dateFormatted = new Date(message.createdAt);
-      message.createdAt = `${moment(dateFormatted).unix()}000`;
+      message.createdAt = new Date(message.createdAt).getTime();
       const authorData: any = await User.findById(message.userId);
       const author = authorData.toObject();
       return { user: { ...user, ...{ token: jwt.sign({ id: user.id }, config.token.secret) } }, message: { ...message, ...{user: author} }, list: UsersMap.online };

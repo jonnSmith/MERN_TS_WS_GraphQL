@@ -53,7 +53,7 @@ export const userTypeDefs = `
     deleteUser(id: String!): User
     signInUser(email: String!, password: String!): User
     signUpUser(email: String!, password: String!, firstName: String!, lastName: String): User
-    signOutUser(email: String!): OnlineUsersData
+    signOutUser(email: String): OnlineUsersData
   }
   
   extend type Subscription {
@@ -159,9 +159,7 @@ export const userResolvers = {
       return userObject;
     },
     async signOutUser(_, data, context) {
-      const {user} = await context;
       const {email} = data;
-      if(email !== user.email) { return { list: UsersMap.online }; }
       UsersMap.remove(email);
       await PubSub.publish(ONLINE_USERS_TRIGGER, {onlineUsers: { list: UsersMap.online, action: ACTIONS.USER.DISCONNECT}});
       return { list: UsersMap.online };
