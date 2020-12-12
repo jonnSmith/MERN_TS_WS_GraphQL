@@ -56,7 +56,10 @@ export default {
         ONLINE_CLOSE: "Click on opened panel",
       },
       workspace: {
-        WORKSPACE_ADDED: "Add new workspace"
+        WORKSPACE_ADDED: "Add new workspace",
+        WORKSPACE_DELETED: "Delete workspace",
+        WORKSPACES_CHANGED: "Workspaces list changed",
+        WORKSPACES_UPDATED: "Workspaces list updated"
       }
     },
   },

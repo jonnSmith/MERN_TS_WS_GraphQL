@@ -25,7 +25,7 @@ const onlineUserListUpdated = (data: IOnlineUserListReducer): ICommonAction => (
 
 const toggleOnlineUserPanel = (data: IOnlineTogglePanelReducer): ICommonAction => ({
     payload: data,
-    type: ACTIONS.ONLINE_UPDATED,
+    type: ACTIONS.ONLINE_OPEN,
 });
 
 export { userLogin, userLogout, userUpdated, onlineUserListUpdated, toggleOnlineUserPanel };

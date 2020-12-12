@@ -1,6 +1,7 @@
 import {SignInFormInitialObject} from "@appchat/ui/templates/user/constants";
 import {ISignInProps} from "@appchat/ui/templates/user/interfaces";
-import {checkFields} from "@appchat/ui/templates/user/transformers";
+import {WorkspaceList} from "@appchat/ui/templates/workspace/list";
+import {checkFields} from "@appchat/ui/transformers";
 import { Divider } from "@react-md/divider";
 import * as React from "react";
 import {Button, CardActions, Password, TextField} from "react-md";
@@ -15,7 +16,7 @@ const UserSignIn = (props: ISignInProps) => {
     onSubmit(SignInForm);
   };
 
-  return (<form onSubmit={(event) => { event.preventDefault(); sendSignInForm(event); }}>
+  return <form onSubmit={(event) => { event.preventDefault(); sendSignInForm(event); }}>
     <TextField
       required={true}
       id="email"
@@ -50,7 +51,7 @@ const UserSignIn = (props: ISignInProps) => {
         Sign In
       </Button>
     </CardActions>
-  </form>);
+  </form>;
 };
 
 export {UserSignIn};

@@ -2,18 +2,21 @@ import {useMutation} from "@apollo/react-hooks";
 import {ACTIONS} from "@appchat/core/store/constants";
 import {StateReturnTypes} from "@appchat/core/store/types";
 import {UPDATE_USER} from "@appchat/data/user/queries";
+import {IWorkspaceModel} from "@appchat/data/workspace/interfaces";
 import {ADD_WORKSPACE} from "@appchat/data/workspace/queries";
 import {ContainerPage} from "@appchat/ui/containers/page";
 import {IUpdateForm} from "@appchat/ui/templates/user/interfaces";
 import {UserUpdate} from "@appchat/ui/templates/user/update";
 import {WorkSpaceCreate} from "@appchat/ui/templates/workspace/create";
 import {IWorkspaceCreateForm} from "@appchat/ui/templates/workspace/interfaces";
+import {WorkspaceList} from "@appchat/ui/templates/workspace/list";
 import * as React from "react";
 import { Grid, GridCell, Text } from "react-md";
 import {useDispatch, useSelector} from "react-redux";
 
 const Account = () => {
   const {user} = useSelector((state: StateReturnTypes) => state.UserReducer);
+
   const dispatch = useDispatch();
   const [saveUser, {data, loading}] = useMutation(UPDATE_USER);
   const [addWorkspace, {data: workspace, loading: saving}] = useMutation(ADD_WORKSPACE);
@@ -22,7 +25,7 @@ const Account = () => {
     saveUser({variables: { ...variables, ...{ id: user.id} }});
   };
 
-  const CreateWorkspace = (input: IWorkspaceCreateForm) => {
+  const CreateWorkspace = (input: IWorkspaceModel) => {
     addWorkspace({ variables: {input} });
   };
 
@@ -41,7 +44,7 @@ const Account = () => {
   return (
     <ContainerPage title={`${user?.firstName} ${user?.lastName}`} className="account">
       <Grid>
-        <GridCell colSpan={8}>
+        <GridCell colSpan={4}>
           <Text type="headline-6" style={{margin: "0 0 2rem 0"}}>Edit account</Text>
           <UserUpdate
             onSubmit={(variables: IUpdateForm) => {UpdateUser(variables); }}
@@ -51,6 +54,10 @@ const Account = () => {
         <GridCell colSpan={4}>
           <Text type="headline-6" style={{margin: "0 0 2rem 0"}}>Create workspace</Text>
           <WorkSpaceCreate onCreate={(s: IWorkspaceCreateForm) => { CreateWorkspace(s); }} />
+        </GridCell>
+        <GridCell colSpan={4}>
+          <Text type="headline-6" style={{margin: "0 0 1.5rem 0"}}>Workspaces</Text>
+          <WorkspaceList />
         </GridCell>
       </Grid>
     </ContainerPage>);

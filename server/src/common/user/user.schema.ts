@@ -49,7 +49,7 @@ export const userTypeDefs = `
 
   extend type Mutation {
     addUser(input: UserInput!): User
-    updateUser(firstName: String, lastName: String, id: ID!): User
+    updateUser(firstName: String, lastName: String, id: ID!, workspaceId: ID): User
     deleteUser(id: String!): User
     signInUser(email: String!, password: String!): User
     signUpUser(email: String!, password: String!, firstName: String!, lastName: String): User
@@ -90,10 +90,10 @@ export const userResolvers = {
       const user: any = await User.create(input);
       return user.toObject();
     },
-    async updateUser(_, { id, firstName, lastName }, context) {
+    async updateUser(_, { id, firstName, lastName, workspaceId }, context) {
       const {user} = await context;
       if(id !== user.id) { return user; }
-      const updated: any = await User.findByIdAndUpdate(user.id, {firstName, lastName}, {new: true});
+      const updated: any = await User.findByIdAndUpdate(user.id, {firstName, lastName, workspaceId}, {new: true});
       const data = updated.toObject();
       data.token = jwt.sign({id: user.id}, config.token.secret);
       const message: any = await Message.findOne({}).sort({createdAt: -1});
@@ -174,7 +174,7 @@ export const userResolvers = {
     async workspace(user: { workspaceId: string }) {
       if (user.workspaceId) {
         const workspace: any = await Workspace.findById(user.workspaceId);
-        return workspace.toObject();
+        return workspace ? workspace.toObject() : null;
       }
       return null;
     },

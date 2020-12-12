@@ -11,7 +11,8 @@ const UserInitState: IUserReducer = {
     workspace: {
       id: null,
       name: null,
-    }
+    },
+    workspaceId: null,
   }
 };
 
@@ -31,6 +32,7 @@ const UserFields = `{
   firstName
   lastName
   token
+  workspaceId
   workspace {
     id
     name

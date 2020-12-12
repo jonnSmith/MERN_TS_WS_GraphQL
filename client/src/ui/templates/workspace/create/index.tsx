@@ -1,6 +1,6 @@
-import {checkFields} from "@appchat/ui/templates/user/transformers";
 import {WorkspaceCreateInitialObject} from "@appchat/ui/templates/workspace/constants";
 import {IWorkspaceCreateProps} from "@appchat/ui/templates/workspace/interfaces";
+import {checkFields} from "@appchat/ui/transformers";
 import {Divider} from "@react-md/divider";
 import * as React from "react";
 import {Button, CardActions, TextField} from "react-md";

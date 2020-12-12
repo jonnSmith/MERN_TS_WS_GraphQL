@@ -4,6 +4,7 @@ import {ACTIONS} from "@appchat/core/store/constants";
 import {IMessageModel} from "@appchat/data/message/interfaces";
 import {IUserModel} from "@appchat/data/user/interfaces";
 import {IOnlineUserData} from "@appchat/data/user/interfaces";
+import {IWorkspaceModel} from "@appchat/data/workspace/interfaces";
 import {GraphQLError, print} from "graphql";
 import {Client, ClientOptions, createClient} from "graphql-ws";
 
@@ -16,8 +17,14 @@ class WSLink extends ApolloLink {
     this.client = this.client || createClient(options);
     this.client.on(
       "connected",
-      (socket, payload: {user: IUserModel, message: IMessageModel, list: IOnlineUserData[]}) => {
-        const {user, message, list} = payload;
+      (
+        socket,
+        payload: {
+          user: IUserModel,
+          message: IMessageModel,
+          list: IOnlineUserData[],
+          workspace: IWorkspaceModel[]}) => {
+        const {user, message, list, workspace} = payload;
         CoreStore.ReduxSaga.dispatch({type: user ? ACTIONS.USER_LOGIN : ACTIONS.USER_LOGOUT, payload: {user} });
         if (message && user) {
           CoreStore.ReduxSaga.dispatch(
@@ -26,6 +33,9 @@ class WSLink extends ApolloLink {
         }
         if (list && user) {
           CoreStore.ReduxSaga.dispatch({type: ACTIONS.ONLINE_CHANGED, payload: {list}});
+        }
+        if (workspace) {
+          CoreStore.ReduxSaga.dispatch({type: ACTIONS.WORKSPACES_CHANGED, payload: {list: workspace}});
         }
     });
     this.client.on("closed", (event) => {

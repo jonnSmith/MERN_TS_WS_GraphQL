@@ -16,6 +16,7 @@ import {IOnlineUserData} from "./src/core/bus/interfaces";
 import User from "./src/common/user/user.model";
 import {ACTIONS, ONLINE_USERS_TRIGGER} from "./src/core/bus/actions";
 import {CoreBus} from "./src/core/bus";
+import Workspace from "./src/common/workspace/workspace.model";
 // import * as moment from "moment";
 // import helmet = require('helmet');
 // import NoIntrospection from "graphql-disable-introspection"
@@ -75,7 +76,11 @@ useServer(
     subscribe,
     onConnect: async (ctx) => {
       const { user } = await WSMiddleware(ctx);
-      if(!user) { return { user: null, message: null, list: [] }; }
+
+      const workspaceData: any[] = await Workspace.find({}, {});
+      const workspace: any[] = workspaceData.map(w => w.toObject())
+
+      if(!user) { return { user: null, message: null, list: [], workspace }; }
       const onlineUser: IOnlineUserData = {
         email: user.email,
         typing: false
@@ -85,12 +90,19 @@ useServer(
         UsersMap.remove(user.email);
         await PubSub.publish(ONLINE_USERS_TRIGGER, {onlineUsers: { list: UsersMap.online, action: ACTIONS.USER.DISCONNECT}});
       });
+
       const messageData: any = await Message.findOne({}).sort({createdAt: -1});
       const message = messageData.toObject();
       message.createdAt = new Date(message.createdAt).getTime();
       const authorData: any = await User.findById(message.userId);
       const author = authorData.toObject();
-      return { user: { ...user, ...{ token: jwt.sign({ id: user.id }, config.token.secret) } }, message: { ...message, ...{user: author} }, list: UsersMap.online };
+
+      return {
+        user: { ...user, ...{ token: jwt.sign({ id: user.id }, config.token.secret) } },
+        message: { ...message, ...{user: author} },
+        list: UsersMap.online,
+        workspace
+      };
     },
     onSubscribe: async (ctx, message) => {
       const { user } = await WSMiddleware(ctx);

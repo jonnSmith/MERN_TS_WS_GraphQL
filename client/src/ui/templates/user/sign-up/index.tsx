@@ -1,6 +1,6 @@
 import {SignUpFormInitialObject} from "@appchat/ui/templates/user/constants";
 import {ISignUpProps} from "@appchat/ui/templates/user/interfaces";
-import {checkFields} from "@appchat/ui/templates/user/transformers";
+import {checkFields} from "@appchat/ui/transformers";
 import {Divider} from "@react-md/divider";
 import * as React from "react";
 import {Button, CardActions, Password, TextField} from "react-md";

@@ -28,8 +28,9 @@ const UPDATE_USER = gql`
     $firstName: String
     $lastName: String
     $id: ID!
+    $workspaceId: ID
   ) {
-    user: updateUser(id: $id, firstName: $firstName, lastName: $lastName) ${UserFields}
+    user: updateUser(id: $id, firstName: $firstName, lastName: $lastName, workspaceId: $workspaceId) ${UserFields}
   }`;
 
 const SIGN_OUT = gql`
