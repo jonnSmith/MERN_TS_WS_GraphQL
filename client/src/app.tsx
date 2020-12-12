@@ -14,7 +14,8 @@ import {useDispatch, useSelector} from "react-redux";
 
 const App = () => {
 
-  const { user, action } = useSelector((state: StateReturnTypes) => state.UserReducer);
+  const { user } = useSelector((state: StateReturnTypes) => state.UserReducer);
+  const { action: loaded } = useSelector((state: StateReturnTypes) => state.WorkspaceReducer);
 
   const [signOut, {loading: unloading}] = useMutation(SIGN_OUT);
 
@@ -26,56 +27,36 @@ const App = () => {
 
   React.useEffect(() => {
     if (chat && !cloading) {
-      console.debug("chat", chat);
+      // console.debug("chat", chat);
       dispatch({type: ACTIONS.MESSAGE_ADDED, payload: {message: chat?.chatUpdated?.message}});
     }
+    return () => {};
   }, [chat?.chatUpdated, cloading]);
 
   React.useEffect(() => {
     if (users && !uloading) {
-      console.debug("users", users);
+      // console.debug("users", users);
       dispatch({type: ACTIONS.ONLINE_CHANGED, payload: {list: users?.onlineUsers?.list}});
     }
+    return () => {};
   }, [users?.onlineUsers, uloading]);
 
   React.useEffect(() => {
     if (workspace && !wloading) {
-      console.debug("workspaces", workspace);
+      // console.debug("workspaces", workspace);
       dispatch({type: ACTIONS.WORKSPACES_CHANGED, payload: {list: workspace?.workspaceList?.list}});
     }
+    return () => {};
   }, [workspace?.workspaceList, wloading]);
 
-  window.onbeforeunload = async (ev: BeforeUnloadEvent) => {
-    ev.preventDefault();
-    if (user?.email) {
-      await signOut({variables: {email: user?.email}});
-      await dispatch({type: ACTIONS.USER_LOGOUT, payload: {user: null}});
-    }
-    return true;
+  const logout = (ev: BeforeUnloadEvent) => {
+    if (user?.email && !unloading) { signOut({variables: {email: user?.email}}); }
   };
-
-  React.useEffect(() => {
-    window.onbeforeunload = async (ev: BeforeUnloadEvent) => {
-      ev.preventDefault();
-      if (user?.email) {
-        await signOut({variables: {email: user?.email}});
-        await dispatch({type: ACTIONS.USER_LOGOUT, payload: {user: null}});
-      }
-      return true;
-    };
-    return () => {
-      if (user?.email) {
-        signOut({variables: {email: user?.email}}).then(() => {
-          dispatch({type: ACTIONS.USER_LOGOUT, payload: {user: null}});
-        });
-      }
-      window.onbeforeunload = null;
-    };
-  }, []);
+  window.onbeforeunload = (loaded && user?.email) ? logout : null;
 
   return <ConnectedRouter history={ApolloConnection.history}>
-      <LayoutContainer loaded={!!action} user={user} ><RouterSwitch user={user}/></LayoutContainer>
-      {!action && <LoaderOverlay />}
+      <LayoutContainer loaded={!!loaded} user={user} ><RouterSwitch user={user}/></LayoutContainer>
+      {!loaded && <LoaderOverlay />}
     </ConnectedRouter>;
 };
 

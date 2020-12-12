@@ -25,7 +25,9 @@ class WSLink extends ApolloLink {
           list: IOnlineUserData[],
           workspace: IWorkspaceModel[]}) => {
         const {user, message, list, workspace} = payload;
-        CoreStore.ReduxSaga.dispatch({type: user ? ACTIONS.USER_LOGIN : ACTIONS.USER_LOGOUT, payload: {user} });
+        if (user) { CoreStore.ReduxSaga.dispatch({type: ACTIONS.USER_LOGIN, payload: {user} }); } else {
+          CoreStore.ReduxSaga.dispatch({type: ACTIONS.USER_LOGOUT, payload: {user} });
+        }
         if (message && user) {
           CoreStore.ReduxSaga.dispatch(
             {type: ACTIONS.MESSAGE_PRELOADED, payload: { message } }
@@ -38,9 +40,10 @@ class WSLink extends ApolloLink {
           CoreStore.ReduxSaga.dispatch({type: ACTIONS.WORKSPACES_CHANGED, payload: {list: workspace}});
         }
     });
-    this.client.on("closed", (event) => {
-      console.debug("closed", event);
-    });
+    // this.client.on("closed", (event) => {
+    //   CoreStore.ReduxSaga.dispatch({type: ACTIONS.USER_LOGOUT, payload: {user: null} });
+    //   console.debug("closed", event);
+    // });
   }
 
   public request(operation: Operation): Observable<FetchResult> {

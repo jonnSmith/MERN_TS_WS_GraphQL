@@ -8,6 +8,7 @@ import {ACTIONS, ONLINE_USERS_TRIGGER, UPDATE_CHAT_TRIGGER} from "../../core/bus
 import Message from "../message/message.model";
 import {UsersMap} from "../../core/bus/users";
 import {IOnlineUserData} from "../../core/bus/interfaces";
+import {AuthenticationError} from "apollo-server-errors";
 
 // TODO: Remove password field from User data type
 
@@ -137,6 +138,11 @@ export const userResolvers = {
     async signInUser(_, data) {
       const { email, password} = data;
       let userObject;
+
+      // console.debug('signed', UsersMap.online, email);
+
+      if(UsersMap.get(email)) {  throw new AuthenticationError('User already is signed.'); }
+
       try {
         const user: any = await User.findOne({email});
         const match: boolean = await user.comparePassword(password);
