@@ -107,9 +107,10 @@ class ApolloConnection {
   private static CreateErrorLink() {
     return onError(({graphQLErrors, networkError}: ErrorResponse): void => {
       if (graphQLErrors) {
-        graphQLErrors.forEach(({message, extensions}) => {
+        for (const {message, extensions} of graphQLErrors) {
           switch (extensions?.code) {
             case "UNAUTHENTICATED": {
+              console.debug("graphQLError", message);
               CoreStore.ReduxSaga.dispatch({type: ACTIONS.USER_LOGOUT, payload: UserInitState});
               // if (response && response.errors) { response.errors = null; }
               break;
@@ -120,16 +121,16 @@ class ApolloConnection {
               break;
             }
             case "INTERNAL_SERVER_ERROR": {
-              console.error("graphQLError", message);
+              console.debug("graphQLError", message);
               // response.errors = null;
               break;
             }
           }
-        });
+        }
       }
       if (networkError) {
         if (!graphQLErrors) {
-          console.error("networkError", networkError);
+          console.debug("networkError", networkError);
         }
       }
     });

@@ -9,19 +9,19 @@ class UsersMap {
 
   public static set(user: IOnlineUserData) {
     if(!UsersMap.Online) { new UsersMap(); }
-    UsersMap.Online.set(user.email, user);
+    return UsersMap.Online.set(user.email, user);
     // console.debug(UsersMap.Online);
   }
 
   public static get(email) {
     if(!UsersMap.Online) { new UsersMap(); }
-    UsersMap.Online.get(email);
+    return UsersMap.Online.get(email);
     // console.debug(UsersMap.Online);
   }
 
   public static remove(email) {
     if(!UsersMap.Online) { new UsersMap(); }
-    UsersMap.Online.delete(email);
+    return UsersMap.Online.delete(email);
     // console.debug(UsersMap.Online);
   }
 

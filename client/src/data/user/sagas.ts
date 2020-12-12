@@ -20,16 +20,18 @@ function* setUser(action: ICommonAction) {
   const auth = NavigationPathsSecurity[path as keyof typeof ROUTES];
   const {user} = action?.payload;
   ClientStorage.write(ConfigSettings.token.storage, user?.token || "");
-  if (action.type === ACTIONS.USER_LOGOUT) {
+
+  if (action.type === ACTIONS.USER_LOGOUT || !user) {
+    if (auth) {
+      yield put(push(ROUTES.SignIn));
+      yield put(userUpdated({user, action: ACTIONS.USER_UPDATED}));
+    }
     ApolloConnection.client.clearStore();
   }
-  if (user?.token && !auth) {
-    yield put(push(ROUTES.ChatRoom));
+  if (action.type === ACTIONS.USER_LOGIN) {
+    if (!auth) { yield put(push(ROUTES.ChatRoom)); }
+    yield put(userUpdated({user, action: ACTIONS.USER_UPDATED}));
   }
-  if (!user?.token && auth) {
-    yield put(push(ROUTES.SignIn));
-  }
-  yield put(userUpdated({user, action: ACTIONS.USER_UPDATED}));
 }
 
 function* onlineUserListChanged() {
