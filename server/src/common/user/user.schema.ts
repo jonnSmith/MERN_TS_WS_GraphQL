@@ -49,7 +49,7 @@ export const userTypeDefs = `
 
   extend type Mutation {
     addUser(input: UserInput!): User
-    updateUser(firstName: String, lastName: String, id: ID!): User
+    updateUser(firstName: String, lastName: String, id: ID!, workspaceId: ID): User
     deleteUser(id: String!): User
     signInUser(email: String!, password: String!): User
     signUpUser(email: String!, password: String!, firstName: String!, lastName: String): User
@@ -90,12 +90,21 @@ export const userResolvers = {
       const user: any = await User.create(input);
       return user.toObject();
     },
-    async updateUser(_, { id, firstName, lastName }, context) {
+    async updateUser(_, { id, firstName, lastName, workspaceId }, context) {
       const {user} = await context;
       if(id !== user.id) { return user; }
-      const updated: any = await User.findByIdAndUpdate(user.id, {firstName, lastName}, {new: true});
+      const updated: any = await User.findByIdAndUpdate(user.id, {firstName, lastName, workspaceId}, {new: true});
       const data = updated.toObject();
       data.token = jwt.sign({id: user.id}, config.token.secret);
+      const message: any = await Message.findOne({}).sort({createdAt: -1});
+      if(`${message.userId}` === `${id}`) {
+        await PubSub.publish(UPDATE_CHAT_TRIGGER, {
+          chatUpdated: {
+            ...{message, ...{user: data}},
+            action: ACTIONS.MESSAGE.UPDATE
+          }
+        });
+      }
       return data;
     },
     async deleteUser(_, { id }) {
@@ -150,9 +159,7 @@ export const userResolvers = {
       return userObject;
     },
     async signOutUser(_, data, context) {
-      const {user} = await context;
       const {email} = data;
-      if(email !== user.email) { return { list: UsersMap.online }; }
       UsersMap.remove(email);
       await PubSub.publish(ONLINE_USERS_TRIGGER, {onlineUsers: { list: UsersMap.online, action: ACTIONS.USER.DISCONNECT}});
       return { list: UsersMap.online };
@@ -167,7 +174,7 @@ export const userResolvers = {
     async workspace(user: { workspaceId: string }) {
       if (user.workspaceId) {
         const workspace: any = await Workspace.findById(user.workspaceId);
-        return workspace.toObject();
+        return workspace ? workspace.toObject() : null;
       }
       return null;
     },

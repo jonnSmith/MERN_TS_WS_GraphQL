@@ -43,6 +43,7 @@ export default {
         MESSAGE_DELETED: "Delete message from stream",
         MESSAGE_UPDATED: "Update message data",
         MESSAGE_PRELOADED: "Preload latest message",
+        MESSAGE_USER: "Update user fields"
       },
       user: {
         USER_LOGIN: "Set user data",
@@ -53,6 +54,12 @@ export default {
         ONLINE_TOGGLE: "Toggle online panel",
         ONLINE_OPEN: "Press toggle button",
         ONLINE_CLOSE: "Click on opened panel",
+      },
+      workspace: {
+        WORKSPACE_ADDED: "Add new workspace",
+        WORKSPACE_DELETED: "Delete workspace",
+        WORKSPACES_CHANGED: "Workspaces list changed",
+        WORKSPACES_UPDATED: "Workspaces list updated"
       }
     },
   },

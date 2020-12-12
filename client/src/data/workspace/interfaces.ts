@@ -1,6 +1,14 @@
+import {ActionTypes} from "@appchat/data/message/types";
+
 interface IWorkspaceModel {
-    id: string | null;
-    name: string | null;
+  id?: string | null;
+  name?: string | null;
+  rating?: number | null;
 }
 
-export {IWorkspaceModel};
+interface IWorkspaceReducer {
+  list?: IWorkspaceModel[];
+  action?: ActionTypes | null;
+}
+
+export {IWorkspaceModel, IWorkspaceReducer};

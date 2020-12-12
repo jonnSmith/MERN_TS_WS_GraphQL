@@ -8,6 +8,7 @@ interface IUserModel {
   lastName?: string | null;
   token?: string | null;
   workspace?: IWorkspaceModel;
+  workspaceId?: string | null;
 }
 
 interface IOnlineUserData {
