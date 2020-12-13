@@ -11,7 +11,7 @@ export const workspaceTypeDefs = `
 
   type Workspace {
     id: ID
-    name: String!
+    name: String
     rating: Int
   }
 

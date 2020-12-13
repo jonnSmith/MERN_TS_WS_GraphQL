@@ -1,18 +1,23 @@
-import {IOnlineTogglePanelReducer, IOnlineUserListReducer, IUserReducer} from "@appchat/data/user/interfaces";
+import {
+  IOnlineTogglePanelReducer,
+  IOnlineUserListReducer,
+  IUserModel,
+  IUserReducer
+} from "@appchat/data/user/interfaces";
+
+const UserInitObject: IUserModel =  {
+  token: null,
+  workspace: {}
+};
 
 const UserInitState: IUserReducer = {
   action: null,
+  user: UserInitObject
+};
+
+const UserEmptyHolder: {user: IUserModel} = {
   user: {
-    email: null,
-    firstName: null,
-    id: null,
-    lastName: null,
-    token: null,
-    workspace: {
-      id: null,
-      name: null,
-    },
-    workspaceId: null,
+    id: null
   }
 };
 
@@ -31,12 +36,12 @@ const UserFields = `{
   email
   firstName
   lastName
-  token
   workspaceId
   workspace {
     id
     name
+    rating
   }
 }`;
 
-export {UserInitState, OnlineUserListInitState, UserFields, OnlineTogglePanelInitState};
+export {UserInitState, UserInitObject, UserEmptyHolder, OnlineUserListInitState, UserFields, OnlineTogglePanelInitState};

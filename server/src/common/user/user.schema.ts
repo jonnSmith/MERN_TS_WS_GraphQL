@@ -1,28 +1,37 @@
-import * as jwt from 'jsonwebtoken';
 import Workspace from '../workspace/workspace.model';
 import {UserInputError} from '@apollo/server/errors';
 import User from './user.model';
-import config from '../../../../configs/config.app';
 import {CoreBus} from "../../core/bus";
-import {ACTIONS, ONLINE_USERS_TRIGGER, UPDATE_CHAT_TRIGGER} from "../../core/bus/actions";
+import {ONLINE_USERS_TRIGGER} from "../../core/bus/actions";
 import Message from "../message/message.model";
 import {UsersMap} from "../../core/bus/users";
-import {IOnlineUserData} from "../../core/bus/interfaces";
 import {AuthenticationError} from "apollo-server-errors";
+import {
+  DEFAULT_USER,
+  DocumentQueryType,
+  setMessage,
+  setOnlineUsers,
+  signUser,
+  queryUser,
+  DEFAULT_USER_DATA, DEFAULT_LIST
+} from "../transformers";
+import {Document, DocumentQuery} from "mongoose";
+import {IUserModel} from "../../../../client/src/data/user/interfaces";
+import {ID} from "graphql-ws";
 
 // TODO: Remove password field from User data type
 
 export const userTypeDefs = `
 
   type User {
-    id: ID!
-    workspaceId: String
-    workspace: Workspace
+    id: ID
+    workspaceId: ID
     email: String
     password: String
     firstName: String
     lastName: String
     token: String
+    workspace: Workspace
   }
 
   input UserFilterInput {
@@ -31,7 +40,7 @@ export const userTypeDefs = `
 
   extend type Query {
     users(filter: UserFilterInput): [User]
-    user(id: String!): User
+    user(id: ID): User
   }
 
   input UserInput {
@@ -39,19 +48,18 @@ export const userTypeDefs = `
     password: String
     firstName: String
     lastName: String
-    workspaceId: String
+    workspaceId: ID
   }
   
   input UserUpdate {
-    id: ID!
+    id: ID
     firstName: String
     lastName: String
+    workspaceId: ID
   }
 
   extend type Mutation {
-    addUser(input: UserInput!): User
     updateUser(firstName: String, lastName: String, id: ID!, workspaceId: ID): User
-    deleteUser(id: String!): User
     signInUser(email: String!, password: String!): User
     signUpUser(email: String!, password: String!, firstName: String!, lastName: String): User
     signOutUser(email: String!): OnlineUsersData
@@ -87,88 +95,56 @@ export const userResolvers = {
     },
   },
   Mutation: {
-    async addUser(_, { input }) {
-      const user: any = await User.create(input);
-      return user.toObject();
+    async updateUser(_, data, context) {
+      const {document, key, id: uid} = await context;
+      const { id, firstName, lastName, workspaceId } = data;
+
+      const query: DocumentQueryType = User.findByIdAndUpdate(id, {firstName, lastName, workspaceId}, {new: true});
+      const {user: savedUser} = (key && uid === id) ? await queryUser({query}) : DEFAULT_USER;
+      const messageQuery: DocumentQuery<Document | null, Document, {}> | null = Message.findOne({}).sort({createdAt: -1});
+      const {message} = await setMessage({document: messageQuery, user: savedUser, pubsub: PubSub});
+      return savedUser;
     },
-    async updateUser(_, { id, firstName, lastName, workspaceId }, context) {
-      const {user} = await context;
-      if(id !== user.id) { return user; }
-      const updated: any = await User.findByIdAndUpdate(user.id, {firstName, lastName, workspaceId}, {new: true});
-      const data = updated.toObject();
-      data.token = jwt.sign({id: user.id}, config.token.secret);
-      const message: any = await Message.findOne({}).sort({createdAt: -1});
-      if(`${message.userId}` === `${id}`) {
-        await PubSub.publish(UPDATE_CHAT_TRIGGER, {
-          chatUpdated: {
-            ...{message, ...{user: data}},
-            action: ACTIONS.MESSAGE.UPDATE
-          }
-        });
-      }
-      return data;
-    },
-    async deleteUser(_, { id }) {
-      const user: any = await User.findByIdAndRemove(id);
-      return user ? user.toObject() : null;
-    },
-    async signUpUser(_, data) {
+    async signUpUser(_, data, context) {
       const { email, password, firstName, lastName} = data;
-      let userObject;
-      try {
-        const user: any = await User.create({email, password, firstName, lastName});
-        userObject = user.toObject();
-        userObject.token = jwt.sign({id: user.id}, config.token.secret);
-
-        const onlineUser: IOnlineUserData = {
-          email: userObject.email,
-          typing: false
-        }
-        UsersMap.set(onlineUser);
-        await PubSub.publish(ONLINE_USERS_TRIGGER, {onlineUsers: { list: UsersMap.online , action: ACTIONS.USER.CONNECT}});
-
-        const message: any = await Message.findOne({}).sort({createdAt: -1});
-        const author = await User.findById(message.userId);
-        await PubSub.publish(UPDATE_CHAT_TRIGGER, {chatUpdated: { ...{message, ...{user: author}}, action: ACTIONS.MESSAGE.UPDATE}});
-      } catch (e) {
-        throw new UserInputError(e);
-      }
+      const {document, key, uid} = await context;
+      const userObject = DEFAULT_USER.user;
+    //   try {
+    //     const userDocument = User.create({email, password, firstName, lastName});
+    //     const {user} = await signUser(userDocument, key, true);
+    //     userObject = {...user};
+    //     const {list} = await setOnlineUsers(PubSub, userObject, UsersMap, true);
+    //     const messageDocument: any = Message.findOne({}).sort({createdAt: -1});
+    //     const {message} = await setMessage(messageDocument, userObject, PubSub);
+    //
+    //   } catch (e) {
+    //     throw new UserInputError(e);
+    //   }
       return userObject;
     },
-    async signInUser(_, data) {
+    async signInUser(_, data, context) {
       const { email, password} = data;
-      let userObject;
-
-      // console.debug('signed', UsersMap.online, email);
-
-      if(UsersMap.get(email)) {  throw new AuthenticationError('User already is signed.'); }
-
+      const {document, key, uid} = await context;
+      if(UsersMap.get(email)) {  console.debug(email, "Already signed in"); return DEFAULT_USER.user;  }
+      if(!email || !password) {  console.debug(email, "Wrong data"); return DEFAULT_USER.user;  }
       try {
-        const user: any = await User.findOne({email});
-        const match: boolean = await user.comparePassword(password);
-        userObject = match ? user.toObject() : null;
-        userObject.token = jwt.sign({id: user.id}, config.token.secret);
-
-        const onlineUser: IOnlineUserData = {
-          email: userObject.email,
-          typing: false
-        }
-        UsersMap.set(onlineUser);
-        await PubSub.publish(ONLINE_USERS_TRIGGER, {onlineUsers: { list: UsersMap.online , action: ACTIONS.USER.CONNECT}});
-
-        const message: any = await Message.findOne({}).sort({createdAt: -1});
-        const author = await User.findById(message.userId);
-        await PubSub.publish(UPDATE_CHAT_TRIGGER, {chatUpdated: { ...{message, ...{user: author}}, action: ACTIONS.MESSAGE.UPDATE}});
+        const userDocument: any = User.findOne({email});
+        const {user,code}  = await signUser({document: userDocument, key, update: true, password});
+        if(!user.email || !code) { return DEFAULT_USER_DATA }
+        const {list} = await setOnlineUsers({pubsub: PubSub, user, map: UsersMap, online: true});
+        const messageDocument: any = Message.findOne({}).sort({createdAt: -1});
+        const {message} = await setMessage({ document: messageDocument, user, pubsub: PubSub });
+        return {...user};
       } catch (e) {
-        throw new UserInputError(e);
+        console.debug(e);
+        return DEFAULT_USER.user;
       }
-      return userObject;
     },
     async signOutUser(_, data, context) {
-      const {email} = data;
-      UsersMap.remove(email);
-      await PubSub.publish(ONLINE_USERS_TRIGGER, {onlineUsers: { list: UsersMap.online, action: ACTIONS.USER.DISCONNECT}});
-      return { list: UsersMap.online };
+      const {document, key, uid} = await context;
+      if(!data.email) { return DEFAULT_LIST };
+      const {list} = await setOnlineUsers({pubsub: PubSub, user: data, map: UsersMap, online: false});
+      return {list};
     }
   },
   Subscription: {
@@ -177,12 +153,12 @@ export const userResolvers = {
     }
   },
   User: {
-    async workspace(user: { workspaceId: string }) {
+    async workspace(user: { workspaceId: ID }) {
       if (user.workspaceId) {
         const workspace: any = await Workspace.findById(user.workspaceId);
-        return workspace ? workspace.toObject() : null;
+        return workspace ? workspace.toObject() : {};
       }
-      return null;
+      return {};
     },
   },
 };

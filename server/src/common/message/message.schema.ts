@@ -10,23 +10,23 @@ import {ACTIONS, UPDATE_CHAT_TRIGGER} from "../../core/bus/actions";
 export const messageTypeDefs = `
 
   type Message {
-    id: ID!
-    userId: String!
+    id: ID
+    userId: ID
     user: User
-    text: String!
-    workspaceId: String
+    text: String
+    workspaceId: ID
     workspace: Workspace
-    createdAt: String!
+    createdAt: String
   }
 
   extend type Query {
     messages: [Message]
-    message(id: ID!): Message!
+    message(id: ID): Message!
   }
 
   extend type Mutation {
     createMessage(text: String!): Message
-    deleteMessage(id: ID!): Message
+    deleteMessage(id: ID): Message
   }
   
   type updateAction {
@@ -91,14 +91,14 @@ export const messageResolvers = {
         const user: any = await User.findById(message.userId);
         return user.toObject();
       }
-      return null;
+      return {};
     },
     async workspace(message: { workspaceId: string }) {
       if (message.workspaceId) {
         const workspace: any = await Workspace.findById(message.workspaceId);
         return workspace.toObject();
       }
-      return null;
+      return {};
     },
   },
 };

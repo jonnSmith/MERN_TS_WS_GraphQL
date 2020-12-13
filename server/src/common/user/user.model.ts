@@ -74,4 +74,7 @@ userSchema.method('comparePassword', function comparePassword(
  * Finally, we compile the schema into a model which we then
  * export to be used by our GraphQL resolvers.
  */
-export default mongoose.model('User', userSchema);
+const userModel = mongoose.model('User', userSchema);
+export default userModel;
+type UserSchema = typeof userModel.schema;
+export {UserSchema};

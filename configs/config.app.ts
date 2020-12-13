@@ -72,4 +72,4 @@ export default {
     secret: 'neurochat!secret',
     engine: 'sessionStorage',
   },
-};
+}

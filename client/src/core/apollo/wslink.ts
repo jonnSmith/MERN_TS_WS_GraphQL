@@ -23,21 +23,22 @@ class WSLink extends ApolloLink {
           user: IUserModel,
           message: IMessageModel,
           list: IOnlineUserData[],
-          workspace: IWorkspaceModel[]}) => {
-        const {user, message, list, workspace} = payload;
-        if (user) { CoreStore.ReduxSaga.dispatch({type: ACTIONS.USER_LOGIN, payload: {user} }); } else {
+          workspaces: IWorkspaceModel[]}) => {
+        const {user, message, list, workspaces} = payload;
+        if (user.token) {
+          CoreStore.ReduxSaga.dispatch({type: ACTIONS.USER_LOGIN, payload: {user} }); } else {
           CoreStore.ReduxSaga.dispatch({type: ACTIONS.USER_LOGOUT, payload: {user} });
         }
-        if (message && user) {
+        if (message && user.token) {
           CoreStore.ReduxSaga.dispatch(
             {type: ACTIONS.MESSAGE_PRELOADED, payload: { message } }
             );
         }
-        if (list && user) {
+        if (list && user.token) {
           CoreStore.ReduxSaga.dispatch({type: ACTIONS.ONLINE_CHANGED, payload: {list}});
         }
-        if (workspace) {
-          CoreStore.ReduxSaga.dispatch({type: ACTIONS.WORKSPACES_CHANGED, payload: {list: workspace}});
+        if (workspaces) {
+          CoreStore.ReduxSaga.dispatch({type: ACTIONS.WORKSPACES_CHANGED, payload: {list: workspaces}});
         }
     });
     // this.client.on("closed", (event) => {

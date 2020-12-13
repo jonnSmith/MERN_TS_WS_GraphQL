@@ -7,19 +7,22 @@ import config from './../configs/config.app';
 import {execute, subscribe} from "graphql";
 import {graphqlHTTP} from "express-graphql";
 import {ContextMiddleware, WSMiddleware} from "./src/core/midddleware/token";
-import { Server as WSS} from 'ws';
-import { useServer } from 'graphql-ws/lib/use/ws';
-import Message from "./src/common/message/message.model";
-import * as jwt from "jsonwebtoken";
+import {Server as WSS} from 'ws';
+import {useServer} from 'graphql-ws/lib/use/ws';
 import {UsersMap} from "./src/core/bus/users";
-import {IOnlineUserData} from "./src/core/bus/interfaces";
-import User from "./src/common/user/user.model";
-import {ACTIONS, ONLINE_USERS_TRIGGER} from "./src/core/bus/actions";
 import {CoreBus} from "./src/core/bus";
 import Workspace from "./src/common/workspace/workspace.model";
-// import * as moment from "moment";
-// import helmet = require('helmet');
-// import NoIntrospection from "graphql-disable-introspection"
+import {
+  signUser,
+  updateWorkspaces,
+  setMessage,
+  setOnlineUsers,
+  DEFAULT_USER,
+  DocumentQueryType,
+  DEFAULT_MESSAGE, DEFAULT_USER_DATA, DEFAULT_LIST
+} from "./src/common/transformers";
+import {PubSubEngine} from "graphql-subscriptions";
+import Message from "./src/common/message/message.model";
 
 const schema = makeExecutableSchema(ExecutableSchema);
 const mongoose = require('mongoose');
@@ -45,7 +48,7 @@ mongoose.connect(
 //   });
 // } else {
 
-const PubSub = CoreBus.pubsub;
+const PubSub: PubSubEngine = CoreBus.pubsub;
 
 const app = express();
 const session = require('express-session');
@@ -75,54 +78,36 @@ useServer(
     execute,
     subscribe,
     onConnect: async (ctx) => {
-      const { user } = await WSMiddleware(ctx);
+      const {document, key, id} = await WSMiddleware(ctx);
 
-      const workspaceData: any[] = await Workspace.find({}, {});
-      const workspace: any[] = workspaceData.map(w => w.toObject())
+      const collection = Workspace.find({}, {});
+      const {workspaces} = await updateWorkspaces({ document: null, collection, pubsub: PubSub});
 
-      if(!user) { return { user: null, message: null, list: [], workspace }; }
-      const onlineUser: IOnlineUserData = {
-        email: user.email,
-        typing: false
-      }
-      UsersMap.set(onlineUser);
-      ctx.extra.socket.on("close", async (socket, code, reason) => {
-        UsersMap.remove(user.email);
-        await PubSub.publish(ONLINE_USERS_TRIGGER, {onlineUsers: { list: UsersMap.online, action: ACTIONS.USER.DISCONNECT}});
-      });
+      const {user, code} = (document && key) ? await signUser({document, key, update: true, pubsub: undefined}) : DEFAULT_USER_DATA;
+      if(id !== user.id) { return { ...{workspaces}, ...DEFAULT_USER_DATA, ...DEFAULT_LIST, ...DEFAULT_MESSAGE} }
 
-      const messageData: any = await Message.findOne({}).sort({createdAt: -1});
-      const message = messageData.toObject();
-      message.createdAt = new Date(message.createdAt).getTime();
-      const authorData: any = await User.findById(message.userId);
-      const author = authorData.toObject();
+      const {list} = user.email ? await setOnlineUsers({user, map: UsersMap, online: true, pubsub: PubSub}) : DEFAULT_LIST;
+      const messageDocument: DocumentQueryType = Message.findOne({}).sort({createdAt: -1});
+      const {message} = user.email ? await setMessage({document: messageDocument, user, pubsub: undefined}) : DEFAULT_MESSAGE;
 
       return {
-        user: { ...user, ...{ token: jwt.sign({ id: user.id }, config.token.secret) } },
-        message: { ...message, ...{user: author} },
-        list: UsersMap.online,
-        workspace
+        user,
+        message,
+        list,
+        workspaces
       };
     },
     onSubscribe: async (ctx, message) => {
-      const { user } = await WSMiddleware(ctx);
-      if(!user) { return; }
-      if(message?.payload?.operationName === 'onlineUsers') {
-        const onlineUser: IOnlineUserData = {
-          email: user.email,
-          typing: false
-        }
-        UsersMap.set(onlineUser);
-        await PubSub.publish(ONLINE_USERS_TRIGGER, {
-          onlineUsers: {
-            list: UsersMap.online,
-            action: ACTIONS.USER.CONNECT
-          }
-        });
+      const {document, key} = await WSMiddleware(ctx);
+      const {user, code} = await signUser({document, key, online: false, pubsub: undefined});
+      if(!code || !user.id) { return; }
+
+      if (message?.payload?.operationName === 'onlineUsers') {
+        const {list} = user.email ? await setOnlineUsers({user, map: UsersMap, online: true, pubsub: PubSub}) : { list: [] };
       }
     },
     onNext: async (ctx) => {
-      const { user } = await WSMiddleware(ctx);
+      // const {user} = await WSMiddleware(ctx);
       // console.debug('next');
       // TODO: resolve WS Cluster problem through process/worker bus
     },
@@ -131,14 +116,14 @@ useServer(
       console.error('error', message);
     },
     onComplete: async (ctx) => {
-      const { user } = await WSMiddleware(ctx);
+      // const {user} = await WSMiddleware(ctx);
       // console.debug('complete');
     }
   },
   wss,
 );
 
-server.listen(config.server.ws,() =>  console.debug(`websocket started on ${config.server.ws}`));
+server.listen(config.server.ws, () => console.debug(`websocket started on ${config.server.ws}`));
 
 app.use(`/${config.server.path}`, graphqlHTTP(
   async (request, response, graphQLParams) => (
