@@ -16,13 +16,14 @@ const SignIn = () => {
     await signIn({variables});
   };
 
-  const {user} = data;
+  // const {user} = data;
 
   React.useLayoutEffect(() => {
-    if (user.id) {
-      dispatch({type: ACTIONS.USER_LOGIN, payload: user});
-    }
-  }, [user.id]);
+    console.debug("data", data);
+    // if (user.id) {
+    //   dispatch({type: ACTIONS.USER_LOGIN, payload: user});
+    // }
+  }, [data]);
 
   return (
     <ContainerPage title="Sign in" className="sign-in">

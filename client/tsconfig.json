@@ -10,7 +10,9 @@
     "target": "es6",
     "baseUrl": "./",
     "paths": {
-      "@appchat/*": ["src/*/index", "src/*"]
+      "@appchat/*": ["src/*/index", "src/*"],
+      "@shared/*": ["./../shared/*", "./../shared/*/index"],
+      "@configs/*": ["./../configs/*", "./../configs/*/index"]
     },
     "lib": ["es6", "es5", "dom"],
     "types": ["node"],

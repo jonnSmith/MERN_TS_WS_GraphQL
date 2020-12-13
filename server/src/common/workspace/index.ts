@@ -1,7 +1,6 @@
-import Workspace from './workspace.model';
-import {ACTIONS, WORKSPACES_TRIGGER} from "../../core/bus/actions";
-import {CoreBus} from "../../core/bus";
-import Message from "../message/message.model";
+import {Workspace} from "@shared/data/workspace";
+import {ACTIONS, WORKSPACES_TRIGGER} from "@backchat/core/bus/actions";
+import {CoreBus} from "@backchat/core/bus";
 import {ForbiddenError} from "@apollo/server/errors";
 
 /**
@@ -81,7 +80,7 @@ export const workspaceResolvers: any = {
         await PubSub.publish(WORKSPACES_TRIGGER, {workspaceList: { list, action: ACTIONS.WORKSPACE.UPDATE}});
         return workspace.toObject();
       } catch(e) {
-        throw new ForbiddenError('Workspace forbidden to delete.');
+        throw new ForbiddenError("Workspace forbidden to delete.");
       }
     }
   },

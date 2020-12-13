@@ -14,7 +14,8 @@
     "no-console": false,
     "one-variable-per-declaration": false,
     "no-submodule-imports": false,
-    "no-unused-expression": false
+    "no-unused-expression": false,
+    "no-implicit-dependencies": false
   },
   "rulesDirectory": []
 }

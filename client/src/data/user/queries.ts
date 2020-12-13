@@ -1,9 +1,18 @@
+import {MessageFields} from "@appchat/data/message/constants";
 import {UserFields} from "@appchat/data/user/constants";
 import gql from "graphql-tag";
 
 const SIGN_IN = gql`
-  mutation($email: String!, $password: String!) {
-    user: signInUser(email: $email, password: $password) ${UserFields}
+  mutation SignInUser($email: String!, $password: String!) {
+    payload: signInUser(email: $email, password: $password) {
+      user ${UserFields}
+      list {
+        email
+        typing
+      }
+      code
+      message ${MessageFields}
+    }
   }
 `;
 

@@ -1,11 +1,11 @@
 // tslint:disable-next-line:no-submodule-imports
-import {ForbiddenError} from '@apollo/server/errors';
-import {CoreBus} from "../../core/bus";
+import {ForbiddenError} from "@apollo/server/errors";
+import {CoreBus} from "@backchat/core/bus";
 
-import User from '../user/user.model';
-import Workspace from '../workspace/workspace.model';
-import Message from './message.model';
-import {ACTIONS, UPDATE_CHAT_TRIGGER} from "../../core/bus/actions";
+import {User} from "@shared/data/user";
+import {Workspace} from "@shared/data/workspace";
+import {Message} from "@shared/data/message";
+import {ACTIONS, UPDATE_CHAT_TRIGGER} from "@backchat/core/bus/actions";
 
 export const messageTypeDefs = `
 
@@ -66,7 +66,7 @@ export const messageResolvers = {
       }
       catch(e) {
         console.debug(e);
-        throw new ForbiddenError('Message forbidden to create.');
+        throw new ForbiddenError("Message forbidden to create.");
       }
     },
     deleteMessage: async (_, { id }, context) => {
@@ -76,7 +76,7 @@ export const messageResolvers = {
         await PubSub.publish(UPDATE_CHAT_TRIGGER, {chatUpdated: { message: updated, action: ACTIONS.MESSAGE.DELETE}});
         return message.toObject();
       } catch(e) {
-        throw new ForbiddenError('Message forbidden to delete.');
+        throw new ForbiddenError("Message forbidden to delete.");
       }
     },
   },

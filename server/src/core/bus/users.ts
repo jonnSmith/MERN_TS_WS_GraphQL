@@ -1,4 +1,4 @@
-import {IOnlineUserData} from "./interfaces";
+import {IOnlineUserData} from "@backchat/core/bus/interfaces";
 
 class UsersMap {
 

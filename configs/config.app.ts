@@ -69,7 +69,7 @@ export default {
   token: {
     header: 'x-token',
     storage: 'token',
-    secret: 'neurochat!secret',
+    secret: 'appchat!secret',
     engine: 'sessionStorage',
   },
 }

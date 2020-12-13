@@ -1,14 +1,14 @@
-import express = require('express');
-import path = require('path');
-import config from './../configs/config.app';
+import express = require("express");
+import path = require("path");
+import config from "@configs/config.app";
 
 const app = express();
 const portNumber = config.client.port;
-const sourceDir = './build/client';
+const sourceDir = "./build/client";
 
 app.use(express.static(sourceDir));
-app.get('/*', function(req, res) {
-  res.sendFile(path.join(__dirname, '../client/index.html'), function(err) {
+app.get("/*", function(req, res) {
+  res.sendFile(path.join(__dirname, "../client/index.html"), function(err) {
     if (err) {
       res.status(500).send(err)
     }

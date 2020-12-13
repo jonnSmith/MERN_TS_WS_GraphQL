@@ -1,4 +1,4 @@
-export const rootTypeDefs = `
+const rootTypeDefs = `
   type Query
   type Mutation
   type Subscription
@@ -8,3 +8,5 @@ export const rootTypeDefs = `
     subscription: Subscription 
   }
 `;
+
+export {rootTypeDefs}

@@ -1,9 +1,7 @@
-import config from "../../../../../configs/config.app";
+import config from "@configs/config.app";
 import * as jwt from "jsonwebtoken";
-import User from "../../../common/user/user.model";
+import {User} from "@shared/data/user";
 import {ID} from "graphql-ws";
-import {DocumentQueryType} from "../../../common/transformers";
-import {AuthenticationError} from "apollo-server-errors";
 
 const ContextMiddleware = async (req) => {
   return GetUserByToken(GetHeadersToken(req));
