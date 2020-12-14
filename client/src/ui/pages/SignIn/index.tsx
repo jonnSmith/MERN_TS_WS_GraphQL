@@ -25,9 +25,7 @@ const SignIn = () => {
 
   return (
     <ContainerPage title="Sign in" className="sign-in">
-      <UserSignIn onSubmit={ async (variables: ISignInForm) => {
-        await LoginUser(variables);
-      }}/>
+      <UserSignIn onSubmit={ async (variables: ISignInForm) => { await LoginUser(variables); }}/>
     </ContainerPage>);
 };
 

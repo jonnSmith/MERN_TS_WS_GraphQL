@@ -42,7 +42,7 @@ export const userTypeDefs = `
   extend type Mutation {
     updateUser(firstName: String, lastName: String, id: ID!, workspaceId: ID): User
     signInUser(email: String!, password: String!): ${payloadDataType}
-    signUpUser(email: String!, password: String!, firstName: String!, lastName: String): ${payloadDataType}
+    signUpUser(email: String!, password: String!, firstName: String!, lastName: String, workspaceId: ID): ${payloadDataType}
     signOutUser(email: String!, id: ID, firstName: String, lastName: String, workspaceId: ID): OnlineUsersData
   }
   extend type Subscription {
@@ -95,7 +95,7 @@ export const userResolvers = {
         payload.set("user", await signUser(document, token, true, password))
         loaded.user = payload.get("user");
         if(loaded.user?.token) {
-          loaded.set("token", loaded.user?.token)
+          payload.set("token", loaded.user?.token)
             .set("message", await publishTopMessage(loaded.user,pubsub))
             .set("list", await publishOnlineUsers(loaded.user,UsersMap,true,pubsub))
         }
@@ -123,10 +123,7 @@ export const userResolvers = {
             .set("list", await publishOnlineUsers(loaded.user,UsersMap,true,pubsub));
         }
         payload.set("workspaces", await publishWorkspaces(pubsub))
-          .forEach(function(value, key) {
-            loaded[key] = value;
-            console.debug(key, value);
-          });
+          .forEach(function(value, key) { loaded[key] = value; });
         payload.clear();
         return loaded
       } catch (e) {

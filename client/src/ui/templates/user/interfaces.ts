@@ -1,5 +1,6 @@
 import {IUserModel} from "@appchat/data/user/interfaces";
 import {SheetPosition} from "@react-md/sheet";
+import {ID} from "graphql-ws";
 
 interface ISignInProps {
   onSubmit?: (variables: ISignInForm) => void;
@@ -30,6 +31,7 @@ interface ISignUpForm {
   password: string;
   firstName: string;
   lastName: string;
+  workspaceId: ID;
 }
 
 interface IOnlineUserSheetProps {

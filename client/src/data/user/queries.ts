@@ -22,12 +22,14 @@ const SIGN_UP = gql`
     $password: String!
     $firstName: String!
     $lastName: String
+    $workspaceId: ID
   ) {
     payload: signUpUser(
       email: $email
       password: $password
       firstName: $firstName
       lastName: $lastName
+      workspaceId: $workspaceId
     ) {
       user ${UserFields}
       list {
