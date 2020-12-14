@@ -4,7 +4,7 @@ import {UserInputError, AuthenticationError} from "@apollo/server/errors";
 import {CoreBus} from "@backchat/core/bus";
 import {ONLINE_USERS_TRIGGER} from "@backchat/core/bus/actions";
 import {UsersMap} from "@backchat/core/bus/users";
-import {publishOnlineUsers, publishTopMessage, signUser} from "@backchat/core/adapters";
+import {publishOnlineUsers, publishTopMessage, publishWorkspaces, signUser} from "@backchat/core/adapters";
 import { payloadData, payloadDataType} from "@shared/queries";
 import {ID} from "graphql-ws";
 import * as SharedConstants from "@shared/constants";
@@ -68,8 +68,8 @@ export const userResolvers = {
       return users.map(u => (u)?.toObject() );
     },
     async user(_, { id }) {
-      const user = await User.findById(id).lean({ virtuals: true });
-      return user;
+      const user = await User.findById(id);
+      return (user)?.toObject();
     },
   },
   Mutation: {
@@ -85,11 +85,23 @@ export const userResolvers = {
       return {message, user};
     },
     async signUpUser(_, data, context) {
+      const payload = new Map();const loaded = {};
       const { email, password, firstName, lastName, workspaceId} = data;
       if(!email || !password) { throw new UserInputError("Data is missing");  }
       const {token} = await context;
       try {
         const document = User.create({email, password, firstName, lastName, workspaceId});
+        payload
+          .set("user", await signUser(User.findOne({email}), token, true, password))
+          .set("token", payload.get("user")?.token)
+          .set("message", await publishTopMessage(payload.get("user"),pubsub))
+          .set("list", await publishOnlineUsers(payload.get("user"),UsersMap,true,pubsub))
+          .forEach(function(value, key) {
+            loaded[key] = value;
+            console.debug(key, value);
+          });
+
+
         const {user,code} = await signUser(document,token,true,password)
         const {message} = await publishTopMessage(user,pubsub);
         const {list} = await publishOnlineUsers(user,UsersMap,true,pubsub);
@@ -99,15 +111,20 @@ export const userResolvers = {
       }
     },
     async signInUser(_, data, context) {
-      const payload = new Map();const loaded = {};
+      const payload = new Map();const loaded any = {};
       const { email, password} = data;
       const {token} = await context;
       // if(UsersMap.get(email)) { throw new AuthenticationError("User is signed in");  }
       if(!email || !password) { throw new UserInputError("Missing sign in data");  }
       try {
-        payload.set("user", await signUser(User.findOne({email}), token, true, password)).set("token", payload.get("user")?.token);
-        payload.set("message", await publishTopMessage(payload.get("user"),pubsub))
-          .set("list", await publishOnlineUsers(payload.get("user"),UsersMap,true,pubsub))
+        payload.set("user", await signUser(User.findOne({email}), token, true, password))
+        loaded.user = payload.get("user");
+        if(loaded.user?.token) {
+          payload.set("token", loaded.user?.token);
+          payload.set("message", await publishTopMessage(payload.get("user"),pubsub))
+            .set("list", await publishOnlineUsers(payload.get("user"),UsersMap,true,pubsub));
+        }
+        payload.set("workspaces", await publishWorkspaces(pubsub))
           .forEach(function(value, key) {
             loaded[key] = value;
             console.debug(key, value);

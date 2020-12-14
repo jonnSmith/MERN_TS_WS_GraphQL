@@ -34,7 +34,7 @@ const SIGN_UP = gql`
         email
         typing
       }
-      code
+      token
       message ${MessageFields}
     }
   }
