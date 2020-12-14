@@ -85,44 +85,42 @@ export const userResolvers = {
       return {message, user};
     },
     async signUpUser(_, data, context) {
-      const payload = new Map();const loaded = {};
+      const payload = new Map();
+      const loaded:  any = {};
       const { email, password, firstName, lastName, workspaceId} = data;
       if(!email || !password) { throw new UserInputError("Data is missing");  }
-      const {token} = await context;
       try {
         const document = User.create({email, password, firstName, lastName, workspaceId});
-        payload
-          .set("user", await signUser(User.findOne({email}), token, true, password))
-          .set("token", payload.get("user")?.token)
-          .set("message", await publishTopMessage(payload.get("user"),pubsub))
-          .set("list", await publishOnlineUsers(payload.get("user"),UsersMap,true,pubsub))
-          .forEach(function(value, key) {
-            loaded[key] = value;
-            console.debug(key, value);
-          });
-
-
-        const {user,code} = await signUser(document,token,true,password)
-        const {message} = await publishTopMessage(user,pubsub);
-        const {list} = await publishOnlineUsers(user,UsersMap,true,pubsub);
-        return {user,message,code,list};
+        const {token} = await context;
+        payload.set("user", await signUser(document, token, true, password))
+        loaded.user = payload.get("user");
+        if(loaded.user?.token) {
+          loaded.set("token", loaded.user?.token)
+            .set("message", await publishTopMessage(loaded.user,pubsub))
+            .set("list", await publishOnlineUsers(loaded.user,UsersMap,true,pubsub))
+        }
+        payload.set("workspaces", await publishWorkspaces(pubsub))
+          .forEach(function(value, key) { loaded[key] = value; });
+        payload.clear();
+        return loaded
       } catch (e) {
         throw new AuthenticationError(e);
       }
     },
     async signInUser(_, data, context) {
-      const payload = new Map();const loaded any = {};
-      const { email, password} = data;
+      const payload = new Map();
+      const loaded: any = {};
+      const {email, password} = data;
       const {token} = await context;
       // if(UsersMap.get(email)) { throw new AuthenticationError("User is signed in");  }
       if(!email || !password) { throw new UserInputError("Missing sign in data");  }
       try {
         payload.set("user", await signUser(User.findOne({email}), token, true, password))
-        loaded.user = payload.get("user");
+        loaded.user = {...payload.get("user")};
         if(loaded.user?.token) {
-          payload.set("token", loaded.user?.token);
-          payload.set("message", await publishTopMessage(payload.get("user"),pubsub))
-            .set("list", await publishOnlineUsers(payload.get("user"),UsersMap,true,pubsub));
+          payload.set("token", loaded.user?.token)
+            .set("message", await publishTopMessage(loaded.user , pubsub))
+            .set("list", await publishOnlineUsers(loaded.user,UsersMap,true,pubsub));
         }
         payload.set("workspaces", await publishWorkspaces(pubsub))
           .forEach(function(value, key) {

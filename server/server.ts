@@ -80,14 +80,14 @@ useServer(
     schema, execute, subscribe, onConnect: async (ctx) => {
       const holder = new Map(); const payload = {};
       const verified: {token, id} = await WSMiddleware(ctx);
-      holder.set('token', verified.token).set("message", await publishTopMessage({email: null}, pubsub));
       if(verified.token) {
         const signed: {user, code} = await signUser(User.findById(verified?.id as ID), verified?.token, false, null) || {};
         holder.set('user', signed.user).set('token', signed.code)
           .set("message", signed.user?.email ? await publishTopMessage(signed.user, pubsub) : {})
           .set("list", signed.user?.email ? await publishOnlineUsers(signed.user, UsersMap, true, pubsub) : [])
       }
-      holder.set("workspaces", await publishWorkspaces(pubsub)).forEach(function(value, key) { payload[key] = value });
+      holder.set("workspaces", await publishWorkspaces(pubsub))
+        .forEach(function(value, key) { payload[key] = value });
       holder.clear();
       return payload;
     },
