@@ -1,71 +1,43 @@
 import {User} from "@shared/data/user";
-import {IOnlineUserData} from "@backchat/core/bus/interfaces";
 import {ACTIONS, ONLINE_USERS_TRIGGER, UPDATE_CHAT_TRIGGER, WORKSPACES_TRIGGER} from "@backchat/core/bus/actions";
 import * as jwt from "jsonwebtoken";
 import config from "@configs/config.app";
-import * as SharedModels from "@shared/models";
-import * as SharedTypes from "@shared/types";
 import * as SharedConstants from "@shared/constants";
+import {Message} from "@shared/data/message";
+import {Workspace} from "@shared/data/workspace";
+import {AuthenticationError} from "apollo-server-errors";
 
-const setWorkspace = async (args) => {
-  const {document, object} = args;
-  if(!document || !object.email) { return SharedConstants.DEFAULT_USER; }
-  const {user} = document ? { user: (await document)?.toObject() } : { user: object };
-  if(!user.email) { return SharedConstants.DEFAULT_USER; }
-  let userClone = {...user};
-  if(!userClone.workspaceId || userClone.workspace.name) {
-    return {user: userClone};
-  } else {
-    const cleanedUser: any = User.findByIdAndUpdate(userClone.id, {workspaceId: null}, {new: true});
-    const {user: cleaned} = { user: (await cleanedUser)?.toObject()};
-    userClone = cleaned.email ? {...userClone, ...cleaned} : { ...userClone, ...{workspaceId: undefined, workspace: {}} };
+const setMessageUser = async(message): Promise<any> => {
+  const updated = {...message};
+  if(updated?.userId && !updated.user?.email) {
+    const author = (await User.findById(message.userId))?.toObject();
+    updated.user = {...await setUserWorkspace(author)};
   }
-  return {user: userClone};
+  return {...updated};
 }
 
-const setMessage = async (args: {
-  document: SharedTypes.DocumentQueryType,
-  user: SharedModels.IUserModel,
-  pubsub: SharedTypes.PubSubType}) =>
-{
-  const {document, user, pubsub} = args;
-  if(!document || !user.email) { return SharedConstants.DEFAULT_MESSAGE; }
-  const message = (await document)?.toObject();
-  const messageClone = {...message};
-  if(pubsub && messageClone.id) {
-    await pubsub.publish(UPDATE_CHAT_TRIGGER, {
-      chatUpdated: {
-        message: messageClone,
-        action: ACTIONS.MESSAGE.UPDATE
-      }
-    });
-  }
-  return {message: messageClone}
-}
-
-const queryUser = async ({query}) => {
-  const {user} = { user: (await query)?.toObject() };
-  if(!user.email || !user.id) { return SharedConstants.DEFAULT_USER; }
-  return {user};
-}
-
-const setOnlineUsers = async (args) => {
-  const {user, map, online, pubsub} = args;
-  if (!user.email) {
-    return {list: []}
-  }
-  if (!online && map.get(user.email)) {
-    map.remove(user.email)
-  }
-  if (online && !map.get(user.email)) {
-    const onlineUser: IOnlineUserData = {
-      email: user.email,
-      typing: false
+const setUserWorkspace = async(user): Promise<any> => {
+  let updated = { ...user};
+  if(updated?.workspaceId && !updated.workspace?.name) {
+    const workspace = (await Workspace.findById(updated.workspaceId))?.toObject();
+    updated.workspace = {...workspace};
+    if(!updated.workspace?.name) {
+      updated = (await User.findByIdAndUpdate(user.id, {workspaceId: undefined}, {new: true}))?.toObject();
+      updated.workspace = undefined;
     }
-    map.set(onlineUser);
   }
-  console.debug('map', map.online);
-  if(pubsub) {
+  return {...updated};
+}
+
+const queryUser = async (query): Promise<any> => {
+  const user = await query;
+  return user.toObject();
+}
+
+const publishOnlineUsers = async (user, map, online, pubsub): Promise<any> => {
+  if(!user?.email) { return SharedConstants.DEFAULT_LIST }
+  const changed = online ? map.set({ email: user?.email, typing: false }) : map.remove(user?.email);
+  if(user?.email && pubsub) {
     await pubsub.publish(ONLINE_USERS_TRIGGER, {
       onlineUsers: {
         list: map.online,
@@ -73,34 +45,26 @@ const setOnlineUsers = async (args) => {
       }
     });
   }
-  return {list: map.online};
+  return [...map.online];
 }
 
-const signUser = async (args) => {
-  const {document, key, update, password} = args;
-  if(!document) { return SharedConstants.DEFAULT_USER_DATA; }
+const signUser = async (doc, token, refresh, password): Promise<any> => {
   try {
-    const entry = await document;
-    if(!entry) { return SharedConstants.DEFAULT_USER_DATA; }
+    const document = await doc;
     if(password) {
-      const match: boolean = await entry.comparePassword(password);
-      if(!match) { return SharedConstants.DEFAULT_USER_DATA; }
+      const match: boolean = await document.comparePassword(password);
+      if(!match) { throw new AuthenticationError('Password mismatch'); }
     }
-    const {user} = { user: entry.toObject() };
-    const code = user.id ? (update ? jwt.sign({id: user.id}, config.token.secret) : key) : null;
-    return {user, code};
+    const {...user} = await setUserWorkspace( await (document)?.toObject());
+    user.token = user?.id ? (refresh ? jwt.sign({id: user?.id}, config.token.secret) : token) : "";
+    return user;
   } catch (e) {
-    console.debug(e);
     return {...SharedConstants.DEFAULT_USER_DATA};
   }
 }
 
-const updateWorkspaces = async (args) => {
-  const {document,collection,pubsub} = args;
-  const entry = document ? (await document)?.toObject() : {}
-  const entries: SharedModels.IWorkspaceModel[] | undefined = collection ? (await collection)?.map(e => e.toObject()) : [];
-  const workspace = {...entry};
-  const workspaces = {...entries};
+const publishWorkspaces = async (pubsub): Promise<any> => {
+  const workspaces = (await WORKSPACES_COLLECTION)?.map((w) => w.toObject()) || [];
   if(pubsub) {
     await pubsub.publish(WORKSPACES_TRIGGER, {
       workspaceList: {
@@ -109,13 +73,35 @@ const updateWorkspaces = async (args) => {
       }
     });
   }
-  return {workspace, workspaces};
+  return workspaces;
 }
 
+const publishTopMessage = async (user, pubsub): Promise<any> => {
+  let message = (await TOP_MESSAGE)!.toObject();
+  if(message?.userId && !message?.user?.email ) {
+    message = setMessageUser(message);
+  }
+  if (user?.email && pubsub) {
+    await pubsub.publish(UPDATE_CHAT_TRIGGER, {
+      chatUpdated: {
+        ...{message},
+        action: ACTIONS.MESSAGE.UPDATE
+      }
+    });
+  }
+  return message;
+}
+
+const TOP_MESSAGE: any = Message.findOne({"userId":{$exists:true}}).sort({createdAt: -1});
+const WORKSPACES_COLLECTION: any = Workspace.find({}, {});
+
 export {
-  setWorkspace,
-  setMessage,
-  setOnlineUsers,
+  setUserWorkspace,
+  setMessageUser,
+  publishOnlineUsers,
+  publishTopMessage,
+  publishWorkspaces,
   signUser,
-  updateWorkspaces,
-  queryUser,};
+  queryUser,
+  TOP_MESSAGE,
+  WORKSPACES_COLLECTION};

@@ -1,4 +1,5 @@
 import * as mongoose from 'mongoose';
+import mongooseLeanVirtuals = require("mongoose-lean-virtuals");
 
 const messageSchema = new mongoose.Schema(
   {
@@ -16,8 +17,8 @@ const messageSchema = new mongoose.Schema(
     timestamps: { createdAt: true, updatedAt: false }
   }
 );
-
 messageSchema.set('toObject', { getters: true, virtuals: true });
+messageSchema.plugin(mongooseLeanVirtuals);
 
 const Message = mongoose.model('Message', messageSchema);
 export { Message };

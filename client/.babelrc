@@ -12,8 +12,8 @@
         "extensions": [".ts", ".tsx", ".scss", ".svg"],
         "alias": {
           "@appchat": "./src",
-          "@shared": "../../shared",
-          "@configs": "../../configs"
+          "@shared": "./../shared/*",
+          "@configs": "./../configs/*"
         }
       }
     ]

@@ -58,8 +58,8 @@ const App = () => {
 
   React.useEffect(() => {
     console.debug("load", pageIsLoaded);
-    if (!pageIsLoaded && updatingUser && updatingWS) {
-      setPageIsLoaded(updatingUser === ACTIONS.USER_UPDATED && updatingWS === ACTIONS.WORKSPACES_UPDATED);
+    if (!pageIsLoaded && updatingWS) {
+      setPageIsLoaded(updatingWS === ACTIONS.WORKSPACES_UPDATED);
     }
     return () => {};
   }, [updatingUser, updatingWS, pageIsLoaded]);

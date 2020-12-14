@@ -15,31 +15,29 @@ class WSLink extends ApolloLink {
   constructor(options: ClientOptions) {
     super();
     this.client = this.client || createClient(options);
-    this.client.on(
-      "connected",
-      (
-        socket,
-        payload: {
-          user: IUserModel,
-          message: IMessageModel,
-          list: IOnlineUserData[],
-          workspaces: IWorkspaceModel[]}) => {
-        const {user, message, list, workspaces} = payload;
-        if (user.token) {
-          CoreStore.ReduxSaga.dispatch({type: ACTIONS.USER_LOGIN, payload: {user} }); } else {
-          CoreStore.ReduxSaga.dispatch({type: ACTIONS.USER_LOGOUT, payload: {user} });
-        }
-        if (message && user.token) {
-          CoreStore.ReduxSaga.dispatch(
-            {type: ACTIONS.MESSAGE_PRELOADED, payload: { message } }
-            );
-        }
-        if (list && user.token) {
-          CoreStore.ReduxSaga.dispatch({type: ACTIONS.ONLINE_CHANGED, payload: {list}});
-        }
+    this.client.on("connected",
+      (socket, payload) => {
+        const {user, message, online, workspaces, token} = payload;
+        console.debug(payload);
         if (workspaces) {
           CoreStore.ReduxSaga.dispatch({type: ACTIONS.WORKSPACES_CHANGED, payload: {list: workspaces}});
         }
+        // const {user, message, list, workspaces, token} = payload;
+        // // if (user.email) {
+        // //   CoreStore.ReduxSaga.dispatch({type: ACTIONS.USER_LOGIN, payload: {user} }); } else {
+        // //   CoreStore.ReduxSaga.dispatch({type: ACTIONS.USER_LOGOUT, payload: {user} });
+        // // }
+        // if (message && user.email) {
+        //   CoreStore.ReduxSaga.dispatch(
+        //     {type: ACTIONS.MESSAGE_PRELOADED, payload: { message } }
+        //     );
+        // }
+        // if (list && user.email) {
+        //   CoreStore.ReduxSaga.dispatch({type: ACTIONS.ONLINE_CHANGED, payload: {list}});
+        // }
+        // if (workspaces) {
+        //   CoreStore.ReduxSaga.dispatch({type: ACTIONS.WORKSPACES_CHANGED, payload: {list: workspaces}});
+        // }
     });
     // this.client.on("closed", (event) => {
     //   CoreStore.ReduxSaga.dispatch({type: ACTIONS.USER_LOGOUT, payload: {user: null} });

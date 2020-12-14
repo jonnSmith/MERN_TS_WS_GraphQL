@@ -1,3 +1,5 @@
+import {PayloadEmptyHolder} from "../client/src/data/user/constants";
+
 const tSModuleAlias = require("@momothepug/tsmodule-alias");
 const aliasRegister = tSModuleAlias.use({
   "@backchat": __dirname + "/src/",
@@ -18,17 +20,12 @@ import {Server as WSS} from "ws";
 import {useServer} from "graphql-ws/lib/use/ws";
 import {UsersMap} from "@backchat/core/bus/users";
 import {CoreBus} from "@backchat/core/bus";
-import {Workspace} from "@shared/data/workspace";
 import {
-  signUser,
-  updateWorkspaces,
-  setMessage,
-  setOnlineUsers,
+  signUser, publishWorkspaces, publishOnlineUsers, publishTopMessage,
 } from "@backchat/core/adapters";
 import {PubSubEngine} from "graphql-subscriptions";
-import {Message} from "@shared/data/message";
-import * as SharedConstants from "@shared/constants";
-import * as SharedTypes from "@shared/types";
+import {User} from "../shared/data/user";
+import {ID} from "graphql-ws";
 
 const schema = makeExecutableSchema(ExecutableSchema);
 const mongoose = require("mongoose");
@@ -54,7 +51,7 @@ mongoose.connect(
 //   });
 // } else {
 
-const PubSub: PubSubEngine = CoreBus.pubsub;
+const pubsub: PubSubEngine = CoreBus.pubsub;
 
 const app = express();
 const session = require("express-session");
@@ -80,45 +77,29 @@ const wss = new WSS({
 
 useServer(
   {
-    schema,
-    execute,
-    subscribe,
-    onConnect: async (ctx) => {
-      const {document, key, id} = await WSMiddleware(ctx);
-
-      const collection = Workspace.find({}, {});
-      const {workspaces} = await updateWorkspaces({ document: null, collection, pubsub: PubSub});
-
-      const {user, code} = (document && key) ? await signUser({document, key, update: true, pubsub: undefined}) : SharedConstants.DEFAULT_USER_DATA;
-      if(id !== user.id) { return { ...{workspaces}, ...SharedConstants.DEFAULT_USER_DATA, ...SharedConstants.DEFAULT_LIST, ...SharedConstants.DEFAULT_MESSAGE} }
-
-      const {list} = user.email ? await setOnlineUsers({user, map: UsersMap, online: true, pubsub: PubSub}) : SharedConstants.DEFAULT_LIST;
-      const messageDocument: SharedTypes.DocumentQueryType = Message.findOne({}).sort({createdAt: -1});
-      const {message} = user.email ? await setMessage({document: messageDocument, user, pubsub: undefined}) : SharedConstants.DEFAULT_MESSAGE;
-
-      return {
-        user,
-        message,
-        list,
-        workspaces
-      };
-    },
-    onSubscribe: async (ctx, message) => {
-      const {document, key} = await WSMiddleware(ctx);
-      const {user, code} = await signUser({document, key, online: false, pubsub: undefined});
-      if(!code || !user.id) { return; }
-
-      if (message?.payload?.operationName === "onlineUsers") {
-        const {list} = user.email ? await setOnlineUsers({user, map: UsersMap, online: true, pubsub: PubSub}) : { list: [] };
+    schema, execute, subscribe, onConnect: async (ctx) => {
+      const payload = new Map(); const loaded = {};
+      const verified: {token, id} = await WSMiddleware(ctx)  || {};
+      payload.set("token", verified.token).set("message", await publishTopMessage({email: null}, pubsub));
+      if(verified.token) {
+        const signed: {user, code} = await signUser(User.findById(verified.id as ID), verified.token, false, null) || {};
+        payload.set("user", signed.user).set("token", signed.code)
+          .set("message", signed.user?.email ? await publishTopMessage(signed.user, pubsub) : {})
+          .set("list", signed.user?.email ? await publishOnlineUsers(signed.user, UsersMap, true, pubsub) : [])
       }
+      payload.set("workspaces", await publishWorkspaces(pubsub)).forEach(function(value, key) { loaded[key] = value });
+      payload.clear();
+      return loaded;
+    },
+    // TODO: Socket middlewares
+    onSubscribe: async (ctx, message) => {
+      // TODO: add only light and cheep middleware - many calls on load and after
     },
     onNext: async (ctx) => {
-      // const {user} = await WSMiddleware(ctx);
-      // console.debug("next");
-      // TODO: resolve WS Cluster problem through process/worker bus
+      // TODO: middleware for every socket operation
     },
     onError: async (ctx, message) => {
-      // TODO: add acceptable debugger
+      // TODO: catch and process errors middleware
       console.error("error", message);
     },
     onComplete: async (ctx) => {

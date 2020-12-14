@@ -6,6 +6,8 @@ import {User} from "@shared/data/user";
 import {Workspace} from "@shared/data/workspace";
 import {Message} from "@shared/data/message";
 import {ACTIONS, UPDATE_CHAT_TRIGGER} from "@backchat/core/bus/actions";
+import {ID} from "graphql-ws";
+import {TOP_MESSAGE} from "../../core/adapters";
 
 export const messageTypeDefs = `
 
@@ -72,7 +74,7 @@ export const messageResolvers = {
     deleteMessage: async (_, { id }, context) => {
       try {
         const message: any = await Message.findByIdAndRemove(id);
-        const updated: any= await Message.findOne({}).sort({createdAt: -1});
+        const updated: any= await TOP_MESSAGE;
         await PubSub.publish(UPDATE_CHAT_TRIGGER, {chatUpdated: { message: updated, action: ACTIONS.MESSAGE.DELETE}});
         return message.toObject();
       } catch(e) {
@@ -86,14 +88,14 @@ export const messageResolvers = {
     }
   },
   Message: {
-    async user(message: { userId: string }) {
+    async user(message: { userId: ID }) {
       if (message.userId) {
         const user: any = await User.findById(message.userId);
         return user.toObject();
       }
       return {};
     },
-    async workspace(message: { workspaceId: string }) {
+    async workspace(message: { workspaceId: ID }) {
       if (message.workspaceId) {
         const workspace: any = await Workspace.findById(message.workspaceId);
         return workspace.toObject();

@@ -5,12 +5,12 @@ import {Switch} from "react-router-dom";
 
 const RouterSwitch = (props: ISwitchRouterProps) => {
   const { user } = props;
-  const [routes, setRoutes] = React.useState(CoreNavigation.pages(!!user?.token));
+  const [routes, setRoutes] = React.useState(CoreNavigation.pages(!!user?.email));
   React.useEffect(() => {
-    setRoutes(CoreNavigation.pages(!!user?.token));
+    setRoutes(CoreNavigation.pages(!!user?.email));
     // console.debug("navs", CoreNavigation.navs(!!user?.token));
     return () => {};
-  }, [user?.token]);
+  }, [user?.email]);
 
   return <Switch>
     {routes}

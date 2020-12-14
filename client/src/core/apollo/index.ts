@@ -15,10 +15,7 @@ import {ErrorResponse, onError} from "@apollo/client/link/error";
 import {getMainDefinition} from "@apollo/client/utilities";
 import {WSLink} from "@appchat/core/apollo/wslink";
 import {ConfigSettings} from "@appchat/core/config";
-import {CoreStore} from "@appchat/core/store";
-import {ACTIONS} from "@appchat/core/store/constants";
 import {ClientStorage} from "@appchat/core/store/storage";
-import {UserInitState} from "@appchat/data/user/constants";
 import {History} from "history";
 
 class ApolloConnection {
@@ -111,7 +108,8 @@ class ApolloConnection {
           switch (extensions?.code) {
             case "UNAUTHENTICATED": {
               console.debug("graphQLError", message);
-              CoreStore.ReduxSaga.dispatch({type: ACTIONS.USER_LOGOUT, payload: UserInitState});
+              // TODO: Revert comment logout call on authentication all errors
+              // CoreStore.ReduxSaga.dispatch({type: ACTIONS.USER_LOGOUT, payload: UserInitState});
               // if (response && response.errors) { response.errors = null; }
               break;
             }

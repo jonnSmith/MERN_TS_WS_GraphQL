@@ -26,6 +26,11 @@ const onlineUserFields = `{
   typing
 }`;
 
+const onlineUserData = `{
+  action
+  list ${onlineUserFields}
+}`;
+
 const payloadDataFields = `{
   user ${userFields}
   list ${onlineUserFields}
@@ -38,7 +43,7 @@ const payloadDataType = `ResponseData`;
 const payloadData = `type ${payloadDataType} {
   user: User
   list: [OnlineUser]
-  code: String
+  token: String
   message: Message
 }`;
 
@@ -49,5 +54,6 @@ export {
   onlineUserFields,
   payloadData,
   payloadDataFields,
-  payloadDataType
+  payloadDataType,
+  onlineUserData
 };

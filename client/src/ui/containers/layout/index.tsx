@@ -11,13 +11,13 @@ const LayoutContainer = (props: IContainerLayoutProps): React.ReactElement => {
   const {children, user} = props;
   const {pathname} = useLocation();
 
-  const [navs, setNavs] = React.useState(CoreNavigation.navs(!!user?.token));
+  const [navs, setNavs] = React.useState(CoreNavigation.navs(!!user?.email));
 
   React.useEffect(() => {
-    setNavs(CoreNavigation.navs(!!user?.token));
+    setNavs(CoreNavigation.navs(!!user?.email));
     // console.debug("navs", CoreNavigation.navs(!!user?.token));
     return () => {};
-  }, [user?.token]);
+  }, [user?.email]);
 
   return <Configuration disableRipple={true} disableProgrammaticRipple={true}>
     <Layout
@@ -31,7 +31,7 @@ const LayoutContainer = (props: IContainerLayoutProps): React.ReactElement => {
     >
       {children}
     </Layout>
-    {!!user?.token && <UserOnlineSheet position={"right"} />}
+    {!!user?.email && <UserOnlineSheet position={"right"} />}
   </Configuration >;
 };
 

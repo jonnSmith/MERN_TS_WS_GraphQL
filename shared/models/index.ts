@@ -1,3 +1,5 @@
+import {JsonWebTokenError} from "jsonwebtoken";
+
 interface IMessageModel {
   id?: string | null;
   text?: string | null;
@@ -22,4 +24,27 @@ interface IWorkspaceModel {
   rating?: number | null;
 }
 
-export {IUserModel, IWorkspaceModel, IMessageModel}
+interface IOnlineUserData {
+  email: string | null;
+  typing: boolean | null;
+}
+
+interface IPayloadData {
+  user: IUserModel;
+  list: IOnlineUserData[];
+  message: IMessageModel;
+  code: string | undefined | null;
+}
+
+interface IPayloadObject {
+  payload: IPayloadData;
+}
+
+export {
+  IUserModel,
+  IWorkspaceModel,
+  IMessageModel,
+  IPayloadData,
+  IOnlineUserData,
+  IPayloadObject
+};

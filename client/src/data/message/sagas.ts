@@ -5,14 +5,16 @@ import {put, takeLatest} from "redux-saga/effects";
 import {Map} from "typescript";
 
 function* messagesChanged() {
-  yield takeLatest([ACTIONS.MESSAGE_UPDATED, ACTIONS.MESSAGE_DELETED, ACTIONS.MESSAGE_ADDED], updateMessages);
+  yield takeLatest([
+    ACTIONS.MESSAGE_UPDATED,
+    ACTIONS.MESSAGE_DELETED,
+    ACTIONS.MESSAGE_ADDED,
+    ACTIONS.MESSAGE_PRELOADED], updateMessages);
 }
 
 function* updateMessages(action: ICommonAction) {
   console.debug("message-saga", action);
   const {message} = action?.payload;
-  const messages = new Map();
-  messages.set(message.id, message);
   const data = {
     action: ACTIONS.MESSAGES_UPDATED,
     message,

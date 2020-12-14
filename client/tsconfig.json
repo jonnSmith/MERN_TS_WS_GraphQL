@@ -8,11 +8,11 @@
     "strict": false,
     "sourceMap": true,
     "target": "es6",
-    "baseUrl": "./",
+    "baseUrl": "../",
     "paths": {
-      "@appchat/*": ["src/*/index", "src/*"],
-      "@shared/*": ["./../shared/*", "./../shared/*/index"],
-      "@configs/*": ["./../configs/*", "./../configs/*/index"]
+      "@appchat/*": ["client/src/*/index", "client/src/*"],
+      "@configs/*": ["configs/*/index", "configs/*"],
+      "@shared/*": ["shared/*/index", "shared/src/*"]
     },
     "lib": ["es6", "es5", "dom"],
     "types": ["node"],

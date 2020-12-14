@@ -1,5 +1,6 @@
 import * as bcrypt from 'bcryptjs';
 import * as mongoose from 'mongoose';
+import mongooseLeanVirtuals = require("mongoose-lean-virtuals");
 
 const userSchema = new mongoose.Schema({
   workspaceId: {
@@ -25,6 +26,7 @@ const userSchema = new mongoose.Schema({
 });
 
 userSchema.set('toObject', { getters: true, virtuals: true });
+userSchema.plugin(mongooseLeanVirtuals);
 
 userSchema.pre('save', function preSave(this: any, next: () => {}) {
   if (!this.isModified('password')) {

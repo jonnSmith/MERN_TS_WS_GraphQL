@@ -8,8 +8,8 @@ const userLogin = (data: IUserReducer): ICommonAction => ({
     type: ACTIONS.USER_LOGIN,
 });
 
-const userLogout = (): ICommonAction => ({
-    payload: UserInitState,
+const userLogout = (data: IUserReducer): ICommonAction => ({
+    payload: data,
     type: ACTIONS.USER_LOGOUT,
 });
 

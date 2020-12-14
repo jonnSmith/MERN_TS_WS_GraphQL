@@ -60,6 +60,11 @@ export default {
         WORKSPACE_DELETED: "Delete workspace",
         WORKSPACES_CHANGED: "Workspaces list changed",
         WORKSPACES_UPDATED: "Workspaces list updated"
+      },
+      payload: {
+        HANDLE_PAYLOAD: "Handle payload data from GraphQL response",
+        PROCESS_PAYLOAD: "Data processing payload data",
+        SEND_PAYLOAD: "Send payload processed separately",
       }
     },
   },

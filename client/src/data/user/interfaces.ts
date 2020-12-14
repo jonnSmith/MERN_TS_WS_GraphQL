@@ -19,6 +19,7 @@ interface IOnlineUserData {
 interface IUserReducer {
   action?: ActionTypes | null;
   user?: IUserModel | null;
+  token?: string | null | undefined;
 }
 
 interface IOnlineUserListReducer {

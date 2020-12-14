@@ -15,7 +15,7 @@ const UserInitState: IUserReducer = {
   user: UserInitObject
 };
 
-const UserEmptyHolder: any = {
+const PayloadEmptyHolder: any = {
   payload: {
     code: undefined,
     list: [],
@@ -58,7 +58,7 @@ const UserFields = `{
 export {
   UserInitState,
   UserInitObject,
-  UserEmptyHolder,
+  PayloadEmptyHolder,
   OnlineUserListInitState,
   UserFields,
   OnlineTogglePanelInitState

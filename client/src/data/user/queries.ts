@@ -10,7 +10,7 @@ const SIGN_IN = gql`
         email
         typing
       }
-      code
+      token
       message ${MessageFields}
     }
   }
@@ -23,12 +23,20 @@ const SIGN_UP = gql`
     $firstName: String!
     $lastName: String
   ) {
-    user: signUpUser(
+    payload: signUpUser(
       email: $email
       password: $password
       firstName: $firstName
       lastName: $lastName
-    ) ${UserFields}
+    ) {
+      user ${UserFields}
+      list {
+        email
+        typing
+      }
+      code
+      message ${MessageFields}
+    }
   }
 `;
 

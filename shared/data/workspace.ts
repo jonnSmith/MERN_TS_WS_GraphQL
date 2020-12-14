@@ -1,4 +1,5 @@
 import * as mongoose from 'mongoose';
+import mongooseLeanVirtuals = require("mongoose-lean-virtuals");
 
 const workspaceSchema = new mongoose.Schema({
   name: {
@@ -11,6 +12,7 @@ const workspaceSchema = new mongoose.Schema({
 });
 
 workspaceSchema.set('toObject', { getters: true, virtuals: true });
+workspaceSchema.plugin(mongooseLeanVirtuals);
 
 const Workspace = mongoose.model('Workspace', workspaceSchema);
 export {Workspace};
