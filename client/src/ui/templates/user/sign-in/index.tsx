@@ -1,61 +1,81 @@
+import {ConfigSettings} from "@appchat/core/config";
 import {SignInFormInitialObject} from "@appchat/ui/templates/user/constants";
-import {ISignInProps} from "@appchat/ui/templates/user/interfaces";
+import {ISignInForm, ISignInProps} from "@appchat/ui/templates/user/interfaces";
 import {checkFields} from "@appchat/ui/transformers";
 import {Divider} from "@react-md/divider";
+import {
+  CircularProgress,
+  getProgressA11y,
+  LinearProgress,
+} from "@react-md/progress";
 import * as React from "react";
-import {Button, CardActions, Password, TextField} from "react-md";
+import {FormEvent, useEffect, useState} from "react";
+import {Button, CardActions, FontIcon, Form, Password, TextField, TextIconSpacing} from "react-md";
 import {CSSTransitionClassNames} from "react-transition-group/CSSTransition";
+import {useDebouncedCallback} from "use-debounce";
 
 const UserSignIn = (props: ISignInProps) => {
   const {onSubmit} = props;
-  const [SignInForm, updateSignInForm] = React.useState(SignInFormInitialObject);
+  const [sending, toggleSending] = useState(false);
 
-  const sendSignInForm = (event: React.FormEvent) => {
-    onSubmit(SignInForm);
+  const sendSignInForm = (el: HTMLFormControlsCollection) => {
+    Object.keys(SignInFormInitialObject).forEach( (k) => {
+      SignInFormInitialObject[k as keyof ISignInForm] = (el.namedItem(k) as HTMLInputElement).value;
+    });
+    onSubmit(SignInFormInitialObject).then(() => {
+      toggleSending(false);
+    });
   };
 
-  return <form onSubmit={(event) => {
-    event.preventDefault();
-    sendSignInForm(event);
-  }}>
+  const debounced = useDebouncedCallback(sendSignInForm, ConfigSettings.client.form.debounce.form);
+  useEffect(() => () => {
+    debounced.flush();
+  }, [debounced]);
+
+  return <Form
+    onSubmit={
+      (e: FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        toggleSending(true);
+        debounced.callback(e.currentTarget.elements);
+      }}>
     <TextField
+      readOnly={sending}
       required={true}
       id="email"
       name="email"
       type="email"
       label="Email or Username"
-      value={SignInForm.email}
-      onChange={(event: React.ChangeEvent<any>) => {
-        updateSignInForm(
-          {...SignInForm, ...{email: event.currentTarget.value}});
-      }}
     />
     <Divider/>
     <Password
+      readOnly={sending}
       required={true}
       id="password"
       name="password"
       label="Password"
-      value={SignInForm.password}
-      onChange={(event: React.ChangeEvent<any>) => {
-        updateSignInForm({...SignInForm, ...{password: event.currentTarget.value}});
-      }}
     />
     <Divider/>
     <CardActions className="md-cell md-cell--12">
       <Button
+        disabled={sending}
         theme={"secondary"}
         themeType={"contained"}
         type="submit"
         disableProgrammaticRipple
         disableRipple
         rippleTimeout={0}
-        rippleClassNames={"appear" as CSSTransitionClassNames}
-        disabled={checkFields(SignInForm)}>
-        Sign In
-      </Button>
+        children={
+          <TextIconSpacing
+            children={sending ? `Sending` : `Sign in`}
+            iconAfter={false}
+            icon={sending ?
+              <CircularProgress id="loading-sign-in" style={{marginRight: "10px"}}/> :
+              <FontIcon style={{width: "24px"}}>done</FontIcon>
+            }/>}
+        rippleClassNames={"appear" as CSSTransitionClassNames}/>
     </CardActions>
-  </form>;
+  </Form>;
 };
 
 export {UserSignIn};

@@ -8,24 +8,18 @@ import * as React from "react";
 import {useDispatch} from "react-redux";
 
 const SignIn = () => {
-  const [signIn, {data, loading}] = useMutation(SIGN_IN);
+  const [signIn] = useMutation(SIGN_IN);
   const dispatch = useDispatch();
 
   const LoginUser = async (variables: ISignInForm) => {
-    await signIn({variables});
+    const result = await signIn({variables});
+    console.debug("data", result);
+    return true;
   };
-
-  React.useEffect(() => {
-    if (data && !loading) {
-      console.debug("data", data);
-      // dispatch({type: ACTIONS.HANDLE_PAYLOAD, payload: data?.payload});
-    }
-    return () => {};
-  }, [data && loading]);
 
   return (
     <ContainerPage title="Sign in" className="sign-in">
-      <UserSignIn onSubmit={ async (variables: ISignInForm) => { await LoginUser(variables); }}/>
+      <UserSignIn onSubmit={LoginUser}/>
     </ContainerPage>);
 };
 

@@ -3,7 +3,7 @@ import {SheetPosition} from "@react-md/sheet";
 import {ID} from "graphql-ws";
 
 interface ISignInProps {
-  onSubmit?: (variables: ISignInForm) => void;
+  onSubmit?: (variables: ISignInForm) => Promise<boolean>;
 }
 
 interface ISignInForm {
@@ -12,7 +12,7 @@ interface ISignInForm {
 }
 
 interface ISignUpProps {
-  onSubmit?: (variables: ISignUpForm) => void;
+  onSubmit?: (variables: ISignInForm) => Promise<boolean>;
 }
 
 interface IUpdateForm {

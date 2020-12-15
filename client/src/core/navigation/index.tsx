@@ -47,7 +47,7 @@ class CoreNavigation {
         label={item.label}
         id={item.id}
         payload={item.payload} />;
-      NavItem.contentComponent = Text,
+      NavItem.contentComponent = Text;
       NavItem.leftAddon = (<FontIcon>{item.icon}</FontIcon>);
       NavItem.itemId = `${item.id.toLowerCase()}`;
       NavItem.parentId = null;

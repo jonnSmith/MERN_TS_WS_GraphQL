@@ -36,6 +36,12 @@ export default {
     theme: {
       color: "blue-green"
     },
+    form: {
+      debounce: {
+        value: 100,
+        form: 1000
+      }
+    },
     actions: {
       messages: {
         MESSAGES_UPDATED: "Update messages stream",

@@ -1,54 +1,56 @@
+import {ConfigSettings} from "@appchat/core/config";
 import {StateReturnTypes} from "@appchat/core/store/types";
-import {SignUpFormInitialObject} from "@appchat/ui/templates/user/constants";
-import {ISignUpProps} from "@appchat/ui/templates/user/interfaces";
+import {SignInFormInitialObject, SignUpFormInitialObject} from "@appchat/ui/templates/user/constants";
+import {ISignInForm, ISignUpForm, ISignUpProps} from "@appchat/ui/templates/user/interfaces";
 import {checkFields} from "@appchat/ui/transformers";
 import {Avatar} from "@react-md/avatar";
 import {Divider} from "@react-md/divider";
 import {Select} from "@react-md/form";
+import {CircularProgress} from "@react-md/progress";
 import * as React from "react";
-import {useEffect} from "react";
-import {Button, CardActions, Password, TextField} from "react-md";
+import {FormEvent, useEffect, useState} from "react";
+import {Button, CardActions, FontIcon, Password, TextField, TextIconSpacing} from "react-md";
 import PasswordStrengthBar from "react-password-strength-bar";
 import {useSelector} from "react-redux";
 import {CSSTransitionClassNames} from "react-transition-group/CSSTransition";
-import { useDebouncedCallback } from "use-debounce";
+import { useDebounce, useDebouncedCallback } from "use-debounce";
 
 const UserSignUp = (props: ISignUpProps) => {
+  const [sending, toggleSending] = useState(false);
+  const [passwordState, setPassword] = useState("");
+  const [workspaceIdState, setWorkspaceId] = useState("");
+  const [password] = useDebounce(passwordState, ConfigSettings.client.form.debounce.value);
+  const [workspace] = useDebounce(workspaceIdState, ConfigSettings.client.form.debounce.value);
 
   const {onSubmit} = props;
-
-  const [SignUpForm, updateSignUpForm] = React.useState(SignUpFormInitialObject);
-
-  const sendSignUpForm = (event: React.FormEvent) => {
-    event.preventDefault();
-    onSubmit(SignUpForm);
+  const sendSignUpForm = (el: HTMLFormControlsCollection) => {
+    Object.keys(SignUpFormInitialObject).forEach( (k) => {
+       SignUpFormInitialObject[k as keyof ISignUpForm] = (
+          el.namedItem(k) as HTMLInputElement || el.namedItem(`${k}-value`) as HTMLInputElement).value;
+      });
+    onSubmit(SignUpFormInitialObject).then(() => {
+        toggleSending(false);
+      });
   };
-
-  const debounced = useDebouncedCallback( (value) => { updateSignUpForm(value); }, 10 );
-  useEffect(() => () => { debounced.flush(); }, [debounced]);
+  const debounced = useDebouncedCallback(sendSignUpForm, ConfigSettings.client.form.debounce.form);
+  useEffect(() => () => {
+    debounced.flush();
+  }, [debounced]);
 
   const workspacesOptions = useSelector((state: StateReturnTypes) => state.WorkspaceReducer.list);
 
-  useEffect(() => {
-    if (workspacesOptions.length && !SignUpForm.workspaceId) {
-      debounced.callback( {...SignUpForm, ...{workspaceId: workspacesOptions[0]?.id}});
-    }
-  }, [workspacesOptions]);
-
-  return (<form onSubmit={(event: React.FormEvent) => {
-      event.preventDefault();
-      sendSignUpForm(event);
-    }}>
+  return (<form onSubmit={(e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    toggleSending(true);
+    debounced.callback(e.currentTarget.elements);
+  }}>
     <TextField
       id="email"
       name="email"
-      value={SignUpForm.email}
-      onChange={(event: React.ChangeEvent<any>) => {
-        debounced.callback({...SignUpForm, ...{email: event.currentTarget.value}});
-      }}
       type="email"
       label="Email or Username"
       required={true}
+      readOnly={sending}
     />
     <Divider />
     <Password
@@ -56,58 +58,60 @@ const UserSignUp = (props: ISignUpProps) => {
       name="password"
       label="Password"
       required={true}
-      value={SignUpForm.password}
-      onChange={(event: React.ChangeEvent<any>) =>
-        debounced.callback({...SignUpForm, ...{password: event.currentTarget.value}})}
+      readOnly={sending}
+      value={passwordState}
+      onChange={(event: React.ChangeEvent<any>) => setPassword(event.currentTarget.value)}
     />
-    <PasswordStrengthBar password={SignUpForm.password} />
+    <PasswordStrengthBar password={password} />
     <TextField
       id="firstName"
       name="firstName"
-      value={SignUpForm.firstName}
-      onChange={(event: React.ChangeEvent<any>) =>
-        debounced.callback({...SignUpForm, ...{firstName: event.currentTarget.value}})}
       type="text"
       label="First Name"
+      readOnly={sending}
       required={true}
     />
     <Divider />
     <TextField
       id="lastName"
       name="lastName"
+      readOnly={sending}
       required={true}
-      value={SignUpForm.lastName}
-      onChange={
-        (event: React.ChangeEvent<any>) =>
-          debounced.callback({...SignUpForm, ...{lastName: event.currentTarget.value}})}
       type="text"
       label="Last Name"
     />
     <Divider />
     <Select
-      id="custom-select-1"
+      id="workspaceId"
+      readOnly={sending}
       options={workspacesOptions}
+      defaultChecked={true}
       labelKey="name"
       valueKey="id"
-      value={SignUpForm.workspaceId}
+      value={workspace}
       label="Start in workspace:"
       onChange={
-        (nextValue ) => { debounced.callback( {...SignUpForm, ...{workspaceId: nextValue}}); }
+        (nextValue ) => { setWorkspaceId(nextValue); }
       }
       disableMovementChange={true}/>
     <CardActions>
       <Button
-        disableProgrammaticRipple
-        disableRipple
-        rippleTimeout={0}
-        rippleClassNames={"appear" as CSSTransitionClassNames}
+        disabled={sending}
         theme={"secondary"}
         themeType={"contained"}
         type="submit"
-        disabled={checkFields(SignUpForm)}
-      >
-        Sign Up
-      </Button>
+        disableProgrammaticRipple
+        disableRipple
+        rippleTimeout={0}
+        children={
+          <TextIconSpacing
+            children={sending ? `Sending` : `Sign up`}
+            iconAfter={false}
+            icon={sending ?
+              <CircularProgress id="loading-sign-up" style={{marginRight: "10px"}}/> :
+              <FontIcon style={{width: "24px"}}>done</FontIcon>
+            }/>}
+        rippleClassNames={"appear" as CSSTransitionClassNames}/>
     </CardActions>
   </form>);
 };
