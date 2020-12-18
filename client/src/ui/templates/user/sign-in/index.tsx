@@ -25,8 +25,13 @@ const UserSignIn = (props: ISignInProps) => {
     Object.keys(SignInFormInitialObject).forEach( (k) => {
       SignInFormInitialObject[k as keyof ISignInForm] = (el.namedItem(k) as HTMLInputElement).value;
     });
+    // signIn({variables: SignInFormInitialObject}).then(({data}) => {
+    //   dispatch({type: ACTIONS.HANDLE_PAYLOAD, payload: data?.payload});
+    //   disable();
+    // });
     onSubmit(SignInFormInitialObject).then(() => {
-      disable();
+      // TODO: React state update on an unmounted component.
+      // disable();
     });
   };
 
