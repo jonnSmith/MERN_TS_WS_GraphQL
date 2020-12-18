@@ -81,7 +81,7 @@ export const userResolvers = {
         .findByIdAndUpdate(uid, {firstName, lastName, workspaceId}, {new: true})
         .lean({ virtuals: true });
 
-      const {message} = await publishTopMessage(pubsub, user);
+      const {message} = await publishTopMessage(pubsub);
       return {message, user};
     },
     async signUpUser(_, data, context) {
@@ -96,7 +96,7 @@ export const userResolvers = {
         loaded.user = payload.get("user");
         if(loaded.user?.token) {
           payload.set("token", loaded.user?.token)
-            .set("message", await publishTopMessage(loaded.user, null))
+            .set("message", await publishTopMessage(null))
             .set("list", await publishOnlineUsers(loaded.user,UsersMap,true, pubsub))
         }
         payload.set("workspaces", await publishWorkspaces(null))
@@ -120,7 +120,7 @@ export const userResolvers = {
         loaded.user = {...payload.get("user")};
         if(loaded.user?.token) {
           payload.set("token", loaded.user?.token)
-            .set("message", await publishTopMessage(loaded.user , null))
+            .set("message", await publishTopMessage(null))
             .set("list", await publishOnlineUsers(loaded.user,UsersMap,true,pubsub));
         }
         payload.set("workspaces", await publishWorkspaces(null))
@@ -133,7 +133,7 @@ export const userResolvers = {
     },
     async signOutUser(_, data, context) {
       const user = {...data};
-      const {token,id} = await context;
+      const {token, id} = await context;
       if(!user?.email) { throw new AuthenticationError("Missing logout data"); }
       const {list} = await publishOnlineUsers(user, UsersMap,false, pubsub);
       return {list};

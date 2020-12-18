@@ -89,7 +89,7 @@ useServer(
           holder.set('token', clone?.token);
           clone.token = undefined;
           holder.set('user', clone)
-            .set("message", await publishTopMessage(clone, null))
+            .set("message", await publishTopMessage(null))
             .set("list", await publishOnlineUsers(clone, UsersMap, true, pubsub))
         }
       }

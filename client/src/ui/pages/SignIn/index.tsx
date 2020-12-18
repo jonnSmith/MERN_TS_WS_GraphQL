@@ -15,7 +15,7 @@ const SignIn = () => {
   const LoginUser = async (variables: ISignInForm) => {
     const {data} = await signIn({variables});
     await dispatch({type: ACTIONS.HANDLE_PAYLOAD, payload: data?.payload});
-    return true;
+    return !!data?.payload.token;
   };
 
   return (

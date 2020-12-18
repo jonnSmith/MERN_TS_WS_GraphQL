@@ -76,12 +76,12 @@ const publishWorkspaces = async (pubsub): Promise<any> => {
   return workspaces;
 }
 
-const publishTopMessage = async (user, pubsub): Promise<any> => {
-  let message = (await TOP_MESSAGE)!.toObject();
+const publishMessage = async (document, pubsub): Promise<any> => {
+  let message = (await document)!.toObject();
   if(message?.userId && !message?.user?.email ) {
     message = setMessageUser(message);
   }
-  if (user?.email && pubsub) {
+  if (pubsub) {
     await pubsub.publish(UPDATE_CHAT_TRIGGER, {
       chatUpdated: {
         ...{message},
@@ -92,6 +92,10 @@ const publishTopMessage = async (user, pubsub): Promise<any> => {
   return message;
 }
 
+const publishTopMessage = async (pubsub): Promise<any> => {
+  return publishMessage(TOP_MESSAGE, pubsub);
+}
+
 const TOP_MESSAGE: any = Message.findOne({"userId":{$exists:true}}).sort({createdAt: -1});
 const WORKSPACES_COLLECTION: any = Workspace.find({}, {});
 
@@ -100,6 +104,7 @@ export {
   setMessageUser,
   publishOnlineUsers,
   publishTopMessage,
+  publishMessage,
   publishWorkspaces,
   signUser,
   queryUser,

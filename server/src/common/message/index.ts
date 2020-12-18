@@ -7,7 +7,7 @@ import {Workspace} from "@shared/data/workspace";
 import {Message} from "@shared/data/message";
 import {ACTIONS, UPDATE_CHAT_TRIGGER} from "@backchat/core/bus/actions";
 import {ID} from "graphql-ws";
-import {TOP_MESSAGE} from "../../core/adapters";
+import {publishMessage, publishTopMessage, TOP_MESSAGE} from "../../core/adapters";
 
 export const messageTypeDefs = `
 
@@ -58,13 +58,12 @@ export const messageResolvers = {
   Mutation: {
     createMessage: async (_, { text }, context) => {
       try {
-        const { user } = await context;
-        const message: any = await Message.create({
+        const { id } = await context;
+        const document: any = Message.create({
           text,
-          userId: user?.id,
+          userId: id,
         });
-        await PubSub.publish(UPDATE_CHAT_TRIGGER, {chatUpdated: { ...{message, ...{user}}, action: ACTIONS.MESSAGE.CREATE}});
-        return message.toObject();
+        return publishMessage(document, PubSub);
       }
       catch(e) {
         console.debug(e);
@@ -74,9 +73,7 @@ export const messageResolvers = {
     deleteMessage: async (_, { id }, context) => {
       try {
         const message: any = await Message.findByIdAndRemove(id);
-        const updated: any= await TOP_MESSAGE;
-        await PubSub.publish(UPDATE_CHAT_TRIGGER, {chatUpdated: { message: updated, action: ACTIONS.MESSAGE.DELETE}});
-        return message.toObject();
+        return publishTopMessage(PubSub);
       } catch(e) {
         throw new ForbiddenError("Message forbidden to delete.");
       }
