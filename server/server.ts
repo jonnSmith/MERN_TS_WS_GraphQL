@@ -80,15 +80,17 @@ useServer(
     schema, execute, subscribe, onConnect: async (ctx) => {
       const holder = new Map(); const payload = {};
       const verified: {token, id} = await WSMiddleware(ctx);
+      console.debug('verified', verified);
       if(verified.token) {
-        const {user} = await signUser(User.findById(verified?.id as ID), verified?.token, false, null) || {};
+        const user = await signUser(User.findById(verified?.id as ID), verified?.token, false, null);
+        console.debug('user', user);
         if(user?.email && user?.token) {
           const clone = {...user};
-          holder.set('token', user?.token);
-          user.token = undefined;
-          holder.set('user', user)
-            .set("message", await publishTopMessage(user, null))
-            .set("list", await publishOnlineUsers(user, UsersMap, true, pubsub))
+          holder.set('token', clone?.token);
+          clone.token = undefined;
+          holder.set('user', clone)
+            .set("message", await publishTopMessage(clone, null))
+            .set("list", await publishOnlineUsers(clone, UsersMap, true, pubsub))
         }
       }
       holder.set("workspaces", await publishWorkspaces(null))

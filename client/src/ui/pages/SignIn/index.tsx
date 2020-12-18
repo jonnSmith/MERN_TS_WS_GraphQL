@@ -5,6 +5,7 @@ import {ContainerPage} from "@appchat/ui/containers/page";
 import {ISignInForm} from "@appchat/ui/templates/user/interfaces";
 import {UserSignIn} from "@appchat/ui/templates/user/sign-in";
 import * as React from "react";
+import {useEffect} from "react";
 import {useDispatch} from "react-redux";
 
 const SignIn = () => {
@@ -13,7 +14,7 @@ const SignIn = () => {
 
   const LoginUser = async (variables: ISignInForm) => {
     const {data} = await signIn({variables});
-    dispatch({type: ACTIONS.HANDLE_PAYLOAD, payload: data?.payload});
+    await dispatch({type: ACTIONS.HANDLE_PAYLOAD, payload: data?.payload});
     return true;
   };
 

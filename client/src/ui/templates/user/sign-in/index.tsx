@@ -1,14 +1,19 @@
 import {ConfigSettings} from "@appchat/core/config";
 import {SignInFormInitialObject} from "@appchat/ui/templates/user/constants";
 import {ISignInForm, ISignInProps} from "@appchat/ui/templates/user/interfaces";
-import {checkFields} from "@appchat/ui/transformers";
-import {Divider} from "@react-md/divider";
-import {
-  CircularProgress
-} from "@react-md/progress";
 import * as React from "react";
 import {FormEvent, useEffect, useState} from "react";
-import {Button, CardActions, FontIcon, Form, Password, TextField, TextIconSpacing, useToggle} from "react-md";
+import {
+  Button,
+  CardActions,
+  CircularProgress,
+  Divider,
+  FontIcon,
+  Form,
+  Password,
+  TextField,
+  TextIconSpacing,
+  useToggle} from "react-md";
 import {CSSTransitionClassNames} from "react-transition-group/CSSTransition";
 import {useDebouncedCallback} from "use-debounce";
 

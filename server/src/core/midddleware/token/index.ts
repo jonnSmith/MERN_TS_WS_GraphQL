@@ -16,6 +16,7 @@ const GetHeadersToken = (request) => {
 
 const GetUserByToken = async (token) => {
   try {
+    console.debug('t', token);
     const check: any = token ? await jwt.verify(token as string, config.token.secret) : null;
     const id = check?.id || null;
     return { token, id }
