@@ -51,10 +51,9 @@ const App = () => {
     return () => {};
   }, [workspace?.workspaceList, wloading]);
 
-  const logout = (ev: BeforeUnloadEvent) => {
+  window.onbeforeunload = (ev: BeforeUnloadEvent) => {
     if (user?.email && !unloading) { signOut({variables: {email: user?.email}}); }
   };
-  window.onbeforeunload = (pageIsLoaded && user?.email) ? logout : null;
 
   React.useEffect(() => {
     // console.debug("load", pageIsLoaded);
