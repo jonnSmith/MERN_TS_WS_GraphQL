@@ -1,6 +1,5 @@
 import {ACTIONS} from "@appchat/core/store/constants";
 import {ICommonAction} from "@appchat/core/store/interfaces";
-import {UserInitState} from "@appchat/data/user/constants";
 import {IOnlineTogglePanelReducer, IOnlineUserListReducer, IUserReducer} from "@appchat/data/user/interfaces";
 
 const userLogin = (data: IUserReducer): ICommonAction => ({

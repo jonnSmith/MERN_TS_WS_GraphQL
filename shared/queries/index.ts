@@ -34,8 +34,9 @@ const onlineUserData = `{
 const payloadDataFields = `{
   user ${userFields}
   list ${onlineUserFields}
-  code
+  token
   message ${messageFields}
+  workspaces ${workspaceFields}
 }`;
 
 const payloadDataType = `ResponseData`;
@@ -45,6 +46,7 @@ const payloadData = `type ${payloadDataType} {
   list: [OnlineUser]
   token: String
   message: Message
+  workspaces: [Workspace]
 }`;
 
 export {

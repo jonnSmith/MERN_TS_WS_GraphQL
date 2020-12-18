@@ -12,8 +12,8 @@ const SignUp = () => {
   const dispatch = useDispatch();
 
   const RegisterUser = async (variables: ISignUpForm) => {
-    const result = await signUp({variables});
-    console.debug("data", result);
+    const {data} = await signUp({variables});
+    dispatch({type: ACTIONS.HANDLE_PAYLOAD, payload: data?.payload});
     return true;
   };
 

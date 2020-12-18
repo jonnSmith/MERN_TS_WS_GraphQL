@@ -18,10 +18,13 @@ class WSLink extends ApolloLink {
     this.client.on("connected",
       (socket, payload) => {
         const {user, message, online, workspaces, token} = payload;
-        console.debug(payload);
+        // console.debug(payload);
         if (workspaces) {
           CoreStore.ReduxSaga.dispatch({type: ACTIONS.WORKSPACES_CHANGED, payload: {list: workspaces}});
         }
+
+        CoreStore.ReduxSaga.dispatch({type: ACTIONS.HANDLE_PAYLOAD, payload});
+
         // const {user, message, list, workspaces, token} = payload;
         // // if (user.email) {
         // //   CoreStore.ReduxSaga.dispatch({type: ACTIONS.USER_LOGIN, payload: {user} }); } else {

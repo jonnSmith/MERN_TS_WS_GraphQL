@@ -96,11 +96,12 @@ export const userResolvers = {
         loaded.user = payload.get("user");
         if(loaded.user?.token) {
           payload.set("token", loaded.user?.token)
-            .set("message", await publishTopMessage(loaded.user,pubsub))
-            .set("list", await publishOnlineUsers(loaded.user,UsersMap,true,pubsub))
+            .set("message", await publishTopMessage(loaded.user, null))
+            .set("list", await publishOnlineUsers(loaded.user,UsersMap,true, pubsub))
         }
-        payload.set("workspaces", await publishWorkspaces(pubsub))
-          .forEach(function(value, key) { loaded[key] = value; });
+        payload.set("workspaces", await publishWorkspaces(null))
+        payload.forEach(function(value, key) { loaded[key] = value; });
+
         payload.clear();
         return loaded
       } catch (e) {
@@ -119,11 +120,11 @@ export const userResolvers = {
         loaded.user = {...payload.get("user")};
         if(loaded.user?.token) {
           payload.set("token", loaded.user?.token)
-            .set("message", await publishTopMessage(loaded.user , pubsub))
+            .set("message", await publishTopMessage(loaded.user , null))
             .set("list", await publishOnlineUsers(loaded.user,UsersMap,true,pubsub));
         }
-        payload.set("workspaces", await publishWorkspaces(pubsub))
-          .forEach(function(value, key) { loaded[key] = value; });
+        payload.set("workspaces", await publishWorkspaces(null))
+        payload.forEach(function(value, key) { loaded[key] = value; });
         payload.clear();
         return loaded
       } catch (e) {

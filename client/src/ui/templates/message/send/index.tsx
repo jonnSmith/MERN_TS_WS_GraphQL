@@ -1,10 +1,8 @@
 import {MessageFormInitialObject} from "@appchat/ui/templates/message/constants";
 import {IMessageSendForm, IMessageSendProps} from "@appchat/ui/templates/message/interfaces";
 import * as React from "react";
-import {useEffect} from "react";
 import {Button, CardActions, TextField} from "react-md";
 import {CSSTransitionClassNames} from "react-transition-group/CSSTransition";
-import {useDebouncedCallback} from "use-debounce";
 
 const MessageSend = (props: IMessageSendProps) => {
   const {onSubmit, loading} = props;
@@ -12,12 +10,10 @@ const MessageSend = (props: IMessageSendProps) => {
   const messageTextRef = React.useRef();
 
   const sendMessageForm = (event: React.FormEvent) => {
+    event.preventDefault();
     onSubmit(MessageForm);
     updateMessageForm({...MessageForm, ...{text: ""}});
   };
-
-  const debounced = useDebouncedCallback( (value) => { updateMessageForm(value); }, 5 );
-  useEffect(() => () => { debounced.flush(); }, [debounced]);
 
   return (<form onSubmit={(event: React.FormEvent) => { sendMessageForm(event); }}>
     <TextField

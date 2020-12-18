@@ -78,7 +78,7 @@ class ApolloConnection {
     const wsLink = new WSLink({
       connectionParams: async () => {
         const token = await ClientStorage.read(ConfigSettings.token.storage);
-        console.debug('ws', token);
+        console.debug("ws", token);
         return {
           headers: {
             [ConfigSettings.token.header]: token,

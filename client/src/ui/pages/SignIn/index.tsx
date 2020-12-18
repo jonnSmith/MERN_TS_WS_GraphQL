@@ -12,8 +12,8 @@ const SignIn = () => {
   const dispatch = useDispatch();
 
   const LoginUser = async (variables: ISignInForm) => {
-    const result = await signIn({variables});
-    console.debug("data", result);
+    const {data} = await signIn({variables});
+    dispatch({type: ACTIONS.HANDLE_PAYLOAD, payload: data?.payload});
     return true;
   };
 

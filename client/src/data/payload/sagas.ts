@@ -8,14 +8,13 @@ function* payloadHandled() {
 }
 
 function* processPayload(action: ICommonAction) {
-  const {user, list, code, message} = action.payload;
-  console.debug("payload-saga", user, list, code, message);
-  if (code) {
-    yield put(code ?
-      userLogin({user, token: code, action: ACTIONS.USER_LOGIN}) :
-      userLogout({user, token: code, action: ACTIONS.USER_LOGOUT}
-      ));
-  }
+  console.debug("payload-saga", action.payload);
+  // if (code) {
+  //   yield put(code ?
+  //     userLogin({user, token: code, action: ACTIONS.USER_LOGIN}) :
+  //     userLogout({user, token: code, action: ACTIONS.USER_LOGOUT}
+  //     ));
+  // }
 }
 
 export {payloadHandled};

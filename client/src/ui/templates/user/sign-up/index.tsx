@@ -1,22 +1,20 @@
 import {ConfigSettings} from "@appchat/core/config";
 import {StateReturnTypes} from "@appchat/core/store/types";
-import {SignInFormInitialObject, SignUpFormInitialObject} from "@appchat/ui/templates/user/constants";
-import {ISignInForm, ISignUpForm, ISignUpProps} from "@appchat/ui/templates/user/interfaces";
-import {checkFields} from "@appchat/ui/transformers";
-import {Avatar} from "@react-md/avatar";
+import {SignUpFormInitialObject} from "@appchat/ui/templates/user/constants";
+import {ISignUpForm, ISignUpProps} from "@appchat/ui/templates/user/interfaces";
 import {Divider} from "@react-md/divider";
 import {Select} from "@react-md/form";
 import {CircularProgress} from "@react-md/progress";
 import * as React from "react";
 import {FormEvent, useEffect, useState} from "react";
-import {Button, CardActions, FontIcon, Password, TextField, TextIconSpacing} from "react-md";
+import {Button, CardActions, FontIcon, Password, TextField, TextIconSpacing, useToggle} from "react-md";
 import PasswordStrengthBar from "react-password-strength-bar";
 import {useSelector} from "react-redux";
 import {CSSTransitionClassNames} from "react-transition-group/CSSTransition";
 import { useDebounce, useDebouncedCallback } from "use-debounce";
 
 const UserSignUp = (props: ISignUpProps) => {
-  const [sending, toggleSending] = useState(false);
+  const [sending, enable, disable] = useToggle(false);
   const [passwordState, setPassword] = useState("");
   const [workspaceIdState, setWorkspaceId] = useState("");
   const [password] = useDebounce(passwordState, ConfigSettings.client.form.debounce.value);
@@ -29,7 +27,7 @@ const UserSignUp = (props: ISignUpProps) => {
           el.namedItem(k) as HTMLInputElement || el.namedItem(`${k}-value`) as HTMLInputElement).value;
       });
     onSubmit(SignUpFormInitialObject).then(() => {
-        toggleSending(false);
+        disable();
       });
   };
   const debounced = useDebouncedCallback(sendSignUpForm, ConfigSettings.client.form.debounce.form);
@@ -41,7 +39,7 @@ const UserSignUp = (props: ISignUpProps) => {
 
   return (<form onSubmit={(e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    toggleSending(true);
+    enable();
     debounced.callback(e.currentTarget.elements);
   }}>
     <TextField

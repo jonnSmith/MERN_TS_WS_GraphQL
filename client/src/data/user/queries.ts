@@ -1,18 +1,9 @@
-import {MessageFields} from "@appchat/data/message/constants";
-import {UserFields} from "@appchat/data/user/constants";
+import {payloadDataFields, userFields} from "@shared/queries";
 import gql from "graphql-tag";
 
 const SIGN_IN = gql`
   mutation SignInUser($email: String!, $password: String!) {
-    payload: signInUser(email: $email, password: $password) {
-      user ${UserFields}
-      list {
-        email
-        typing
-      }
-      token
-      message ${MessageFields}
-    }
+    payload: signInUser(email: $email, password: $password) ${payloadDataFields}
   }
 `;
 
@@ -30,15 +21,7 @@ const SIGN_UP = gql`
       firstName: $firstName
       lastName: $lastName
       workspaceId: $workspaceId
-    ) {
-      user ${UserFields}
-      list {
-        email
-        typing
-      }
-      token
-      message ${MessageFields}
-    }
+    ) ${payloadDataFields}
   }
 `;
 
@@ -49,7 +32,7 @@ const UPDATE_USER = gql`
     $id: ID!
     $workspaceId: ID
   ) {
-    user: updateUser(id: $id, firstName: $firstName, lastName: $lastName, workspaceId: $workspaceId) ${UserFields}
+    user: updateUser(id: $id, firstName: $firstName, lastName: $lastName, workspaceId: $workspaceId) ${userFields}
   }`;
 
 const SIGN_OUT = gql`

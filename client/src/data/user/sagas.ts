@@ -18,21 +18,21 @@ function* setUser(action: ICommonAction) {
   console.debug("user-saga", action);
   const path: Pathname = ApolloConnection.history?.location?.pathname as Pathname;
   const auth = NavigationPathsSecurity[path as keyof typeof ROUTES];
-  const {user, code, list, message, workspaces} = action.payload;
-  ClientStorage.write(ConfigSettings.token.storage, code || "");
+  const {user, token} = action.payload;
+  ClientStorage.write(ConfigSettings.token.storage, token || "");
 
-  if (action.type === ACTIONS.USER_LOGOUT || !code) {
+  if (action.type === ACTIONS.USER_LOGOUT || !token) {
     if (auth) {
       yield put(push(ROUTES.SignIn));
     }
-    // ApolloConnection.client.clearStore();
-    // yield put(userUpdated({user, action: ACTIONS.USER_UPDATED}));
+    ApolloConnection.client.clearStore();
+    yield put(userUpdated({user, action: ACTIONS.USER_UPDATED}));
   }
-  if (action.type === ACTIONS.USER_LOGIN) {
+  if (action.type === ACTIONS.USER_LOGIN && token) {
     if (!auth) {
       yield put(push(ROUTES.ChatRoom));
     }
-    // yield put(userUpdated({user, action: ACTIONS.USER_UPDATED}));
+    yield put(userUpdated({user, action: ACTIONS.USER_UPDATED}));
   }
 }
 

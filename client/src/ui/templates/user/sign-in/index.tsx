@@ -4,26 +4,24 @@ import {ISignInForm, ISignInProps} from "@appchat/ui/templates/user/interfaces";
 import {checkFields} from "@appchat/ui/transformers";
 import {Divider} from "@react-md/divider";
 import {
-  CircularProgress,
-  getProgressA11y,
-  LinearProgress,
+  CircularProgress
 } from "@react-md/progress";
 import * as React from "react";
 import {FormEvent, useEffect, useState} from "react";
-import {Button, CardActions, FontIcon, Form, Password, TextField, TextIconSpacing} from "react-md";
+import {Button, CardActions, FontIcon, Form, Password, TextField, TextIconSpacing, useToggle} from "react-md";
 import {CSSTransitionClassNames} from "react-transition-group/CSSTransition";
 import {useDebouncedCallback} from "use-debounce";
 
 const UserSignIn = (props: ISignInProps) => {
   const {onSubmit} = props;
-  const [sending, toggleSending] = useState(false);
+  const [sending, enable, disable] = useToggle(false);
 
   const sendSignInForm = (el: HTMLFormControlsCollection) => {
     Object.keys(SignInFormInitialObject).forEach( (k) => {
       SignInFormInitialObject[k as keyof ISignInForm] = (el.namedItem(k) as HTMLInputElement).value;
     });
     onSubmit(SignInFormInitialObject).then(() => {
-      toggleSending(false);
+      disable();
     });
   };
 
@@ -36,7 +34,7 @@ const UserSignIn = (props: ISignInProps) => {
     onSubmit={
       (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        toggleSending(true);
+        enable();
         debounced.callback(e.currentTarget.elements);
       }}>
     <TextField

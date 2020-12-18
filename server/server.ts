@@ -81,12 +81,17 @@ useServer(
       const holder = new Map(); const payload = {};
       const verified: {token, id} = await WSMiddleware(ctx);
       if(verified.token) {
-        const signed: {user, code} = await signUser(User.findById(verified?.id as ID), verified?.token, false, null) || {};
-        holder.set('user', signed.user).set('token', signed.code)
-          .set("message", signed.user?.email ? await publishTopMessage(signed.user, pubsub) : {})
-          .set("list", signed.user?.email ? await publishOnlineUsers(signed.user, UsersMap, true, pubsub) : [])
+        const {user} = await signUser(User.findById(verified?.id as ID), verified?.token, false, null) || {};
+        if(user?.email && user?.token) {
+          const clone = {...user};
+          holder.set('token', user?.token);
+          user.token = undefined;
+          holder.set('user', user)
+            .set("message", await publishTopMessage(user, null))
+            .set("list", await publishOnlineUsers(user, UsersMap, true, pubsub))
+        }
       }
-      holder.set("workspaces", await publishWorkspaces(pubsub))
+      holder.set("workspaces", await publishWorkspaces(null))
         .forEach(function(value, key) { payload[key] = value });
       holder.clear();
       return payload;

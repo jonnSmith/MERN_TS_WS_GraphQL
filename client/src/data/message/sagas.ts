@@ -2,7 +2,6 @@ import {ACTIONS} from "@appchat/core/store/constants";
 import {ICommonAction} from "@appchat/core/store/interfaces";
 import {MessagesUpdated} from "@appchat/data/message/actions";
 import {put, takeLatest} from "redux-saga/effects";
-import {Map} from "typescript";
 
 function* messagesChanged() {
   yield takeLatest([
@@ -13,7 +12,6 @@ function* messagesChanged() {
 }
 
 function* updateMessages(action: ICommonAction) {
-  console.debug("message-saga", action);
   const {message} = action?.payload;
   const data = {
     action: ACTIONS.MESSAGES_UPDATED,

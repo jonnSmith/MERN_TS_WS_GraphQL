@@ -29,7 +29,7 @@ const App = () => {
 
   React.useEffect(() => {
     if (chat && !cloading) {
-      // console.debug("chat", chat);
+      console.debug("chat", chat);
       dispatch({type: ACTIONS.MESSAGE_ADDED, payload: {message: chat?.chatUpdated?.message}});
     }
     return () => {};
@@ -37,7 +37,7 @@ const App = () => {
 
   React.useEffect(() => {
     if (users && !uloading) {
-      // console.debug("users", users);
+      console.debug("users", users);
       dispatch({type: ACTIONS.ONLINE_CHANGED, payload: {list: users?.onlineUsers?.list}});
     }
     return () => {};
@@ -57,7 +57,7 @@ const App = () => {
   window.onbeforeunload = (pageIsLoaded && user?.email) ? logout : null;
 
   React.useEffect(() => {
-    console.debug("load", pageIsLoaded);
+    // console.debug("load", pageIsLoaded);
     if (!pageIsLoaded && updatingWS) {
       setPageIsLoaded(updatingWS === ACTIONS.WORKSPACES_UPDATED);
     }
