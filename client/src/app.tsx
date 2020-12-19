@@ -19,7 +19,7 @@ const App = () => {
 
   const [pageIsLoaded, setPageIsLoaded] = React.useState(false);
 
-  const [signOut, {loading: unloading}] = useMutation(SIGN_OUT);
+  const [signOut] = useMutation(SIGN_OUT);
 
   const {data: users, loading: uloading} = useSubscription(ONLINE_USERS);
   const {data: chat, loading: cloading} = useSubscription(CHAT_UPDATED);
@@ -52,7 +52,7 @@ const App = () => {
   }, [workspace?.workspaceList, wloading]);
 
   window.onbeforeunload = (ev: BeforeUnloadEvent) => {
-    if (user?.email && !unloading) { signOut({variables: {email: user?.email}}); }
+    if (user?.email) { signOut({variables: {email: user?.email}}); }
   };
 
   React.useEffect(() => {

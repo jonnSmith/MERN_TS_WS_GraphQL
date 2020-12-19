@@ -14,7 +14,7 @@ const SignUp = () => {
   const RegisterUser = async (variables: ISignUpForm) => {
     const {data} = await signUp({variables});
     dispatch({type: ACTIONS.HANDLE_PAYLOAD, payload: data?.payload});
-    return true;
+    return !!data?.payload.token;
   };
 
   return (<ContainerPage className="sign-out" title="Sign up">

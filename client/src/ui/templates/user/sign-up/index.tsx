@@ -26,9 +26,9 @@ const UserSignUp = (props: ISignUpProps) => {
        SignUpFormInitialObject[k as keyof ISignUpForm] = (
           el.namedItem(k) as HTMLInputElement || el.namedItem(`${k}-value`) as HTMLInputElement).value;
       });
-    onSubmit(SignUpFormInitialObject).then(() => {
-        disable();
-      });
+    onSubmit(SignUpFormInitialObject).then((token) => {
+      if (!token) { disable(); }
+    });
   };
   const debounced = useDebouncedCallback(sendSignUpForm, ConfigSettings.client.form.debounce.form);
   useEffect(() => () => {
@@ -36,6 +36,11 @@ const UserSignUp = (props: ISignUpProps) => {
   }, [debounced]);
 
   const workspacesOptions = useSelector((state: StateReturnTypes) => state.WorkspaceReducer.list);
+
+  useEffect(() => {
+    if (!workspaceIdState && workspacesOptions?.length) { setWorkspaceId(workspacesOptions[0].id); }
+    return () => {};
+  }, [workspacesOptions]);
 
   return (<form onSubmit={(e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -78,7 +83,7 @@ const UserSignUp = (props: ISignUpProps) => {
       type="text"
       label="Last Name"
     />
-    <Divider />
+    <Divider style={{marginBottom: "20px"}} />
     <Select
       id="workspaceId"
       readOnly={sending}

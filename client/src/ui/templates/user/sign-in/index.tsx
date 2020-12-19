@@ -26,7 +26,6 @@ const UserSignIn = (props: ISignInProps) => {
       SignInFormInitialObject[k as keyof ISignInForm] = (el.namedItem(k) as HTMLInputElement).value;
     });
     onSubmit(SignInFormInitialObject).then((token) => {
-      // TODO: React state update on an unmounted component.
       if (!token) { disable(); }
     });
   };
