@@ -1,16 +1,15 @@
 import {ConfigSettings} from "@appchat/core/config";
 import {StateReturnTypes} from "@appchat/core/store/types";
+import {FormButton} from "@appchat/ui/elements/form/button";
 import {SignUpFormInitialObject} from "@appchat/ui/templates/user/constants";
 import {ISignUpForm, ISignUpProps} from "@appchat/ui/templates/user/interfaces";
 import {Divider} from "@react-md/divider";
 import {Select} from "@react-md/form";
-import {CircularProgress} from "@react-md/progress";
 import * as React from "react";
 import {FormEvent, useEffect, useState} from "react";
-import {Button, CardActions, FontIcon, Password, TextField, TextIconSpacing, useToggle} from "react-md";
+import {CardActions, Password, TextField, useToggle} from "react-md";
 import PasswordStrengthBar from "react-password-strength-bar";
 import {useSelector} from "react-redux";
-import {CSSTransitionClassNames} from "react-transition-group/CSSTransition";
 import { useDebounce, useDebouncedCallback } from "use-debounce";
 
 const UserSignUp = (props: ISignUpProps) => {
@@ -98,23 +97,7 @@ const UserSignUp = (props: ISignUpProps) => {
       }
       disableMovementChange={true}/>
     <CardActions>
-      <Button
-        disabled={sending}
-        theme={"secondary"}
-        themeType={"contained"}
-        type="submit"
-        disableProgrammaticRipple
-        disableRipple
-        rippleTimeout={0}
-        children={
-          <TextIconSpacing
-            children={sending ? `Sending` : `Sign up`}
-            iconAfter={false}
-            icon={sending ?
-              <CircularProgress id="loading-sign-up" style={{marginRight: "10px"}}/> :
-              <FontIcon style={{width: "24px"}}>done</FontIcon>
-            }/>}
-        rippleClassNames={"appear" as CSSTransitionClassNames}/>
+      <FormButton sending={sending} title="Sign up" />
     </CardActions>
   </form>);
 };

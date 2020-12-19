@@ -1,20 +1,16 @@
 import {ConfigSettings} from "@appchat/core/config";
+import {FormButton} from "@appchat/ui/elements/form/button";
 import {SignInFormInitialObject} from "@appchat/ui/templates/user/constants";
 import {ISignInForm, ISignInProps} from "@appchat/ui/templates/user/interfaces";
 import * as React from "react";
-import {FormEvent, useEffect, useState} from "react";
+import {FormEvent, useEffect} from "react";
 import {
-  Button,
   CardActions,
-  CircularProgress,
   Divider,
-  FontIcon,
   Form,
   Password,
   TextField,
-  TextIconSpacing,
   useToggle} from "react-md";
-import {CSSTransitionClassNames} from "react-transition-group/CSSTransition";
 import {useDebouncedCallback} from "use-debounce";
 
 const UserSignIn = (props: ISignInProps) => {
@@ -60,23 +56,7 @@ const UserSignIn = (props: ISignInProps) => {
     />
     <Divider/>
     <CardActions className="md-cell md-cell--12">
-      <Button
-        disabled={sending}
-        theme={"secondary"}
-        themeType={"contained"}
-        type="submit"
-        disableProgrammaticRipple
-        disableRipple
-        rippleTimeout={0}
-        children={
-          <TextIconSpacing
-            children={sending ? `Sending` : `Sign in`}
-            iconAfter={false}
-            icon={sending ?
-              <CircularProgress id="loading-sign-in" style={{marginRight: "10px"}}/> :
-              <FontIcon style={{width: "24px"}}>done</FontIcon>
-            }/>}
-        rippleClassNames={"appear" as CSSTransitionClassNames}/>
+      <FormButton sending={sending} title="Sign in"/>
     </CardActions>
   </Form>;
 };
