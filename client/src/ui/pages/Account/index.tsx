@@ -15,14 +15,16 @@ import { Grid, GridCell, Text } from "react-md";
 import {useDispatch, useSelector} from "react-redux";
 
 const Account = () => {
-  const {user} = useSelector((state: StateReturnTypes) => state.UserReducer);
 
   const dispatch = useDispatch();
-  const [saveUser, {data, loading}] = useMutation(UPDATE_USER);
+  const [saveUser] = useMutation(UPDATE_USER);
   const [addWorkspace, {data: workspace, loading: saving}] = useMutation(ADD_WORKSPACE);
 
-  const UpdateUser = (variables: IUpdateForm) => {
-    saveUser({variables: { ...variables, ...{ id: user.id} }});
+  const UpdateUser = async (variables: IUpdateForm) => {
+    const {data} = await saveUser({variables});
+    console.debug("data", data);
+    await dispatch({type: ACTIONS.HANDLE_PAYLOAD, payload: data?.payload});
+    return false;
   };
 
   const CreateWorkspace = (input: IWorkspaceModel) => {
@@ -35,21 +37,13 @@ const Account = () => {
     }
   }, [workspace]);
 
-  React.useLayoutEffect(() => {
-    if (data?.user) {
-      dispatch({type: ACTIONS.USER_UPDATED, payload: data});
-    }
-  }, [data?.user]);
-
   return (
-    <ContainerPage title={`${user?.firstName} ${user?.lastName}`} className="account">
+    <ContainerPage title="Edit user" className="account">
       <Grid>
         <GridCell colSpan={4}>
           <Text type="headline-6" style={{margin: "0 0 2rem 0"}}>Edit account</Text>
           <UserUpdate
-            onSubmit={(variables: IUpdateForm) => {UpdateUser(variables); }}
-            user={user}
-            loading={loading}/>
+            onSubmit={UpdateUser}/>
         </GridCell>
         <GridCell colSpan={4}>
           <Text type="headline-6" style={{margin: "0 0 2rem 0"}}>Create workspace</Text>

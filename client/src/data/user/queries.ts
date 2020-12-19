@@ -29,10 +29,9 @@ const UPDATE_USER = gql`
   mutation(
     $firstName: String
     $lastName: String
-    $id: ID!
     $workspaceId: ID
   ) {
-    user: updateUser(id: $id, firstName: $firstName, lastName: $lastName, workspaceId: $workspaceId) ${userFields}
+    payload: updateUser(firstName: $firstName, lastName: $lastName, workspaceId: $workspaceId) ${payloadDataFields}
   }`;
 
 const SIGN_OUT = gql`

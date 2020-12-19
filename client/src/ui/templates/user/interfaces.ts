@@ -21,9 +21,7 @@ interface IUpdateForm {
 }
 
 interface IUpdateProps {
-  onSubmit?: (variables: IUpdateForm) => void;
-  user?: IUserModel;
-  loading?: boolean;
+  onSubmit?: (variables: IUpdateForm) => Promise<boolean>;
 }
 
 interface ISignUpForm {

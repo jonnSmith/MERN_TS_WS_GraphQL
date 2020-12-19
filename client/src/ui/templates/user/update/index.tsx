@@ -1,42 +1,46 @@
+import {ConfigSettings} from "@appchat/core/config";
 import {StateReturnTypes} from "@appchat/core/store/types";
-import {IWorkspaceModel} from "@appchat/data/workspace/interfaces";
-import {IUpdateProps} from "@appchat/ui/templates/user/interfaces";
+import {FormButton} from "@appchat/ui/elements/form/button";
+import {FormSelect} from "@appchat/ui/elements/form/select";
+import {UpdateFormInitialObject} from "@appchat/ui/templates/user/constants";
+import {ISignUpForm, IUpdateForm, IUpdateProps} from "@appchat/ui/templates/user/interfaces";
 import {checkFields} from "@appchat/ui/transformers";
 import * as React from "react";
-import {Button, CardActions, Divider, Select, TextField} from "react-md";
+import {FormEvent, useEffect, useRef, useState} from "react";
+import {Button, CardActions, Divider, Form, TextField, useToggle} from "react-md";
 import {useSelector} from "react-redux";
 import {CSSTransitionClassNames} from "react-transition-group/CSSTransition";
+import {useDebouncedCallback} from "use-debounce";
 
 const UserUpdate = (props: IUpdateProps) => {
-  const {onSubmit, user, loading} = props;
-  const {list} = useSelector((state: StateReturnTypes) => state.WorkspaceReducer);
+  const [sending, enable, disable] = useToggle(false);
+  const {onSubmit} = props;
+  const workspacesOptions = useSelector((state: StateReturnTypes) => state.WorkspaceReducer.list);
+  const user = useSelector((state: StateReturnTypes) => state.UserReducer.user);
 
-  React.useEffect(() => {
-    if (list?.length && user && !list.some((w: IWorkspaceModel) => user?.workspaceId?.toString() === w.id.toString())) {
-      updateUserForm({...UserForm, ...{workspaceId: list[0]?.id}});
-    }
-    return () => {};
-  }, [list, user?.workspaceId]);
+  const formRef = useRef();
 
-  const [UserForm, updateUserForm] = React.useState({
-    firstName: user?.firstName,
-    lastName: user?.lastName,
-    workspaceId: user?.workspaceId
-  });
-
-  const sendUpdateUserForm = (event: React.FormEvent) => {
-    event.preventDefault();
-    onSubmit(UserForm);
+  const sendUpdateUserForm = (el: HTMLFormControlsCollection) => {
+    Object.keys(UpdateFormInitialObject).forEach( (k) => {
+      UpdateFormInitialObject[k as keyof IUpdateForm] = (
+        el.namedItem(k) as HTMLInputElement || el.namedItem(`${k}-value`) as HTMLInputElement).value;
+    });
+    onSubmit(UpdateFormInitialObject).then((updated) => {
+      if (!updated) { disable(); }
+    });
   };
 
-  // tslint:disable-next-line:variable-name
-  const selectWorkspace = React.useCallback((nextValue) => {
-    updateUserForm({...UserForm, ...{workspaceId: nextValue}});
-  }, []);
+  const debounced = useDebouncedCallback(sendUpdateUserForm, ConfigSettings.client.form.debounce.form);
+  useEffect(() => () => {
+    debounced.flush();
+  }, [debounced]);
 
-  return (<form onSubmit={(event) => {
-    event.preventDefault();
-    sendUpdateUserForm(event);
+  return (<Form
+    ref={formRef}
+    onSubmit={(e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    enable();
+    debounced.callback(e.currentTarget.elements);
   }}>
     <TextField
       required={true}
@@ -44,9 +48,8 @@ const UserUpdate = (props: IUpdateProps) => {
       name="firstName"
       type="text"
       label="First Name"
-      value={UserForm.firstName}
-      onChange={(event: React.ChangeEvent<any>) =>
-        updateUserForm({...UserForm, ...{firstName: event.currentTarget.value}})}
+      readOnly={sending}
+      defaultValue={user.firstName}
     />
     <Divider/>
     <TextField
@@ -54,32 +57,21 @@ const UserUpdate = (props: IUpdateProps) => {
       id="lastName"
       name="lastName"
       label="Last Name"
-      value={UserForm.lastName}
-      onChange={(event: React.ChangeEvent<any>) =>
-        updateUserForm({...UserForm, ...{lastName: event.currentTarget.value}})}
+      readOnly={sending}
+      defaultValue={user.lastName}
     />
     <Divider />
-    { UserForm.workspaceId && <Select
-      id={`select-workspace`}
-      onChange={selectWorkspace}
-      options={list.map((ws: IWorkspaceModel) => ({ value: ws.id, label: ws.name }))}
-      value={UserForm.workspaceId }
-    />}
+    <FormSelect
+      id="workspaceId"
+      sending={sending}
+      options={workspacesOptions}
+      label="Select workspace"
+      value={user?.workspaceId || ""} />
     <Divider/>
     <CardActions className="md-cell md-cell--12" style={{justifyContent: "flex-start"}}>
-      <Button
-        theme={"secondary"}
-        themeType={"contained"}
-        type="submit"
-        disableProgrammaticRipple
-        disableRipple
-        rippleTimeout={0}
-        rippleClassNames={"appear" as CSSTransitionClassNames}
-        disabled={checkFields(UserForm) || loading}>
-        Save
-      </Button>
+      <FormButton sending={sending} title="Update" />
     </CardActions>
-  </form>);
+  </Form>);
 };
 
 export {UserUpdate};

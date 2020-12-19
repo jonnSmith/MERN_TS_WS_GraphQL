@@ -34,13 +34,12 @@ export const userTypeDefs = `
     workspaceId: ID
   }
   input UserUpdate {
-    id: ID
     firstName: String
     lastName: String
     workspaceId: ID
   }
   extend type Mutation {
-    updateUser(firstName: String, lastName: String, id: ID!, workspaceId: ID): User
+    updateUser(firstName: String, lastName: String, workspaceId: ID): ${payloadDataType}
     signInUser(email: String!, password: String!): ${payloadDataType}
     signUpUser(email: String!, password: String!, firstName: String!, lastName: String, workspaceId: ID): ${payloadDataType}
     signOutUser(email: String!, id: ID, firstName: String, lastName: String, workspaceId: ID): OnlineUsersData
@@ -75,14 +74,24 @@ export const userResolvers = {
   Mutation: {
     async updateUser(_, data, context) {
       const {token, id} = await context;
-      const { id: uid, firstName, lastName, workspaceId } = data;
+      const { firstName, lastName, workspaceId } = data;
+      const payload = new Map();
+      const loaded:  any = {};
 
-      const user = await User
-        .findByIdAndUpdate(uid, {firstName, lastName, workspaceId}, {new: true})
-        .lean({ virtuals: true });
-
-      const {message} = await publishTopMessage(pubsub);
-      return {message, user};
+      const document = User
+        .findByIdAndUpdate(id, {firstName, lastName, workspaceId}, {new: true});
+      payload.set("user", await signUser(document, token, false, null));
+      loaded.user = payload.get("user");
+      console.debug("update", loaded.user );
+      if(loaded.user?.token) {
+        payload.set("token", loaded.user?.token)
+          .set("message", await publishTopMessage(pubsub))
+          .set("list", await publishOnlineUsers(loaded.user,UsersMap,true, pubsub))
+      }
+      payload.set("workspaces", await publishWorkspaces(pubsub))
+      payload.forEach(function(value, key) { loaded[key] = value; });
+      payload.clear();
+      return loaded
     },
     async signUpUser(_, data, context) {
       const payload = new Map();

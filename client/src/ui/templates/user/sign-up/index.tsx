@@ -1,13 +1,12 @@
 import {ConfigSettings} from "@appchat/core/config";
 import {StateReturnTypes} from "@appchat/core/store/types";
 import {FormButton} from "@appchat/ui/elements/form/button";
+import {FormSelect} from "@appchat/ui/elements/form/select";
 import {SignUpFormInitialObject} from "@appchat/ui/templates/user/constants";
 import {ISignUpForm, ISignUpProps} from "@appchat/ui/templates/user/interfaces";
-import {Divider} from "@react-md/divider";
-import {Select} from "@react-md/form";
 import * as React from "react";
 import {FormEvent, useEffect, useState} from "react";
-import {CardActions, Password, TextField, useToggle} from "react-md";
+import {CardActions, Divider, Form, Password, TextField, useToggle} from "react-md";
 import PasswordStrengthBar from "react-password-strength-bar";
 import {useSelector} from "react-redux";
 import { useDebounce, useDebouncedCallback } from "use-debounce";
@@ -15,9 +14,7 @@ import { useDebounce, useDebouncedCallback } from "use-debounce";
 const UserSignUp = (props: ISignUpProps) => {
   const [sending, enable, disable] = useToggle(false);
   const [passwordState, setPassword] = useState("");
-  const [workspaceIdState, setWorkspaceId] = useState("");
   const [password] = useDebounce(passwordState, ConfigSettings.client.form.debounce.value);
-  const [workspace] = useDebounce(workspaceIdState, ConfigSettings.client.form.debounce.value);
 
   const {onSubmit} = props;
   const sendSignUpForm = (el: HTMLFormControlsCollection) => {
@@ -36,12 +33,7 @@ const UserSignUp = (props: ISignUpProps) => {
 
   const workspacesOptions = useSelector((state: StateReturnTypes) => state.WorkspaceReducer.list);
 
-  useEffect(() => {
-    if (!workspaceIdState && workspacesOptions?.length) { setWorkspaceId(workspacesOptions[0].id); }
-    return () => {};
-  }, [workspacesOptions]);
-
-  return (<form onSubmit={(e: FormEvent<HTMLFormElement>) => {
+  return (<Form onSubmit={(e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     enable();
     debounced.callback(e.currentTarget.elements);
@@ -83,23 +75,11 @@ const UserSignUp = (props: ISignUpProps) => {
       label="Last Name"
     />
     <Divider style={{marginBottom: "20px"}} />
-    <Select
-      id="workspaceId"
-      readOnly={sending}
-      options={workspacesOptions}
-      defaultChecked={true}
-      labelKey="name"
-      valueKey="id"
-      value={workspace}
-      label="Start in workspace:"
-      onChange={
-        (nextValue ) => { setWorkspaceId(nextValue); }
-      }
-      disableMovementChange={true}/>
+    <FormSelect id="workspaceId" sending={sending} options={workspacesOptions} label="Start in workspace:" value=""/>
     <CardActions>
       <FormButton sending={sending} title="Sign up" />
     </CardActions>
-  </form>);
+  </Form>);
 };
 
 export {UserSignUp};
