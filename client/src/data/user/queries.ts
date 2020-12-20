@@ -1,4 +1,4 @@
-import {payloadDataFields, userFields} from "@shared/queries";
+import {onlineUserData, payloadDataFields} from "@shared/queries";
 import gql from "graphql-tag";
 
 const SIGN_IN = gql`
@@ -36,24 +36,12 @@ const UPDATE_USER = gql`
 
 const SIGN_OUT = gql`
   mutation($email: String!) {
-    OnlineUsersData: signOutUser(email: $email) {
-      action
-      list {
-        email
-        typing
-      }
-    }
+    OnlineUsersData: signOutUser(email: $email) ${onlineUserData}
   }`;
 
 const ONLINE_USERS = gql`
   subscription onlineUsers {
-    onlineUsers {
-      action
-      list {
-        email
-        typing
-      }
-    }
+    onlineUsers ${onlineUserData}
   }`;
 
 export { SIGN_IN, SIGN_UP, UPDATE_USER, ONLINE_USERS, SIGN_OUT };

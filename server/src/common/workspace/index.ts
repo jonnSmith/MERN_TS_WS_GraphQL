@@ -1,11 +1,9 @@
 import {Workspace} from "@shared/data/workspace";
-import {ACTIONS, WORKSPACES_TRIGGER} from "@backchat/core/bus/actions";
+import {WORKSPACES_TRIGGER} from "@backchat/core/bus/actions";
 import {CoreBus} from "@backchat/core/bus";
 import {ForbiddenError} from "@apollo/server/errors";
+import {publishWorkspaces} from "../../core/adapters";
 
-/**
- * Export a string which contains our GraphQL type definitions.
- */
 export const workspaceTypeDefs = `
 
   type Workspace {
@@ -29,9 +27,9 @@ export const workspaceTypeDefs = `
   }
 
   extend type Mutation {
-    addWorkspace(input: WorkspaceInput!, filter: WorkspaceFilterInput): Workspace
-    editWorkspace(id: String!, input: WorkspaceInput!, filter: WorkspaceFilterInput): Workspace
-    deleteWorkspace(id:ID!, filter: WorkspaceFilterInput): Workspace
+    addWorkspace(input: WorkspaceInput!, filter: WorkspaceFilterInput): [Workspace]
+    editWorkspace(id: String!, input: WorkspaceInput!, filter: WorkspaceFilterInput): [Workspace]
+    deleteWorkspace(id:ID!, filter: WorkspaceFilterInput): [Workspace]
   }
   
   extend type Subscription {
@@ -45,15 +43,12 @@ export const workspaceTypeDefs = `
 
 `;
 
-const PubSub = CoreBus.pubsub;
+const pubsub = CoreBus.pubsub;
 
 export const workspaceResolvers: any = {
   Query: {
     async workspaces(_, { filter }) {
-      const workspaces: any[] = await Workspace.find({}, null, filter);
-      const list = workspaces.map(workspace => workspace.toObject())
-      await PubSub.publish(WORKSPACES_TRIGGER, {workspaceList: { list, action: ACTIONS.WORKSPACE.UPDATE}});
-      return list;
+      return publishWorkspaces(null);
     },
     async workspace(_, { id }) {
       const workspace: any = await Workspace.findById(id);
@@ -62,23 +57,17 @@ export const workspaceResolvers: any = {
   },
   Mutation: {
     async addWorkspace(_, { input, filter }) {
-      const workspace: any = await Workspace.create(input);
-      const workspaces: any[] = await Workspace.find({}, null, filter);
-      const list = workspaces.map(ws => ws.toObject())
-      await PubSub.publish(WORKSPACES_TRIGGER, {workspaceList: { list, action: ACTIONS.WORKSPACE.UPDATE}});
-      return workspace.toObject();
+      await Workspace.create(input);
+      return publishWorkspaces(pubsub);
     },
     async editWorkspace(_, { id, input }) {
-      const workspace: any = await Workspace.findByIdAndUpdate(id, input, {new: true});
-      return workspace.toObject();
+      await Workspace.findByIdAndUpdate(id, input, {new: true});
+      return publishWorkspaces(pubsub);
     },
     async deleteWorkspace(_, { id, filter }, context) {
       try {
-        const workspace: any = await Workspace.findByIdAndRemove(id);
-        const workspaces: any[] = await Workspace.find({}, null, filter);
-        const list = workspaces.map(ws => ws.toObject())
-        await PubSub.publish(WORKSPACES_TRIGGER, {workspaceList: { list, action: ACTIONS.WORKSPACE.UPDATE}});
-        return workspace.toObject();
+        await Workspace.findByIdAndRemove(id);
+        return publishWorkspaces(pubsub);
       } catch(e) {
         throw new ForbiddenError("Workspace forbidden to delete.");
       }
@@ -86,7 +75,7 @@ export const workspaceResolvers: any = {
   },
   Subscription: {
     workspaceList: {
-      subscribe: () => PubSub.asyncIterator([WORKSPACES_TRIGGER]),
+      subscribe: () => pubsub.asyncIterator([WORKSPACES_TRIGGER]),
     }
   }
 };

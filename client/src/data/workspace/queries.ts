@@ -1,34 +1,20 @@
+import {workspaceData, workspaceFields} from "@shared/queries";
 import gql from "graphql-tag";
 
 const ADD_WORKSPACE = gql`
-  mutation AddWorkspace($input: WorkspaceInput!) {
-    Workspace: addWorkspace(input: $input) {
-      id
-      name
-      rating
-    }
+  mutation addWorkspace($input: WorkspaceInput!) {
+    workspaces: addWorkspace(input: $input) ${workspaceFields}
   }
 `;
 
 const WORKSPACE_LIST = gql`
   subscription workspaceList {
-    workspaceList {
-      action
-      list {
-        id
-        name
-        rating
-      }
-    }
+    workspaceList ${workspaceData}
   }`;
 
 const DELETE_WORKSPACE = gql`
-  mutation($id: ID!) {
-    deleteWorkspace(id: $id) {
-      id
-      name
-      rating
-    }
+  mutation deleteWorkspace($id: ID!) {
+    workspaces: deleteWorkspace(id: $id) ${workspaceFields}
   }
 `;
 

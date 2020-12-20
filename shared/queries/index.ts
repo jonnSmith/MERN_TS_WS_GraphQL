@@ -4,6 +4,11 @@ const workspaceFields = `{
   rating
 }`;
 
+const workspaceData = `{
+  action
+  list ${workspaceFields}
+}`;
+
 const userFields = `{
   id
   email
@@ -19,7 +24,14 @@ const messageFields = `{
   createdAt
   userId
   user ${userFields}
+  workspaceId
 }`;
+
+
+const messageData = `{
+  action
+  message ${messageFields}
+}`
 
 const onlineUserFields = `{
   email
@@ -51,11 +63,13 @@ const payloadData = `type ${payloadDataType} {
 
 export {
   workspaceFields,
+  workspaceData,
   userFields,
   messageFields,
+  messageData,
   onlineUserFields,
+  payloadDataType,
   payloadData,
   payloadDataFields,
-  payloadDataType,
   onlineUserData
 };

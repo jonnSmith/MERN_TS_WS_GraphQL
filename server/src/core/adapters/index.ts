@@ -29,15 +29,11 @@ const setUserWorkspace = async(user): Promise<any> => {
   return {...updated};
 }
 
-const queryUser = async (query): Promise<any> => {
-  const user = await query;
-  return user.toObject();
-}
-
 const publishOnlineUsers = async (user, map, online, pubsub): Promise<any> => {
   if(!user?.email) { return SharedConstants.DEFAULT_LIST }
   const changed = online ? map.set({ email: user?.email, typing: false }) : map.remove(user?.email);
-  if(user?.email && pubsub) {
+  console.debug("publishOnlineUsers", changed);
+  if(pubsub) {
     await pubsub.publish(ONLINE_USERS_TRIGGER, {
       onlineUsers: {
         list: map.online,
@@ -48,6 +44,15 @@ const publishOnlineUsers = async (user, map, online, pubsub): Promise<any> => {
   return [...map.online];
 }
 
+const queryUser = async (document): Promise<any> => {
+  try {
+    const {...user} = await setUserWorkspace( (await document)?.toObject());
+    return user;
+  } catch (e) {
+    return {...SharedConstants.DEFAULT_USER_DATA};
+  }
+}
+
 const signUser = async (doc, token, refresh, password): Promise<any> => {
   try {
     const document = await doc;
@@ -56,7 +61,7 @@ const signUser = async (doc, token, refresh, password): Promise<any> => {
       if(!match) { throw new AuthenticationError('Password mismatch'); }
     }
     const {...user} = await setUserWorkspace( await (document)?.toObject());
-    user.token = user?.id ? (refresh ? jwt.sign({id: user?.id}, config.token.secret) : token) : "";
+    user.token = user.id ? (refresh ? jwt.sign({id: user?.id}, config.token.secret) : token) : "";
     return user;
   } catch (e) {
     return {...SharedConstants.DEFAULT_USER_DATA};

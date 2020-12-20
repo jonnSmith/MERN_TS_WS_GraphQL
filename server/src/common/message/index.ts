@@ -1,13 +1,10 @@
-// tslint:disable-next-line:no-submodule-imports
 import {ForbiddenError} from "@apollo/server/errors";
 import {CoreBus} from "@backchat/core/bus";
-
 import {User} from "@shared/data/user";
-import {Workspace} from "@shared/data/workspace";
 import {Message} from "@shared/data/message";
-import {ACTIONS, UPDATE_CHAT_TRIGGER} from "@backchat/core/bus/actions";
+import {UPDATE_CHAT_TRIGGER} from "@backchat/core/bus/actions";
 import {ID} from "graphql-ws";
-import {publishMessage, publishTopMessage, TOP_MESSAGE} from "../../core/adapters";
+import {publishMessage, publishTopMessage, queryUser} from "../../core/adapters";
 
 export const messageTypeDefs = `
 
@@ -17,17 +14,15 @@ export const messageTypeDefs = `
     user: User
     text: String
     workspaceId: ID
-    workspace: Workspace
     createdAt: String
   }
 
   extend type Query {
-    messages: [Message]
-    message(id: ID): Message!
+    message(id: ID): Message
   }
 
   extend type Mutation {
-    createMessage(text: String!): Message
+    createMessage(text: String!, workspaceId: ID): Message
     deleteMessage(id: ID): Message
   }
   
@@ -41,29 +36,25 @@ export const messageTypeDefs = `
   }
 `;
 
-const PubSub = CoreBus.pubsub;
+const pubsub = CoreBus.pubsub;
 
 export const messageResolvers = {
   Query: {
-    messages: async (_, {}, context) => {
-      let messages: any[] = await Message.find({}, null, {});
-      messages = messages.map(m => m.toObject());
-      return { messages };
-    },
     message: async (_, { id }, context) => {
-      const message: any = await Message.findById(id);
-      return message.toObject();
+      const document = Message.findById(id);
+      return publishMessage(document, null);
     },
   },
   Mutation: {
-    createMessage: async (_, { text }, context) => {
+    createMessage: async (_, { text, workspaceId }, context) => {
       try {
         const { id } = await context;
         const document: any = Message.create({
           text,
           userId: id,
+          workspaceId,
         });
-        return publishMessage(document, PubSub);
+        return publishMessage(document, pubsub);
       }
       catch(e) {
         console.debug(e);
@@ -72,8 +63,9 @@ export const messageResolvers = {
     },
     deleteMessage: async (_, { id }, context) => {
       try {
-        const message: any = await Message.findByIdAndRemove(id);
-        return publishTopMessage(PubSub);
+        const { id: userId } = await context;
+        await Message.findOneAndRemove({id,userId});
+        return publishTopMessage(pubsub);
       } catch(e) {
         throw new ForbiddenError("Message forbidden to delete.");
       }
@@ -81,21 +73,14 @@ export const messageResolvers = {
   },
   Subscription: {
     chatUpdated: {
-      subscribe: () => PubSub.asyncIterator([UPDATE_CHAT_TRIGGER]),
+      subscribe: () => pubsub.asyncIterator([UPDATE_CHAT_TRIGGER]),
     }
   },
   Message: {
     async user(message: { userId: ID }) {
       if (message.userId) {
-        const user: any = await User.findById(message.userId);
-        return user.toObject();
-      }
-      return {};
-    },
-    async workspace(message: { workspaceId: ID }) {
-      if (message.workspaceId) {
-        const workspace: any = await Workspace.findById(message.workspaceId);
-        return workspace.toObject();
+        const document: any = await User.findById(message.userId);
+        return queryUser(document);
       }
       return {};
     },

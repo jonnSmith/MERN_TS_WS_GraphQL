@@ -1,24 +1,21 @@
-import {MessageFields} from "@appchat/data/message/constants";
+import {messageData, messageFields} from "@shared/queries";
 import gql from "graphql-tag";
 
 const CREATE_MESSAGE = gql`
-  mutation CreateMessage($text: String!) {
-    message: createMessage(text: $text) ${MessageFields}
+  mutation createMessage($text: String!) {
+    message: createMessage(text: $text) ${messageFields}
   }
 `;
 
 const DELETE_MESSAGE = gql`
-  mutation($id: ID!) {
-    deleteMessage(id: $id) ${MessageFields}
+  mutation deleteMessage($id: ID!) {
+    message: deleteMessage(id: $id) ${messageFields}
   }
 `;
 
 const CHAT_UPDATED = gql`
   subscription chatUpdated {
-    chatUpdated {
-      action
-      message ${MessageFields}
-    }
+    chatUpdated ${messageData}
   }`;
 
 export {
