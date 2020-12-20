@@ -32,6 +32,7 @@ interface IMessageSendProps {
 
 interface IMessageSendForm {
     text: string;
+    workspaceId: string;
 }
 
 export {

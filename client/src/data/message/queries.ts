@@ -2,8 +2,8 @@ import {messageData, messageFields} from "@shared/queries";
 import gql from "graphql-tag";
 
 const CREATE_MESSAGE = gql`
-  mutation createMessage($text: String!) {
-    message: createMessage(text: $text) ${messageFields}
+  mutation createMessage($text: String!, $workspaceId: String) {
+    message: createMessage(text: $text, workspaceId: $workspaceId) ${messageFields}
   }
 `;
 

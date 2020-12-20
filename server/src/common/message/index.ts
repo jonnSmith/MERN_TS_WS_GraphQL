@@ -13,7 +13,7 @@ export const messageTypeDefs = `
     userId: ID
     user: User
     text: String
-    workspaceId: ID
+    workspaceId: String
     createdAt: String
   }
 
@@ -22,7 +22,7 @@ export const messageTypeDefs = `
   }
 
   extend type Mutation {
-    createMessage(text: String!, workspaceId: ID): Message
+    createMessage(text: String!, workspaceId: String): Message
     deleteMessage(id: ID): Message
   }
   
@@ -64,7 +64,7 @@ export const messageResolvers = {
     deleteMessage: async (_, { id }, context) => {
       try {
         const { id: userId } = await context;
-        await Message.findOneAndRemove({id,userId});
+        await Message.findByIdAndRemove(id);
         return publishTopMessage(pubsub);
       } catch(e) {
         throw new ForbiddenError("Message forbidden to delete.");
