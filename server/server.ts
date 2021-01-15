@@ -20,9 +20,7 @@ import {Server as WSS} from "ws";
 import {useServer} from "graphql-ws/lib/use/ws";
 import {UsersMap} from "@backchat/core/bus/users";
 import {CoreBus} from "@backchat/core/bus";
-import {
-  signUser, publishWorkspaces, publishOnlineUsers, publishTopMessage,
-} from "@backchat/core/adapters";
+import {QueryAdapters} from "@backchat/core/adapters";
 import {PubSubEngine} from "graphql-subscriptions";
 import {User} from "../shared/data/user";
 import {ID} from "graphql-ws";
@@ -82,18 +80,18 @@ useServer(
       const verified: {token, id} = await WSMiddleware(ctx);
       console.debug('verified', verified);
       if(verified.token) {
-        const user = await signUser(User.findById(verified?.id as ID), verified?.token, false, null);
+        const user = await QueryAdapters.signUser(User.findById(verified?.id as ID), verified?.token, false, null);
         console.debug('user', user);
         if(user?.email && user?.token) {
           const clone = {...user};
           holder.set('token', clone?.token);
           clone.token = undefined;
           holder.set('user', clone)
-            .set("message", await publishTopMessage(null))
-            .set("list", await publishOnlineUsers(clone, UsersMap, true, pubsub))
+            .set("message", await QueryAdapters.publishTopMessage(null))
+            .set("list", await QueryAdapters.publishOnlineUsers(clone, UsersMap, true, pubsub))
         }
       }
-      holder.set("workspaces", await publishWorkspaces(null))
+      holder.set("workspaces", await QueryAdapters.publishWorkspaces(null))
         .forEach(function(value, key) { payload[key] = value });
       holder.clear();
       return payload;

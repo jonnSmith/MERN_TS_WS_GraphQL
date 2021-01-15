@@ -3,7 +3,7 @@ import {IWorkspaceCreateProps} from "@appchat/ui/templates/workspace/interfaces"
 import {checkFields} from "@appchat/ui/transformers";
 import {Divider} from "@react-md/divider";
 import * as React from "react";
-import {Button, CardActions, TextField} from "react-md";
+import {Button, CardActions, Form, TextField} from "react-md";
 import {CSSTransitionClassNames} from "react-transition-group/CSSTransition";
 
 const WorkSpaceCreate = (props: IWorkspaceCreateProps) => {
@@ -16,7 +16,7 @@ const WorkSpaceCreate = (props: IWorkspaceCreateProps) => {
     updateWorkspaceCreateForm(WorkspaceCreateInitialObject);
   };
 
-  return (<form onSubmit={(event) => {
+  return (<Form onSubmit={(event) => {
     event.preventDefault();
     sendUpdateWorkspaceForm(event);
   }}>
@@ -56,7 +56,7 @@ const WorkSpaceCreate = (props: IWorkspaceCreateProps) => {
         Save
       </Button>
     </CardActions>
-  </form>);
+  </Form>);
 };
 
 export {WorkSpaceCreate};

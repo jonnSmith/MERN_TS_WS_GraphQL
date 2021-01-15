@@ -4,6 +4,11 @@ const workspaceFields = `{
   rating
 }`;
 
+const workspaceQuery = `{
+  name
+  rating
+}`;
+
 const workspaceData = `{
   action
   list ${workspaceFields}
@@ -63,6 +68,7 @@ const payloadData = `type ${payloadDataType} {
 
 export {
   workspaceFields,
+  workspaceQuery,
   workspaceData,
   userFields,
   messageFields,

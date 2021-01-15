@@ -4,7 +4,7 @@ import {User} from "@shared/data/user";
 import {Message} from "@shared/data/message";
 import {UPDATE_CHAT_TRIGGER} from "@backchat/core/bus/actions";
 import {ID} from "graphql-ws";
-import {publishMessage, publishTopMessage, queryUser} from "../../core/adapters";
+import {QueryAdapters} from "../../core/adapters";
 
 export const messageTypeDefs = `
 
@@ -25,12 +25,12 @@ export const messageTypeDefs = `
     createMessage(text: String!, workspaceId: String): Message
     deleteMessage(id: ID): Message
   }
-  
+
   type updateAction {
     message: Message
     action: String
   }
-  
+
   extend type Subscription {
     chatUpdated: updateAction
   }
@@ -42,7 +42,7 @@ export const messageResolvers = {
   Query: {
     message: async (_, { id }, context) => {
       const document = Message.findById(id);
-      return publishMessage(document, null);
+      return QueryAdapters.publishMessage(document, null);
     },
   },
   Mutation: {
@@ -54,7 +54,7 @@ export const messageResolvers = {
           userId: id,
           workspaceId,
         });
-        return publishMessage(document, pubsub);
+        return QueryAdapters.publishMessage(document, pubsub);
       }
       catch(e) {
         console.debug(e);
@@ -65,7 +65,7 @@ export const messageResolvers = {
       try {
         const { id: userId } = await context;
         await Message.findByIdAndRemove(id);
-        return publishTopMessage(pubsub);
+        return QueryAdapters.publishTopMessage(pubsub);
       } catch(e) {
         throw new ForbiddenError("Message forbidden to delete.");
       }
@@ -80,7 +80,7 @@ export const messageResolvers = {
     async user(message: { userId: ID }) {
       if (message.userId) {
         const document: any = await User.findById(message.userId);
-        return queryUser(document);
+        return QueryAdapters.queryUser(document);
       }
       return {};
     },

@@ -4,8 +4,8 @@ import {UserInputError, AuthenticationError} from "@apollo/server/errors";
 import {CoreBus} from "@backchat/core/bus";
 import {ONLINE_USERS_TRIGGER} from "@backchat/core/bus/actions";
 import {UsersMap} from "@backchat/core/bus/users";
-import {publishOnlineUsers, publishTopMessage, publishWorkspaces, signUser} from "@backchat/core/adapters";
-import { payloadData, payloadDataType} from "@shared/queries";
+import {QueryAdapters} from "@backchat/core/adapters";
+import {payloadData, payloadDataType} from "@shared/queries";
 import {ID} from "graphql-ws";
 import * as SharedConstants from "@shared/constants";
 
@@ -80,15 +80,15 @@ export const userResolvers = {
 
       const document = User
         .findByIdAndUpdate(id, {firstName, lastName, workspaceId}, {new: true});
-      payload.set("user", await signUser(document, token, false, null));
+      payload.set("user", await QueryAdapters.signUser(document, token, false, null));
       loaded.user = payload.get("user");
       console.debug("update", loaded.user );
       if(loaded.user?.token) {
         payload.set("token", loaded.user?.token)
-          .set("message", await publishTopMessage(pubsub))
-          .set("list", await publishOnlineUsers(loaded.user,UsersMap,true, pubsub))
+          .set("message", await QueryAdapters.publishTopMessage(pubsub))
+          .set("list", await QueryAdapters.publishOnlineUsers(loaded.user,UsersMap,true, pubsub))
       }
-      payload.set("workspaces", await publishWorkspaces(pubsub))
+      payload.set("workspaces", await QueryAdapters.publishWorkspaces(pubsub))
       payload.forEach(function(value, key) { loaded[key] = value; });
       payload.clear();
       return loaded
@@ -101,14 +101,14 @@ export const userResolvers = {
       try {
         const document = User.create({email, password, firstName, lastName, workspaceId});
         const {token} = await context;
-        payload.set("user", await signUser(document, token, true, password))
+        payload.set("user", await QueryAdapters.signUser(document, token, true, password))
         loaded.user = payload.get("user");
         if(loaded.user?.token) {
           payload.set("token", loaded.user?.token)
-            .set("message", await publishTopMessage(null))
-            .set("list", await publishOnlineUsers(loaded.user,UsersMap,true, pubsub))
+            .set("message", await QueryAdapters.publishTopMessage(null))
+            .set("list", await QueryAdapters.publishOnlineUsers(loaded.user,UsersMap,true, pubsub))
         }
-        payload.set("workspaces", await publishWorkspaces(null))
+        payload.set("workspaces", await QueryAdapters.publishWorkspaces(null))
         payload.forEach(function(value, key) { loaded[key] = value; });
 
         payload.clear();
@@ -125,14 +125,14 @@ export const userResolvers = {
       // if(UsersMap.get(email)) { throw new AuthenticationError("User is signed in");  }
       if(!email || !password) { throw new UserInputError("Missing sign in data");  }
       try {
-        payload.set("user", await signUser(User.findOne({email}), token, true, password))
+        payload.set("user", await QueryAdapters.signUser(User.findOne({email}), token, true, password))
         loaded.user = {...payload.get("user")};
         if(loaded.user?.token) {
           payload.set("token", loaded.user?.token)
-            .set("message", await publishTopMessage(null))
-            .set("list", await publishOnlineUsers(loaded.user,UsersMap,true,pubsub));
+            .set("message", await QueryAdapters.publishTopMessage(null))
+            .set("list", await QueryAdapters.publishOnlineUsers(loaded.user,UsersMap,true,pubsub));
         }
-        payload.set("workspaces", await publishWorkspaces(null))
+        payload.set("workspaces", await QueryAdapters.publishWorkspaces(null))
         payload.forEach(function(value, key) { loaded[key] = value; });
         payload.clear();
         return loaded
@@ -144,7 +144,7 @@ export const userResolvers = {
       const user = {...data};
       const {token, id} = await context;
       if(!user?.email) { throw new AuthenticationError("Missing logout data"); }
-      const {list} = await publishOnlineUsers(user, UsersMap,false, pubsub);
+      const {list} = await QueryAdapters.publishOnlineUsers(user, UsersMap,false, pubsub);
       return {list};
     }
   },
