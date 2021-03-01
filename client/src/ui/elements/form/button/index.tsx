@@ -4,9 +4,9 @@ import {Button, CircularProgress, FontIcon, TextIconSpacing} from "react-md";
 import {CSSTransitionClassNames} from "react-transition-group/CSSTransition";
 
 const FormButton = (props: IButtonProps) => {
-  const {sending, title} = props;
+  const {sending, title, disabled} = props;
   return <Button
-    disabled={sending}
+    disabled={sending || disabled}
     theme={"secondary"}
     themeType={"contained"}
     type="submit"

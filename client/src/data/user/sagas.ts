@@ -22,17 +22,17 @@ function* setUser(action: ICommonAction) {
   ClientStorage.write(ConfigSettings.token.storage, token || "");
 
   if (action.type === ACTIONS.USER_LOGOUT || !token) {
+    ApolloConnection.client.clearStore();
+    yield put(userUpdated({user, action: ACTIONS.USER_UPDATED}));
     if (auth) {
       yield put(push(ROUTES.SignIn));
     }
-    ApolloConnection.client.clearStore();
-    yield put(userUpdated({user, action: ACTIONS.USER_UPDATED}));
   }
   if (action.type === ACTIONS.USER_LOGIN && token) {
+    yield put(userUpdated({user, action: ACTIONS.USER_UPDATED}));
     if (!auth) {
       yield put(push(ROUTES.ChatRoom));
     }
-    yield put(userUpdated({user, action: ACTIONS.USER_UPDATED}));
   }
 }
 

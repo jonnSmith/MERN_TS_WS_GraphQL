@@ -1,16 +1,15 @@
-import {StateReturnTypes} from "@appchat/core/store/types";
 import {MessageFormInitialObject} from "@appchat/ui/templates/message/constants";
 import {IMessageSendForm, IMessageSendProps} from "@appchat/ui/templates/message/interfaces";
 import * as React from "react";
 import {useEffect} from "react";
-import {Button, CardActions, TextField} from "react-md";
-import {useSelector} from "react-redux";
-import {CSSTransitionClassNames} from "react-transition-group/CSSTransition";
+import {CardActions, TextField, Form} from "react-md";
+import {FormButton} from "@appchat/ui/elements/form/button";
 
 const MessageSend = (props: IMessageSendProps) => {
-  const {onSubmit, loading} = props;
+  const {onSubmit, loading, user} = props;
   const [MessageForm, updateMessageForm] = React.useState(MessageFormInitialObject);
   const messageTextRef = React.useRef();
+
 
   const sendMessageForm = (event: React.FormEvent) => {
     event.preventDefault();
@@ -18,15 +17,13 @@ const MessageSend = (props: IMessageSendProps) => {
     updateMessageForm({...MessageForm, ...{text: ""}});
   };
 
-  const user = useSelector((state: StateReturnTypes) => state.UserReducer.user);
-
   useEffect(() => {
     if (user && user?.workspaceId && !MessageForm?.workspaceId) {
       updateMessageForm({...MessageForm, ...{workspaceId: user?.workspaceId}});
     }
   }, [user]);
 
-  return (<form onSubmit={(event: React.FormEvent) => { sendMessageForm(event); }}>
+  return (<Form onSubmit={(event: React.FormEvent) => { sendMessageForm(event); }}>
     <TextField
       id="text"
       name="text"
@@ -39,19 +36,12 @@ const MessageSend = (props: IMessageSendProps) => {
       ref={messageTextRef}
     />
     <CardActions>
-      <Button
-        disableProgrammaticRipple
-        disableRipple
-        rippleTimeout={0}
-        rippleClassNames={"appear" as CSSTransitionClassNames}
-        disabled={Object.keys(MessageForm).some((key: keyof IMessageSendForm) => !MessageForm[key])}
-        theme={"secondary"}
-        themeType={"contained"}
-        type="submit">
-        Send
-      </Button>
+      <FormButton
+      sending={loading}
+      title="Send"
+      disabled={Object.keys(MessageForm).some((key: keyof IMessageSendForm) => !MessageForm[key])}/>
     </CardActions>
-  </form>);
+  </Form>);
 };
 
 export {MessageSend};

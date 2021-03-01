@@ -1,8 +1,7 @@
-import {ListboxOption} from "@react-md/form";
-
 interface IButtonProps {
   sending: boolean;
   title: string;
+  disabled?: boolean;
 }
 
 interface ISelectOption {

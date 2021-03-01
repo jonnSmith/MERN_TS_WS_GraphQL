@@ -54,7 +54,7 @@ class ApolloConnection {
 
   private static CreateAuthLink() {
     return setContext(async (_, {headers}) => {
-      const token = await ClientStorage.read(ConfigSettings.token.storage);
+      const token = ClientStorage.read(ConfigSettings.token.storage);
       // TODO: headers always undefined - check and fix/refactor if needed
       // console.debug(token, headers);
       if (!token) {
@@ -77,7 +77,7 @@ class ApolloConnection {
 
     const wsLink = new WSLink({
       connectionParams: async () => {
-        const token = await ClientStorage.read(ConfigSettings.token.storage);
+        const token = ClientStorage.read(ConfigSettings.token.storage);
         console.debug("ws", token);
         return {
           headers: {

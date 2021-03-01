@@ -23,11 +23,14 @@ interface IMessageDeleteOptions {
 interface IMessageListProps {
     callDelete?: (variables: IMessageDeleteOptions) => void;
     active?: boolean;
+    user?: IUserModel;
+    message?: IMessageModel;
 }
 
 interface IMessageSendProps {
     onSubmit?: (variables: IMessageSendForm) => void;
     loading: boolean;
+    user?: IUserModel;
 }
 
 interface IMessageSendForm {
