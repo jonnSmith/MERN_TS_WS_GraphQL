@@ -41,7 +41,7 @@ const Account = () => {
       user.workspaceId = null;
       dispatch({ type: ACTIONS.USER_UPDATED, payload: { user, action: ACTIONS.USER_UPDATED} });
     }
-    return data;
+    return data?.workspaces;
   }
 
   return (
