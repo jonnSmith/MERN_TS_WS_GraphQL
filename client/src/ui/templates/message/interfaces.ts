@@ -21,15 +21,15 @@ interface IMessageDeleteOptions {
 }
 
 interface IMessageListProps {
-    callDelete?: (variables: IMessageDeleteOptions) => void;
+    callDelete?: (variables: IMessageDeleteOptions) => Promise<boolean>;
     active?: boolean;
     user?: IUserModel;
     message?: IMessageModel;
 }
 
 interface IMessageSendProps {
-    onSubmit?: (variables: IMessageSendForm) => void;
-    loading: boolean;
+    onSubmit?: (variables: IMessageSendForm) => Promise<IMessageModel>;
+    loading?: boolean;
     user?: IUserModel;
 }
 

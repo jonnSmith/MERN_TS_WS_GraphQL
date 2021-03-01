@@ -11,28 +11,34 @@ import {Divider} from "@react-md/divider";
 import * as React from "react";
 
 const ChatRoom = () => {
-  const [sendMessage,
-    {loading: sending}] = useMutation(CREATE_MESSAGE);
-  const [deleteMessage,
-    {loading: deleting}] = useMutation(DELETE_MESSAGE);
+  const [sendMessage] = useMutation(CREATE_MESSAGE);
+  const [deleteMessage] = useMutation(DELETE_MESSAGE);
 
-  const user = useSelector((state: StateReturnTypes) => state.UserReducer.user);
+  const {user} = useSelector((state: StateReturnTypes) => state.UserReducer);
   const {message} = useSelector((state: StateReturnTypes) => state.MessageReducer);
+
+  const ThrowMessage = async (variables: IMessageSendForm) => {
+    const {data} = await sendMessage({variables});
+    return data?.message;
+  };
+
+
+  const ClearMessage = async (options: IMessageDeleteOptions) => {
+    const {data} = await deleteMessage(options);
+    return data?.message;
+  };
 
   return (<ContainerPage title="Chat room">
     <section>
-      {user && message && <MessageList
-        active={!sending && !deleting}
-        callDelete={ async (options: IMessageDeleteOptions) => { await deleteMessage(options); }}
+      <MessageList
+        active={!!user.email && !!message.id}
+        callDelete={ClearMessage}
         user={user}
-        message={message}/>}
+        message={message}/>
       <Divider />
-      {user && <MessageSend
-        onSubmit={(variables: IMessageSendForm) => {
-          sendMessage({variables});
-        }}
-        user={user}
-        loading={sending}/>}
+      <MessageSend
+        onSubmit={ThrowMessage}
+        user={user}/>
     </section>
   </ContainerPage>);
 };

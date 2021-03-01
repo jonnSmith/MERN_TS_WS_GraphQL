@@ -26,7 +26,7 @@ const LayoutContainer = (props: IContainerLayoutProps): React.ReactElement => {
    */
   React.useEffect(() => {
     if (pathname !== ROUTES.Account && !!user?.email && !user?.workspaceId) {
-      console.debug(pathname, !!user.email && !user.workspaceId);
+      // console.debug(pathname, !!user.email && !user.workspaceId);
       history.push(ROUTES.Account);
     }
     return () => { };

@@ -3,13 +3,11 @@ import {StateReturnTypes} from "@appchat/core/store/types";
 import {FormButton} from "@appchat/ui/elements/form/button";
 import {FormSelect} from "@appchat/ui/elements/form/select";
 import {UpdateFormInitialObject} from "@appchat/ui/templates/user/constants";
-import {ISignUpForm, IUpdateForm, IUpdateProps} from "@appchat/ui/templates/user/interfaces";
-import {checkFields} from "@appchat/ui/transformers";
+import {IUpdateForm, IUpdateProps} from "@appchat/ui/templates/user/interfaces";
 import * as React from "react";
-import {FormEvent, useEffect, useRef, useState} from "react";
-import {Button, CardActions, Divider, Form, TextField, useToggle} from "react-md";
+import {FormEvent, useEffect, useRef} from "react";
+import {CardActions, Divider, Form, TextField, useToggle} from "react-md";
 import {useSelector} from "react-redux";
-import {CSSTransitionClassNames} from "react-transition-group/CSSTransition";
 import {useDebouncedCallback} from "use-debounce";
 
 const UserUpdate = (props: IUpdateProps) => {
