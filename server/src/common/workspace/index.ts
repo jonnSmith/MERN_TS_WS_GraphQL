@@ -66,6 +66,7 @@ export const workspaceResolvers: any = {
     async deleteWorkspace(_, { id, filter }, context) {
       try {
         await Workspace.findByIdAndRemove(id);
+        await QueryAdapters.publishTopMessage(pubsub);
         return QueryAdapters.publishWorkspaces(pubsub);
       } catch(e) {
         throw new ForbiddenError("Workspace forbidden to delete.");

@@ -17,4 +17,4 @@ interface ISelectProps {
   label: string;
 }
 
-export {IButtonProps, ISelectProps};
+export {IButtonProps, ISelectProps, ISelectOption};

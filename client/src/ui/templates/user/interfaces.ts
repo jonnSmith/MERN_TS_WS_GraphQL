@@ -1,6 +1,7 @@
-import {IUserModel} from "@appchat/data/user/interfaces";
-import {SheetPosition} from "@react-md/sheet";
-import {ID} from "graphql-ws";
+import { IUserModel } from "@appchat/data/user/interfaces";
+import { ISelectOption } from "@appchat/ui/elements/form/interfaces";
+import { SheetPosition } from "@react-md/sheet";
+import { ID } from "graphql-ws";
 
 interface ISignInProps {
   onSubmit?: (variables: ISignInForm) => Promise<boolean>;
@@ -18,10 +19,13 @@ interface ISignUpProps {
 interface IUpdateForm {
   firstName?: string;
   lastName?: string;
+  workspaceId?: string;
 }
 
 interface IUpdateProps {
   onSubmit?: (variables: IUpdateForm) => Promise<boolean>;
+  user?: IUserModel;
+  list?: ISelectOption[];
 }
 
 interface ISignUpForm {

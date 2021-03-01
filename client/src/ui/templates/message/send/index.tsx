@@ -2,7 +2,7 @@ import {MessageFormInitialObject} from "@appchat/ui/templates/message/constants"
 import {ConfigSettings} from "@appchat/core/config";
 import {IMessageSendForm, IMessageSendProps} from "@appchat/ui/templates/message/interfaces";
 import * as React from "react";
-import {useEffect, FormEvent} from "react";
+import {useEffect, useRef, FormEvent} from "react";
 import {CardActions, TextField, Form, useToggle} from "react-md";
 import {FormButton} from "@appchat/ui/elements/form/button";
 import {useDebouncedCallback} from "use-debounce";
@@ -10,7 +10,7 @@ import {useDebouncedCallback} from "use-debounce";
 const MessageSend = (props: IMessageSendProps) => {
   const {onSubmit, user} = props;
   const [sending, enable, disable] = useToggle(false);
-  const formRef = React.useRef<HTMLFormElement>(null);
+  const formRef = useRef<HTMLFormElement>(null);
 
   const sendMessageForm = (el: HTMLFormControlsCollection) => {
     Object.keys(MessageFormInitialObject).forEach( (k) => {

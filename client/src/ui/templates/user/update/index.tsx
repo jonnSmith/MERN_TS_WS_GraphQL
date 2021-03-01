@@ -1,5 +1,4 @@
 import {ConfigSettings} from "@appchat/core/config";
-import {StateReturnTypes} from "@appchat/core/store/types";
 import {FormButton} from "@appchat/ui/elements/form/button";
 import {FormSelect} from "@appchat/ui/elements/form/select";
 import {UpdateFormInitialObject} from "@appchat/ui/templates/user/constants";
@@ -7,24 +6,26 @@ import {IUpdateForm, IUpdateProps} from "@appchat/ui/templates/user/interfaces";
 import * as React from "react";
 import {FormEvent, useEffect, useRef} from "react";
 import {CardActions, Divider, Form, TextField, useToggle} from "react-md";
-import {useSelector} from "react-redux";
 import {useDebouncedCallback} from "use-debounce";
 
 const UserUpdate = (props: IUpdateProps) => {
   const [sending, enable, disable] = useToggle(false);
-  const {onSubmit} = props;
-  const workspacesOptions = useSelector((state: StateReturnTypes) => state.WorkspaceReducer.list);
-  const user = useSelector((state: StateReturnTypes) => state.UserReducer.user);
+  const {onSubmit, user, list} = props;
 
-  const formRef = useRef();
+  const formRef = useRef<HTMLFormElement>(null);
 
   const sendUpdateUserForm = (el: HTMLFormControlsCollection) => {
-    Object.keys(UpdateFormInitialObject).forEach( (k) => {
-      UpdateFormInitialObject[k as keyof IUpdateForm] = (
-        el.namedItem(k) as HTMLInputElement || el.namedItem(`${k}-value`) as HTMLInputElement).value;
+    const UpdateFormObject = {...UpdateFormInitialObject};
+    Object.keys(UpdateFormObject).forEach( (k) => {
+      UpdateFormObject[k as keyof IUpdateForm] =
+        (el.namedItem(k) as HTMLInputElement || el.namedItem(`${k}-value`) as HTMLInputElement).value;
     });
-    onSubmit(UpdateFormInitialObject).then((updated) => {
-      if (!updated) { disable(); }
+    onSubmit(UpdateFormObject).then((updatedUser) => {
+      if (updatedUser) {
+        // console.debug('update', updatedUser);
+        formRef?.current?.reset();
+        disable();
+       }
     });
   };
 
@@ -62,9 +63,9 @@ const UserUpdate = (props: IUpdateProps) => {
     <FormSelect
       id="workspaceId"
       sending={sending}
-      options={workspacesOptions}
+      options={list}
       label="Select workspace"
-      value={user?.workspaceId || ""} />
+      value={user?.workspaceId} />
     <Divider/>
     <CardActions className="md-cell md-cell--12" style={{justifyContent: "flex-start"}}>
       <FormButton sending={sending} title="Update" />

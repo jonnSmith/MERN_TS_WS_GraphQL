@@ -1,20 +1,30 @@
-import {useMutation} from "@apollo/react-hooks";
-import {StateReturnTypes} from "@appchat/core/store/types";
+import {ConfigSettings} from "@appchat/core/config";
 import {IWorkspaceModel} from "@appchat/data/workspace/interfaces";
-import {DELETE_WORKSPACE} from "@appchat/data/workspace/queries";
-import {Avatar} from "@react-md/avatar";
-import {BadgedButton} from "@react-md/badge";
-import {FontIcon} from "@react-md/icon";
-import {List, ListItem, ListSubheader} from "@react-md/list";
+import {Avatar, BadgedButton, FontIcon, List, ListItem, useToggle} from "react-md";
+import {useDebouncedCallback} from "use-debounce";
 import * as React from "react";
-import {useSelector} from "react-redux";
+import {useEffect} from "react";
 import {CSSTransitionClassNames} from "react-transition-group/CSSTransition";
+import {IRemoveWorkspace, IWorkpacesProps} from "@appchat/ui/templates/workspace/interfaces";
 
-const WorkspaceList = () => {
-  const {list} = useSelector((state: StateReturnTypes) => state.WorkspaceReducer);
+const WorkspaceList = (props: IWorkpacesProps) => {
 
-  const [deleteWorkspace,
-    {loading: deleting}] = useMutation(DELETE_WORKSPACE);
+  const {onDelete, list} = props;
+  const [sending, enable, disable] = useToggle(false);
+
+  const requestDeleteWorkspace = (variables: IRemoveWorkspace) => {
+    onDelete(variables).then((result) => {
+      // console.debug('result', result);
+      if(result?.length) {
+        disable();
+      }
+    });
+  };
+
+  const debounced = useDebouncedCallback(requestDeleteWorkspace, ConfigSettings.client.form.debounce.form);
+  useEffect(() => () => {
+    debounced.flush();
+  }, [debounced]);
 
   return <List>
     {list.map((workspace: IWorkspaceModel) =>
@@ -23,17 +33,18 @@ const WorkspaceList = () => {
         key={`workspace-${workspace.id}`}
         id={`ws-${workspace.id}`}
         rightAddon={<BadgedButton
-            disableProgrammaticRipple
-            disableRipple
-            rippleTimeout={0}
-            rippleClassNames={"appear" as CSSTransitionClassNames}
-            buttonChildren={<FontIcon>delete</FontIcon>}
-            theme={"error"}
-            disabled={deleting}
-            onClick={async (event: React.MouseEvent<HTMLElement>) => {
-              event.preventDefault();
-              await deleteWorkspace({variables: {id: workspace.id}});
-            }}/>}>{workspace.name}</ListItem>)
+          disableProgrammaticRipple
+          disableRipple
+          rippleTimeout={0}
+          rippleClassNames={"appear" as CSSTransitionClassNames}
+          buttonChildren={<FontIcon>delete</FontIcon>}
+          theme={"error"}
+          disabled={sending}
+          onClick={ (e: React.MouseEvent<HTMLElement>) => {
+            e.preventDefault();
+            enable();
+            debounced.callback({id: workspace.id});
+          }}/>}>{workspace.name}</ListItem>)
     }
   </List>;
 };

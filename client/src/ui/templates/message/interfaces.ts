@@ -21,7 +21,7 @@ interface IMessageDeleteOptions {
 }
 
 interface IMessageListProps {
-    callDelete?: (variables: IMessageDeleteOptions) => Promise<boolean>;
+    callDelete?: (variables: IMessageDeleteOptions) => Promise<IMessageModel>;
     active?: boolean;
     user?: IUserModel;
     message?: IMessageModel;

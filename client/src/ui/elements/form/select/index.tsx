@@ -12,7 +12,7 @@ const FormSelect = (props: ISelectProps) => {
   const [selected] = useDebounce(selectedState, ConfigSettings.client.form.debounce.value);
 
   useEffect(() => {
-    if (!selectedState && options?.length) { setSelectedState(options[0].id); }
+    if (!selectedState && options?.length || !options.some(o => o.id === selectedState)) { setSelectedState(options[0].id); }
     return () => {};
   }, [options, selectedState]);
 
@@ -24,9 +24,10 @@ const FormSelect = (props: ISelectProps) => {
     defaultChecked={true}
     labelKey="name"
     valueKey="id"
-    value={selected}
+    value={selected || options[0].id}
     label={`${label}`}
     onChange={setSelectedState}
+    error={!!(options?.length && (!value || !options.some(o => o.id === value)))}
     disableMovementChange={true}/>;
 };
 
