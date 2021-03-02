@@ -8,7 +8,7 @@ import {useDebouncedCallback} from "use-debounce";
 import { CSSTransitionClassNames } from "react-transition-group/CSSTransition";
 
 const MessageList = (props: IMessageListProps) => {
-  const {active, callDelete, user, message} = props;
+  const {callDelete, user, message} = props;
   const [sending, enable, disable] = useToggle(false);
 
   const deleteMessageItem = () => {
@@ -44,7 +44,7 @@ const MessageList = (props: IMessageListProps) => {
           rippleClassNames={"appear" as CSSTransitionClassNames}
           buttonChildren={<FontIcon>delete</FontIcon>}
           theme={"error"}
-          disabled={!active || sending}
+          disabled={sending}
           onClick={(event: React.MouseEvent<HTMLElement>) => {
             event.preventDefault();
             enable();

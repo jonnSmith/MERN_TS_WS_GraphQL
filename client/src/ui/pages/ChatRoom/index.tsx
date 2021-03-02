@@ -30,15 +30,14 @@ const ChatRoom = () => {
 
   return (<ContainerPage title="Chat room">
     <section>
-      <MessageList
-        active={!!user.email && !!message.id}
+      {message && user && <MessageList
         callDelete={ClearMessage}
         user={user}
-        message={message}/>
+        message={message}/>}
       <Divider />
-      <MessageSend
+      {user && <MessageSend
         onSubmit={ThrowMessage}
-        user={user}/>
+        user={user}/>}
     </section>
   </ContainerPage>);
 };

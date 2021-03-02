@@ -7,16 +7,18 @@ import {useDebounce} from "use-debounce";
 
 const FormSelect = (props: ISelectProps) => {
 
-  const {id, sending, options, value, label} = props;
+  const {id, sending, options, value, label, displayError} = props;
   const [selectedState, setSelectedState] = useState(value);
   const [selected] = useDebounce(selectedState, ConfigSettings.client.form.debounce.value);
 
   useEffect(() => {
-    if (!selectedState && options?.length || !options.some(o => o.id === selectedState)) { setSelectedState(options[0].id); }
+    if (!selectedState && options?.length || !options.some(o => o.id === selectedState)) {
+      setSelectedState(options[0].id);
+    }
     return () => {};
   }, [options, selectedState]);
 
-  return <Select
+  return options?.length && <Select
     id={`${id}`}
     readOnly={sending}
     // @ts-ignore
@@ -27,7 +29,7 @@ const FormSelect = (props: ISelectProps) => {
     value={selected || options[0].id}
     label={`${label}`}
     onChange={setSelectedState}
-    error={!!(options?.length && (!value || !options.some(o => o.id === value)))}
+    error={displayError && !!(!value || !options.some(o => o.id === value))}
     disableMovementChange={true}/>;
 };
 

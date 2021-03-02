@@ -75,67 +75,55 @@ export const userResolvers = {
     async updateUser(_, data, context) {
       const {token, id} = await context;
       const { firstName, lastName, workspaceId } = data;
-      const payload = new Map();
-      const loaded:  any = {};
+      const payload:  any = {};
 
       const document = User
         .findByIdAndUpdate(id, {firstName, lastName, workspaceId}, {new: true});
-      payload.set("user", await QueryAdapters.signUser(document, token, false, null));
-      loaded.user = payload.get("user");
-      console.debug("update", loaded.user );
-      if(loaded.user?.token) {
-        payload.set("token", loaded.user?.token)
-          .set("message", await QueryAdapters.publishTopMessage(pubsub))
-          .set("list", await QueryAdapters.publishOnlineUsers(loaded.user,UsersMap,true, pubsub))
+      payload.user = await QueryAdapters.signUser(document, token, false, null);
+      console.debug("update", payload.user );
+      if(payload.user?.token) {
+        payload.token = payload.user?.token;
+        payload.message = await QueryAdapters.publishTopMessage(pubsub)
+        payload.list = await QueryAdapters.publishOnlineUsers(payload.user,UsersMap,true, pubsub)
       }
-      payload.set("workspaces", await QueryAdapters.publishWorkspaces(pubsub))
-      payload.forEach(function(value, key) { loaded[key] = value; });
-      payload.clear();
-      return loaded
+      payload.workspaces = await QueryAdapters.publishWorkspaces(pubsub);
+      return payload
     },
     async signUpUser(_, data, context) {
-      const payload = new Map();
-      const loaded:  any = {};
+      const payload:  any = {};
       const { email, password, firstName, lastName, workspaceId} = data;
       if(!email || !password) { throw new UserInputError("Data is missing");  }
       try {
         const document = User.create({email, password, firstName, lastName, workspaceId});
         const {token} = await context;
-        payload.set("user", await QueryAdapters.signUser(document, token, true, password))
-        loaded.user = payload.get("user");
-        if(loaded.user?.token) {
-          payload.set("token", loaded.user?.token)
-            .set("message", await QueryAdapters.publishTopMessage(null))
-            .set("list", await QueryAdapters.publishOnlineUsers(loaded.user,UsersMap,true, pubsub))
+        payload.user = await QueryAdapters.signUser(document, token, true, password);
+        if(payload.user?.token) {
+          payload.token = payload.user?.token;
+          payload.message = await QueryAdapters.publishTopMessage(null);
+          payload.list = await QueryAdapters.publishOnlineUsers(payload.user,UsersMap,true, pubsub);
         }
-        payload.set("workspaces", await QueryAdapters.publishWorkspaces(null))
-        payload.forEach(function(value, key) { loaded[key] = value; });
+        payload.workspaces = await QueryAdapters.publishWorkspaces(null);
 
-        payload.clear();
-        return loaded
+        return payload
       } catch (e) {
         throw new AuthenticationError(e);
       }
     },
     async signInUser(_, data, context) {
-      const payload = new Map();
-      const loaded: any = {};
+      const payload: any = {};
       const {email, password} = data;
       const {token} = await context;
       // if(UsersMap.get(email)) { throw new AuthenticationError("User is signed in");  }
       if(!email || !password) { throw new UserInputError("Missing sign in data");  }
       try {
-        payload.set("user", await QueryAdapters.signUser(User.findOne({email}), token, true, password))
-        loaded.user = {...payload.get("user")};
-        if(loaded.user?.token) {
-          payload.set("token", loaded.user?.token)
-            .set("message", await QueryAdapters.publishTopMessage(null))
-            .set("list", await QueryAdapters.publishOnlineUsers(loaded.user,UsersMap,true,pubsub));
+        payload.user = await QueryAdapters.signUser(User.findOne({email}), token, true, password);
+        if(payload.user?.token) {
+          payload.token = payload.user?.token;
+          payload.message = await QueryAdapters.publishTopMessage(null);
+          payload.list = await QueryAdapters.publishOnlineUsers(payload.user,UsersMap,true,pubsub);
         }
-        payload.set("workspaces", await QueryAdapters.publishWorkspaces(null))
-        payload.forEach(function(value, key) { loaded[key] = value; });
-        payload.clear();
-        return loaded
+        payload.workspaces = await QueryAdapters.publishWorkspaces(null);
+        return payload
       } catch (e) {
         throw new AuthenticationError(e);
       }

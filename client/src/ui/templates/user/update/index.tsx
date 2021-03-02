@@ -62,6 +62,7 @@ const UserUpdate = (props: IUpdateProps) => {
     <Divider />
     <FormSelect
       id="workspaceId"
+      displayError={true}
       sending={sending}
       options={list}
       label="Select workspace"

@@ -76,7 +76,7 @@ const wss = new WSS({
 useServer(
   {
     schema, execute, subscribe, onConnect: async (ctx) => {
-      const holder = new Map(); const payload = {};
+      const payload: any = {};
       const verified: {token, id} = await WSMiddleware(ctx);
       console.debug('verified', verified);
       if(verified.token) {
@@ -84,16 +84,16 @@ useServer(
         console.debug('user', user);
         if(user?.email && user?.token) {
           const clone = {...user};
-          holder.set('token', clone?.token);
+          payload.token = clone?.token;
+
           clone.token = undefined;
-          holder.set('user', clone)
-            .set("message", await QueryAdapters.publishTopMessage(null))
-            .set("list", await QueryAdapters.publishOnlineUsers(clone, UsersMap, true, pubsub))
+
+          payload.user = clone;
+          payload.message = await QueryAdapters.publishTopMessage(null);
+          payload.list = await QueryAdapters.publishOnlineUsers(clone, UsersMap, true, pubsub);
         }
       }
-      holder.set("workspaces", await QueryAdapters.publishWorkspaces(null))
-        .forEach(function(value, key) { payload[key] = value });
-      holder.clear();
+      payload.workspaces = await QueryAdapters.publishWorkspaces(null);
       return payload;
     },
     // TODO: Socket middlewares

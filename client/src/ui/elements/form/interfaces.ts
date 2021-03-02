@@ -15,6 +15,7 @@ interface ISelectProps {
   options: ISelectOption[];
   value?: string | null | undefined;
   label: string;
+  displayError?: boolean;
 }
 
 export {IButtonProps, ISelectProps, ISelectOption};
