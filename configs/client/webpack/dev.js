@@ -7,6 +7,7 @@ const FaviconsWebpackPlugin = require('favicons-webpack-plugin')
 
 module.exports = {
   mode: 'development',
+  target: "web",
   context: path.join(__dirname, './../../../client'),
   entry: ['./src/index'],
   output: {
@@ -22,13 +23,17 @@ module.exports = {
     },
   },
   resolve: {
-    modules: ['node_modules', '@appchat'],
+    modules: ['node_modules', '@appchat', '@shared', '@configs'],
     alias: {
       "react-dom": "@hot-loader/react-dom",
       "@appchat": "/src",
       "@appchat/ui": "/src/ui",
       "@appchat/core": "/src/core",
       "@appchat/data": "/src/data",
+      "@shared": "/../shared",
+      "@shared/*": "/../shared/*",
+      "@configs": "/../configs",
+      "@configs/*": "/../configs/*",
     },
     extensions: ['.ts', '.tsx', '.js', '.jsx', 'json'],
   },

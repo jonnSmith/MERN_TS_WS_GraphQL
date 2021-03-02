@@ -1,13 +1,5 @@
 import {IMessageModel} from "@appchat/data/message/interfaces";
 import {IUserModel} from "@appchat/data/user/interfaces";
-import * as React from "react";
-
-interface IMessageListItemProps {
-    message: IMessageModel;
-    user?: IUserModel;
-    onClick?: (event: React.MouseEvent<HTMLElement>) => void;
-    active?: boolean;
-}
 
 interface IMessageDeleteButtonProps {
     active?: boolean;
@@ -21,17 +13,20 @@ interface IMessageDeleteOptions {
 }
 
 interface IMessageListProps {
-    callDelete?: (variables: IMessageDeleteOptions) => void;
-    active?: boolean;
+    callDelete?: (variables: IMessageDeleteOptions) => Promise<IMessageModel>;
+    user?: IUserModel;
+    message?: IMessageModel;
 }
 
 interface IMessageSendProps {
-    onSubmit?: (variables: IMessageSendForm) => void;
-    loading: boolean;
+    onSubmit?: (variables: IMessageSendForm) => Promise<IMessageModel>;
+    loading?: boolean;
+    user?: IUserModel;
 }
 
 interface IMessageSendForm {
     text: string;
+    workspaceId: string;
 }
 
 export {
@@ -39,5 +34,4 @@ export {
     IMessageSendProps,
     IMessageDeleteButtonProps,
     IMessageDeleteOptions,
-    IMessageListItemProps,
     IMessageListProps};

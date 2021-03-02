@@ -8,7 +8,14 @@
     "outDir": "../build",
     "strict": true,
     "noImplicitAny": false,
-    "moduleResolution": "node"
+    "moduleResolution": "node",
+    "baseUrl": "./",
+    "paths": {
+      "@backchat/*": ["./src/*"],
+      "@shared/*": ["./../shared/*"],
+      "@configs/*": ["./../configs/*"]
+    }
+
   },
   "include": [
     "./**/*.ts"
@@ -18,5 +25,6 @@
     "./../node_modules",
     "./**/*.json",
     ""
-  ]
+  ],
+  "moduleDirectories": ["node_modules", "server", "shared", "configs"]
 }

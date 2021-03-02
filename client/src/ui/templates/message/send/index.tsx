@@ -1,46 +1,55 @@
 import {MessageFormInitialObject} from "@appchat/ui/templates/message/constants";
+import {ConfigSettings} from "@appchat/core/config";
 import {IMessageSendForm, IMessageSendProps} from "@appchat/ui/templates/message/interfaces";
 import * as React from "react";
-import {Button, CardActions, TextField} from "react-md";
-import {CSSTransitionClassNames} from "react-transition-group/CSSTransition";
+import {useEffect, useRef, FormEvent} from "react";
+import {CardActions, TextField, Form, useToggle} from "react-md";
+import {FormButton} from "@appchat/ui/elements/form/button";
+import {useDebouncedCallback} from "use-debounce";
 
 const MessageSend = (props: IMessageSendProps) => {
-  const {onSubmit, loading} = props;
-  const [MessageForm, updateMessageForm] = React.useState(MessageFormInitialObject);
-  const messageTextRef = React.useRef();
+  const {onSubmit, user} = props;
+  const [sending, enable, disable] = useToggle(false);
+  const formRef = useRef<HTMLFormElement>(null);
 
-  const sendMessageForm = (event: React.FormEvent) => {
-    event.preventDefault();
-    onSubmit(MessageForm);
-    updateMessageForm({...MessageForm, ...{text: ""}});
+  const sendMessageForm = (el: HTMLFormControlsCollection) => {
+    Object.keys(MessageFormInitialObject).forEach( (k) => {
+      MessageFormInitialObject[k as keyof IMessageSendForm] = (el.namedItem(k) as HTMLInputElement).value;
+    });
+    onSubmit(MessageFormInitialObject).then((message) => {
+      if(message?.id) {
+        formRef?.current?.reset();
+        disable(); }
+    });
   };
 
-  return (<form onSubmit={(event: React.FormEvent) => { sendMessageForm(event); }}>
+  const debounced = useDebouncedCallback(sendMessageForm, ConfigSettings.client.form.debounce.form);
+  useEffect(() => () => {
+    debounced.flush();
+  }, [debounced]);
+
+  return (<Form
+    ref={formRef}
+    onSubmit={
+      (e: FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        enable();
+        debounced.callback(e.currentTarget.elements);
+      }}>
     <TextField
       id="text"
       name="text"
-      value={MessageForm.text}
-      onChange={(event: React.ChangeEvent<any>) =>
-        updateMessageForm({...MessageForm, ...{text: event.currentTarget.value}})}
-      maxLength={200}
       label="Write your message here..."
-      disabled={loading}
-      ref={messageTextRef}
+      readOnly={sending}
+      required={true}
     />
+    <input type="text" id="workspaceId" name="workspaceId" defaultValue={user?.workspaceId} required={true} hidden={true}/>
     <CardActions>
-      <Button
-        disableProgrammaticRipple
-        disableRipple
-        rippleTimeout={0}
-        rippleClassNames={"appear" as CSSTransitionClassNames}
-        disabled={Object.keys(MessageForm).some((key: keyof IMessageSendForm) => !MessageForm[key])}
-        theme={"secondary"}
-        themeType={"contained"}
-        type="submit">
-        Send
-      </Button>
+      <FormButton
+      sending={sending}
+      title="Send"/>
     </CardActions>
-  </form>);
+  </Form>);
 };
 
 export {MessageSend};

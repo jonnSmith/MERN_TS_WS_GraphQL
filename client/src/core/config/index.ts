@@ -1,3 +1,3 @@
-import ConfigSettings from "./../../../../configs/config.app";
+import ConfigSettings from "@configs/config.app";
 
 export { ConfigSettings };

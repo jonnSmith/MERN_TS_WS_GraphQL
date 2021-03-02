@@ -15,22 +15,24 @@ function* userStatusChanged() {
 }
 
 function* setUser(action: ICommonAction) {
-  // console.debug("user-saga", action);
+  console.debug("user-saga", action);
   const path: Pathname = ApolloConnection.history?.location?.pathname as Pathname;
   const auth = NavigationPathsSecurity[path as keyof typeof ROUTES];
-  const {user} = action?.payload;
-  ClientStorage.write(ConfigSettings.token.storage, user?.token || "");
+  const {user, token} = action.payload;
+  ClientStorage.write(ConfigSettings.token.storage, token || "");
 
-  if (action.type === ACTIONS.USER_LOGOUT || !user) {
+  if (action.type === ACTIONS.USER_LOGOUT || !token) {
+    ApolloConnection.client.clearStore();
+    yield put(userUpdated({user, action: ACTIONS.USER_UPDATED}));
     if (auth) {
       yield put(push(ROUTES.SignIn));
-      yield put(userUpdated({user, action: ACTIONS.USER_UPDATED}));
     }
-    ApolloConnection.client.clearStore();
   }
-  if (action.type === ACTIONS.USER_LOGIN) {
-    if (!auth) { yield put(push(ROUTES.ChatRoom)); }
+  if (action.type === ACTIONS.USER_LOGIN && token) {
     yield put(userUpdated({user, action: ACTIONS.USER_UPDATED}));
+    if (!auth) {
+      yield put(push(ROUTES.ChatRoom));
+    }
   }
 }
 

@@ -1,14 +1,16 @@
 import * as mongoose from 'mongoose';
+import mongooseLeanVirtuals = require("mongoose-lean-virtuals");
 
-/**
- * Here is the our user schema which will be used to
- * validate the data sent to our database.
- */
 const messageSchema = new mongoose.Schema(
   {
     userId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
+    },
+    workspaceId: {
+      type: String,
+      required: false,
+      unique: false,
     },
     text: {
       type: String,
@@ -20,16 +22,8 @@ const messageSchema = new mongoose.Schema(
     timestamps: { createdAt: true, updatedAt: false }
   }
 );
-
-/**
- * This property will ensure our virtuals (including "id")
- * are set on the user when we use it.
- */
 messageSchema.set('toObject', { getters: true, virtuals: true });
+messageSchema.plugin(mongooseLeanVirtuals);
 
-
-/**
- * Finally, we compile the schema into a model which we then
- * export to be used by our GraphQL resolvers.
- */
-export default mongoose.model('Message', messageSchema);
+const Message = mongoose.model('Message', messageSchema);
+export { Message };

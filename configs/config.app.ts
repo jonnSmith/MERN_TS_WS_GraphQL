@@ -36,6 +36,12 @@ export default {
     theme: {
       color: "blue-green"
     },
+    form: {
+      debounce: {
+        value: 100,
+        form: 1000
+      }
+    },
     actions: {
       messages: {
         MESSAGES_UPDATED: "Update messages stream",
@@ -60,6 +66,11 @@ export default {
         WORKSPACE_DELETED: "Delete workspace",
         WORKSPACES_CHANGED: "Workspaces list changed",
         WORKSPACES_UPDATED: "Workspaces list updated"
+      },
+      payload: {
+        HANDLE_PAYLOAD: "Handle payload data from GraphQL response",
+        PROCESS_PAYLOAD: "Data processing payload data",
+        SEND_PAYLOAD: "Send payload processed separately",
       }
     },
   },
@@ -69,7 +80,7 @@ export default {
   token: {
     header: 'x-token',
     storage: 'token',
-    secret: 'neurochat!secret',
+    secret: 'appchat!secret',
     engine: 'sessionStorage',
   },
-};
+}

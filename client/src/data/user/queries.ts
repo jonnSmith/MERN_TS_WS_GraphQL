@@ -1,9 +1,9 @@
-import {UserFields} from "@appchat/data/user/constants";
+import {onlineUserData, payloadDataFields} from "@shared/queries";
 import gql from "graphql-tag";
 
 const SIGN_IN = gql`
-  mutation($email: String!, $password: String!) {
-    user: signInUser(email: $email, password: $password) ${UserFields}
+  mutation SignInUser($email: String!, $password: String!) {
+    payload: signInUser(email: $email, password: $password) ${payloadDataFields}
   }
 `;
 
@@ -13,13 +13,15 @@ const SIGN_UP = gql`
     $password: String!
     $firstName: String!
     $lastName: String
+    $workspaceId: ID
   ) {
-    user: signUpUser(
+    payload: signUpUser(
       email: $email
       password: $password
       firstName: $firstName
       lastName: $lastName
-    ) ${UserFields}
+      workspaceId: $workspaceId
+    ) ${payloadDataFields}
   }
 `;
 
@@ -27,32 +29,19 @@ const UPDATE_USER = gql`
   mutation(
     $firstName: String
     $lastName: String
-    $id: ID!
     $workspaceId: ID
   ) {
-    user: updateUser(id: $id, firstName: $firstName, lastName: $lastName, workspaceId: $workspaceId) ${UserFields}
+    payload: updateUser(firstName: $firstName, lastName: $lastName, workspaceId: $workspaceId) ${payloadDataFields}
   }`;
 
 const SIGN_OUT = gql`
   mutation($email: String!) {
-    OnlineUsersData: signOutUser(email: $email) {
-      action
-      list {
-        email
-        typing
-      }
-    }
+    OnlineUsersData: signOutUser(email: $email) ${onlineUserData}
   }`;
 
 const ONLINE_USERS = gql`
   subscription onlineUsers {
-    onlineUsers {
-      action
-      list {
-        email
-        typing
-      }
-    }
+    onlineUsers ${onlineUserData}
   }`;
 
 export { SIGN_IN, SIGN_UP, UPDATE_USER, ONLINE_USERS, SIGN_OUT };

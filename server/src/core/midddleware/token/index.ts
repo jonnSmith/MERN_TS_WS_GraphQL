@@ -1,6 +1,5 @@
-import config from "../../../../../configs/config.app";
+import config from "@configs/config.app";
 import * as jwt from "jsonwebtoken";
-import User from "../../../common/user/user.model";
 
 const ContextMiddleware = async (req) => {
   return GetUserByToken(GetHeadersToken(req));
@@ -12,20 +11,19 @@ const WSMiddleware = async (ctx) => {
 
 const GetHeadersToken = (request) => {
   const {[config.token.header]: token} = request?.headers;
-  return token || null;
+  return token || "";
 }
 
 const GetUserByToken = async (token) => {
-  if(!token) { return { user: null }; }
   try {
-    const data: any = jwt.verify(token as string, config.token.secret);
-    const userDocument: any = await User.findById(data?.id);
-    return { user: userDocument.toObject() }
+    console.debug('t', token);
+    const check: any = token ? await jwt.verify(token as string, config.token.secret) : null;
+    const id = check?.id || null;
+    return { token, id }
   } catch (e) {
-    // throw new AuthenticationError(e);
-    console.error(e);
+    console.debug(e);
+    return { token: "", id: null };
   }
-  return { user: null };
 }
 
 export {ContextMiddleware, WSMiddleware};

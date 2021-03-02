@@ -1,15 +1,12 @@
 import {ActionTypes} from "@appchat/data/message/types";
 import {IUserModel} from "@appchat/data/user/interfaces";
-import {IWorkspaceModel} from "@appchat/data/workspace/interfaces";
 
 interface IMessageModel {
-  id: string | null;
-  text: string | null;
+  id?: string | null;
+  text?: string | null;
   createdAt?: string | number | null;
   userId?: string | null;
-  workspaceId?: string | null;
   user?: IUserModel;
-  workspace?: IWorkspaceModel;
 }
 
 interface IMessageFilter {

@@ -12,9 +12,14 @@ const workspacesDeleted = (data: IWorkspaceModel): ICommonAction => ({
   type: ACTIONS.MESSAGE_DELETED,
 });
 
+const workspacesListChanged = (data: IWorkspaceReducer): ICommonAction => ({
+  payload: data,
+  type: ACTIONS.WORKSPACES_CHANGED,
+});
+
 const workspacesListUpdated = (data: IWorkspaceReducer): ICommonAction => ({
   payload: data,
   type: ACTIONS.WORKSPACES_UPDATED,
 });
 
-export {workspacesListUpdated, workspacesAdded, workspacesDeleted};
+export {workspacesListUpdated, workspacesAdded, workspacesDeleted, workspacesListChanged};

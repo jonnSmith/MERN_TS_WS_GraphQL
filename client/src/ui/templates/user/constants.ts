@@ -1,18 +1,20 @@
 const SignUpFormInitialObject = {
-    email: "",
-    firstName: "",
-    lastName: "",
-    password: "",
+  email: "",
+  firstName: "",
+  lastName: "",
+  password: "",
+  workspaceId: "",
 };
 
 const SignInFormInitialObject = {
-    email: "",
-    password: "",
+  email: "",
+  password: "",
 };
 
 const UpdateFormInitialObject = {
-    firstName: "",
-    lastName: "",
+  firstName: "",
+  lastName: "",
+  workspaceId: "",
 };
 
 export {SignUpFormInitialObject, SignInFormInitialObject, UpdateFormInitialObject};

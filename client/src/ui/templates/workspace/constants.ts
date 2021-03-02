@@ -1,8 +1,6 @@
-import {IWorkspaceCreateForm} from "@appchat/ui/templates/workspace/interfaces";
-
-const WorkspaceCreateInitialObject: IWorkspaceCreateForm = {
+const WorkspaceCreateInitialObject = {
   name: "",
-  rating: 5,
+  rating: "",
 };
 
 export {WorkspaceCreateInitialObject};

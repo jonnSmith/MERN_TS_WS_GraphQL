@@ -11,7 +11,9 @@
         "cwd": "babelrc",
         "extensions": [".ts", ".tsx", ".scss", ".svg"],
         "alias": {
-          "@appchat": "./src"
+          "@appchat": "./src",
+          "@shared": "./../shared/*",
+          "@configs": "./../configs/*"
         }
       }
     ]

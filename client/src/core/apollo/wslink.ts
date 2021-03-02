@@ -15,30 +15,10 @@ class WSLink extends ApolloLink {
   constructor(options: ClientOptions) {
     super();
     this.client = this.client || createClient(options);
-    this.client.on(
-      "connected",
-      (
-        socket,
-        payload: {
-          user: IUserModel,
-          message: IMessageModel,
-          list: IOnlineUserData[],
-          workspace: IWorkspaceModel[]}) => {
-        const {user, message, list, workspace} = payload;
-        if (user) { CoreStore.ReduxSaga.dispatch({type: ACTIONS.USER_LOGIN, payload: {user} }); } else {
-          CoreStore.ReduxSaga.dispatch({type: ACTIONS.USER_LOGOUT, payload: {user} });
-        }
-        if (message && user) {
-          CoreStore.ReduxSaga.dispatch(
-            {type: ACTIONS.MESSAGE_PRELOADED, payload: { message } }
-            );
-        }
-        if (list && user) {
-          CoreStore.ReduxSaga.dispatch({type: ACTIONS.ONLINE_CHANGED, payload: {list}});
-        }
-        if (workspace) {
-          CoreStore.ReduxSaga.dispatch({type: ACTIONS.WORKSPACES_CHANGED, payload: {list: workspace}});
-        }
+    this.client.on("connected",
+      (socket, payload) => {
+        console.debug('payload', payload);
+        CoreStore.ReduxSaga.dispatch({type: ACTIONS.HANDLE_PAYLOAD, payload});
     });
     // this.client.on("closed", (event) => {
     //   CoreStore.ReduxSaga.dispatch({type: ACTIONS.USER_LOGOUT, payload: {user: null} });

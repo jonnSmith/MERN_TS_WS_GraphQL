@@ -5,10 +5,6 @@ import {IOnlineTogglePanelReducer, IOnlineUserListReducer, IUserReducer} from "@
 
 const UserReducer = (state: IUserReducer = UserInitState, action: ICommonAction): IUserReducer => {
     switch (action.type) {
-        case ACTIONS.USER_LOGIN:
-            return {...state, ...action.payload};
-        case ACTIONS.USER_LOGOUT:
-            return {...state, ...action.payload};
         case ACTIONS.USER_UPDATED:
             return {...state, ...action.payload};
     }
@@ -19,8 +15,6 @@ const OnlineUserListReducer = (
   state: IOnlineUserListReducer = OnlineUserListInitState,
   action: ICommonAction): IOnlineUserListReducer => {
     switch (action.type) {
-        case ACTIONS.ONLINE_CHANGED:
-            return {...state, ...action.payload};
         case ACTIONS.ONLINE_UPDATED:
             return {...state, ...action.payload};
     }

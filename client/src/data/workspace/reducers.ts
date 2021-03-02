@@ -7,12 +7,6 @@ const WorkspaceReducer = (
   state: IWorkspaceReducer = WorkspacesListInitState,
   action: ICommonAction): IWorkspaceReducer => {
   switch (action.type) {
-    case ACTIONS.WORKSPACE_ADDED:
-      return {...state, ...action.payload};
-    case ACTIONS.WORKSPACE_DELETED:
-      return {...state, ...action.payload};
-    case ACTIONS.WORKSPACES_CHANGED:
-      return {...state, ...action.payload};
     case ACTIONS.WORKSPACES_UPDATED:
       return {...state, ...action.payload};
   }

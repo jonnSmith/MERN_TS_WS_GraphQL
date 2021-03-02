@@ -15,10 +15,7 @@ import {ErrorResponse, onError} from "@apollo/client/link/error";
 import {getMainDefinition} from "@apollo/client/utilities";
 import {WSLink} from "@appchat/core/apollo/wslink";
 import {ConfigSettings} from "@appchat/core/config";
-import {CoreStore} from "@appchat/core/store";
-import {ACTIONS} from "@appchat/core/store/constants";
 import {ClientStorage} from "@appchat/core/store/storage";
-import {UserInitState} from "@appchat/data/user/constants";
 import {History} from "history";
 
 class ApolloConnection {
@@ -57,7 +54,7 @@ class ApolloConnection {
 
   private static CreateAuthLink() {
     return setContext(async (_, {headers}) => {
-      const token = await ClientStorage.read(ConfigSettings.token.storage);
+      const token = ClientStorage.read(ConfigSettings.token.storage);
       // TODO: headers always undefined - check and fix/refactor if needed
       // console.debug(token, headers);
       if (!token) {
@@ -80,7 +77,8 @@ class ApolloConnection {
 
     const wsLink = new WSLink({
       connectionParams: async () => {
-        const token = await ClientStorage.read(ConfigSettings.token.storage);
+        const token = ClientStorage.read(ConfigSettings.token.storage);
+        console.debug("ws", token);
         return {
           headers: {
             [ConfigSettings.token.header]: token,
@@ -111,7 +109,8 @@ class ApolloConnection {
           switch (extensions?.code) {
             case "UNAUTHENTICATED": {
               console.debug("graphQLError", message);
-              CoreStore.ReduxSaga.dispatch({type: ACTIONS.USER_LOGOUT, payload: UserInitState});
+              // TODO: Revert comment logout call on authentication all errors
+              // CoreStore.ReduxSaga.dispatch({type: ACTIONS.USER_LOGOUT, payload: UserInitState});
               // if (response && response.errors) { response.errors = null; }
               break;
             }
